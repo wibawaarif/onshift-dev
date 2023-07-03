@@ -10,7 +10,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const shifts = await Shift.find({});
+    const shifts = await Shift.find({}).populate('location');
 
     return new NextResponse(JSON.stringify(shifts), { status: 200 });
   } catch (err) {

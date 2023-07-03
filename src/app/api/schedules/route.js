@@ -10,7 +10,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const schedules = await Schedule.find({});
+    const schedules = await Schedule.find({}).populate('organization').populate('shift').populate('employee');
 
     return new NextResponse(JSON.stringify(schedules), { status: 200 });
   } catch (err) {

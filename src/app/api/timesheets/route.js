@@ -10,7 +10,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const timesheets = await Timesheet.find({});
+    const timesheets = await Timesheet.find({}).populate('employee');
 
     return new NextResponse(JSON.stringify(timesheets), { status: 200 });
   } catch (err) {
