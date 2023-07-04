@@ -1,4 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
+import user from './user';
+import organization from './organization';
 
 const employeeSchema = new Schema({
     firstName: {
@@ -12,12 +14,12 @@ const employeeSchema = new Schema({
     },
     user: {
       type: mongoose.Types.ObjectId,
-      ref: 'User',
+      ref: user,
       required: true,
     },
     organization: {
       type: mongoose.Types.ObjectId,
-      ref: 'Organization',
+      ref: organization,
       required: true,
     }
 }, { timestamps: true })

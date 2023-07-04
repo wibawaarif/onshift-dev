@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import location from './location';
 
 const shiftSchema = new Schema({
   startTime: {
@@ -9,7 +10,7 @@ const shiftSchema = new Schema({
   },
   location: {
     type: mongoose.Types.ObjectId,
-    ref: 'Location',
+    ref: location,
     required: true,
   },
   radius: {
