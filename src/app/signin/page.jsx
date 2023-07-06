@@ -38,7 +38,7 @@ const SignIn = () => {
     return (
         <div className='bg-[#FAFAFA] flex justify-center items-center h-screen w-screen'>
             <div className='flex flex-col items-center'>
-                <Image height={27} width={110} alt='OnShift' src={'/static/images/onshift.svg'} />
+                <Image height={27} width={110} alt='OnShift' src={'/static/svg/onshift.svg'} />
                 <p className='text-xl font-bold mt-6 mb-4'>Welcome back</p>
 
                 <div className='flex justify-center items-center lg:w-[640px] lg:h-[581px] bg-white rounded-[10px]'>
