@@ -2,7 +2,6 @@
 
 import SchedulerComponent from "@/components/scheduler/page";
 import { Select } from 'antd';
-
 const Scheduler = () => {
   const options = [
     {value: 'day', label: 'Day'},

@@ -1,6 +1,9 @@
+"use client"
+
 import './globals.css'
 import { Inter } from 'next/font/google'
 import Provider from '@/SessionProvider'
+
 
 const inter = Inter({ subsets: ['latin'] })
 
