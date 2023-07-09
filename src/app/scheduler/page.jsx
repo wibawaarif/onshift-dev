@@ -1,22 +1,23 @@
 'use client'
 
 import SchedulerComponent from "@/components/scheduler/page";
-import { Select } from 'antd';
+import { Radio } from 'antd';
+import { useState } from "react";
+import './style.css'
 const Scheduler = () => {
-  const options = [
-    {value: 'day', label: 'Day'},
-    {value: 'week', label: 'Week'},
-    {value: 'month', label: 'Month'}
-  ]
-
+  const [type, setType] = useState('week')
 
   return (
     <div className="h-screen w-screen bg-[#F7F7F7]">
       <div className="flex flex-col items-center pt-16 mb-6">
         <h1>Scheduler component</h1>
-        {/* <Select className="mt-4" defaultValue="week" options={options} /> */}
+      <Radio.Group onChange={(e) => setType(e.target.value)} defaultValue="week" buttonStyle="solid">
+      <Radio.Button value="day">Day</Radio.Button>
+      <Radio.Button value="week">Week</Radio.Button>
+      <Radio.Button value="month">Month</Radio.Button>
+    </Radio.Group>
       </div>
-      <SchedulerComponent />
+      <SchedulerComponent type={type} />
     </div>
   )
 }
