@@ -223,7 +223,7 @@ const SchedulerComponent = ({ type }) => {
 
   return (
     <div className="flex flex-col justify-center items-center">
-      <div className="w-[1096px] h-[90px] bg-white border border-[1px] border-[#E5E5E3]">
+      <div className="w-full h-[90px] bg-white border-b-[1px] border-[#E5E5E3]">
         {/* header table */}
         <div className="p-6 flex h-full w-full justify-between items-center">
           <div className="flex flex-col">
@@ -259,14 +259,14 @@ const SchedulerComponent = ({ type }) => {
         </div>
       </div>
       <div
-        className={`w-[1096px] grid ${
+        className={`w-full grid ${
           type === "week" ? "grid-cols-9" : "grid-cols-25"
         }`}
       >
         <div
           className={`${
             type === "week" ? "col-span-2" : "col-span-6"
-          } bg-white flex items-center px-4 border border-[1px] border-[#E5E5E3]`}
+          } bg-white flex items-center px-4 border-b-[1px] border-r-[1px] border-[#E5E5E3]`}
         >
           <Image
             className="mr-2"
@@ -302,7 +302,7 @@ const SchedulerComponent = ({ type }) => {
           week.map((x) => {
             return (
               <div
-                className="bg-white flex justify-center items-center h-[40px] border border-[1px] border-[#E5E5E3]"
+                className="bg-white flex justify-center items-center h-[40px] border-b-[1px] border-r-[1px] border-[#E5E5E3]"
                 key={x}
               >
                 <span className="text-slate-700">{x}</span>
