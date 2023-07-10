@@ -37,6 +37,7 @@ const Scheduler = () => {
       <Radio.Button value="month">Month</Radio.Button>
     </Radio.Group> */}
 
+        {/* MODAL ADD NEW SHIFT / TIME OFF */}
         <Modal
           footer={[
             <button
