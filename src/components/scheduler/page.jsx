@@ -106,56 +106,47 @@ const SchedulerComponent = ({ type }) => {
         },
       ],
     },
-    // {
-    //   employeeDetail: {
-    //     name: "Michael",
-    //     totalHours: "8hr",
-    //   },
-    //   schedules: [
-    //     {
-    //       id: 1,
-    //       name: "Lettie",
-    //       time: "10am to 2pm",
-    //       total: "71hrs",
-    //     },
-    //     {
-    //       id: 2,
-    //       name: "Blanche",
-    //       time: "5am to 7pm",
-    //       total: "91hrs",
-    //     },
-    //     {
-    //       id: 3,
-    //       name: "Alta",
-    //       time: "11am to 9pm",
-    //       total: "69hrs",
-    //     },
-    //     {
-    //       id: 4,
-    //       name: "Linnie",
-    //       time: "6am to 6pm",
-    //       total: "88hrs",
-    //     },
-    //     {
-    //       id: 5,
-    //       name: "Genevieve",
-    //       time: "3am to 4pm",
-    //       total: "99hrs",
-    //     },
-    //     {
-    //       id: 6,
-    //       name: "Genevieve",
-    //       time: "5am to 6pm",
-    //       total: "72hrs",
-    //     },
-    //     {
-    //       id: 7,
-    //       name: "Craig",
-    //       time: "12am to 1pm",
-    //       total: "57hrs",
-    //     },
-    //   ],
-    // },
+    {
+      employeeDetail: {
+        name: "Martin Lex",
+        totalHours: "10hr",
+      },
+      schedules: [
+        {
+        },
+        {
+        },
+        {
+          id: "ZzPfEddIP86G",
+          name: "Alta",
+          time: "11am to 9pm",
+          total: "69hrs",
+        },
+        {
+          id: "hbfFNEqsn430nXyf",
+          name: "Linnie",
+          time: "6am to 6pm",
+          total: "88hrs",
+        },
+        {
+          // name: "Genevieve",
+          // time: "3am to 4pm",
+          // total: "99hrs",
+        },
+        {
+          id: "fZf6GnLVyrmImJ2nmbwp",
+          name: "Genevieve",
+          time: "5am to 6pm",
+          total: "72hrs",
+        },
+        {
+          id: "datxunAzma3K0EYa",
+          name: "Craig",
+          time: "12am to 1pm",
+          total: "57hrs",
+        },
+      ],
+    },
   ];
 
   const [employees, setEmployees] = useState([]);
@@ -324,7 +315,7 @@ const SchedulerComponent = ({ type }) => {
               <div
                 className={`flex justify-center items-center ${
                   type === "week" ? "col-span-2" : "col-span-6"
-                } border border-[1px] border-[#E5E5E3] bg-white h-[64px] w-[262px]`}
+                } border border-[1px] border-[#E5E5E3] bg-white h-[64px]`}
               >
                 <div className="flex justify-between p-4 h-full w-full">
                   <div className="flex items-center">

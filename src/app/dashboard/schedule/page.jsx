@@ -1,12 +1,30 @@
 "use client";
 
 import SchedulerComponent from "@/components/scheduler/page";
-import { Radio, Modal, Tabs, ConfigProvider, DatePicker, TimePicker } from "antd";
+import FilterComponent from "@/components/filter/page";
+import Image from "next/image";
+import {
+  Modal,
+  Tabs,
+  ConfigProvider,
+  DatePicker,
+  TimePicker,
+  Divider,
+  Select,
+  Input,
+} from "antd";
 import { useState } from "react";
 import "./style.css";
 const Scheduler = () => {
   const [type, setType] = useState("week");
   const [shiftModal, setShiftModal] = useState(false);
+  const [showBreak, setShowBreak] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+
+  const optionsEmployees = [
+    { value: "arif", label: "Arif" },
+    { value: "wibawa", label: "Wibawa" },
+  ];
 
   const addShift = () => {
     console.log("test");
@@ -21,21 +39,27 @@ const Scheduler = () => {
       }}
     >
       <div className="flex flex-col flex-1">
-        <div className="border-b-[1px] border-[#E5E5E3] h-[71px]"></div>
+        <div className="border-b-[1px] border-[#E5E5E3] h-[71px] w-full flex items-center">
+          <div className="px-4 py-1">
+
+            <div className="flex border-[1px] border-[#E5E5E5] w-max">
+              <button onClick={() => setType('day')} className={`hover:bg-[#E5E5E3] ${type === 'day' ? 'bg-[#E5E5E3]' : ''} transition duration-300 px-2 py-1 border-r-[1px] border-[#E5E5E5]`}>Day</button>
+              <button onClick={() => setType('week')} className={`hover:bg-[#E5E5E3] ${type === 'week' ? 'bg-[#E5E5E3]' : ''} duration-300 px-2 py-1 border-r-[1px] border-[#E5E5E5]`}>Week</button>
+              <button onClick={() => setType('month')} className={`hover:bg-[#E5E5E3] ${type === 'month' ? 'bg-[#E5E5E3]' : ''} duration-300 px-2 py-1`}>Month</button>
+            </div>
+
+          </div>
+        </div>
 
         <div className="flex flex-1">
-          <div className="h-full w-[202px] border-r-[1px] border-[#E5E5E3]"></div>
+          <div className="w-[202px] border-r-[1px] border-[#E5E5E3] overflow-y-auto h-[720px]">
+            <FilterComponent />
+          </div>
 
           <div className="flex-1">
             <SchedulerComponent type={type} />
           </div>
         </div>
-
-        {/* <Radio.Group onChange={(e) => setType(e.target.value)} defaultValue="week" buttonStyle="solid">
-      <Radio.Button value="day">Day</Radio.Button>
-      <Radio.Button value="week">Week</Radio.Button>
-      <Radio.Button value="month">Month</Radio.Button>
-    </Radio.Group> */}
 
         {/* MODAL ADD NEW SHIFT / TIME OFF */}
         <Modal
@@ -65,30 +89,141 @@ const Scheduler = () => {
               {
                 key: "1",
                 label: "CREATE SHIFT",
-                children: <div>
-                  <div className="flex flex-col">
-                    <span className="text-xs font-semibold">DATE</span>
-                    <DatePicker className="w-full mt-1" />
-                  </div>
+                children: (
+                  <div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold">DATE</span>
+                      <DatePicker className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0" />
+                    </div>
 
-                  <div className="flex mt-4 justify-between">
-                    <div className="w-[48%] " >
-                    <span className="text-xs font-semibold">START SHIFT</span>
-                  <TimePicker className="w-full"  />
+                    <div className="flex mt-4 justify-between">
+                      <div className="w-[48%] ">
+                        <span className="text-xs font-semibold">
+                          START SHIFT
+                        </span>
+                        <TimePicker className="w-full rounded-none border-t-0 border-l-0 border-r-0" />
+                      </div>
+                      <div className="w-[48%]">
+                        <span className="text-xs font-semibold">
+                          FINISH SHIFT
+                        </span>
+                        <TimePicker className="w-full rounded-none border-t-0 border-l-0 border-r-0" />
+                      </div>
+                    </div>
+
+                    <div className="mt-6">
+                      {!showBreak && (
+                        <button
+                          onClick={() => setShowBreak(true)}
+                          className="transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                        >
+                          + ADD BREAK
+                        </button>
+                      )}
+
+                      {showBreak && (
+                        <div className="flex flex-col h-32 justify-center">
+                          <div>
+                            <span className="text-xs font-semibold">BREAK</span>
+                            <TimePicker className="w-full rounded-none border-t-0 border-l-0 border-r-0" />
+                          </div>
+
+                          <div className="mt-3">
+                            <button className="border-[1px] border-[#E5E5E3] px-2 mr-2">
+                              15 min
+                            </button>
+                            <button className="border-[1px] border-[#E5E5E3] px-2 mr-2">
+                              30 min
+                            </button>
+                            <button className="border-[1px] border-[#E5E5E3] px-2 mr-2">
+                              45 min
+                            </button>
+                            <button className="border-[1px] border-[#E5E5E3] px-2 mr-2">
+                              60 min
+                            </button>
+                            <div className="mt-4">
+                              <button
+                                onClick={() => setShowBreak(false)}
+                                className="transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                              >
+                                DELETE BREAK
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <Divider />
+                    </div>
+
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold">EMPLOYEE</span>
+                      <Image
+                        className="absolute bottom-[29.5%] z-50"
+                        width={20}
+                        height={20}
+                        alt="schedule-logo"
+                        src={"/static/svg/employee.svg"}
+                      />
+                      <Select
+                        mode="multiple"
+                        allowClear
+                        placeholder="Select Employee"
+                        defaultValue={["arif"]}
+                        className="mt-1"
+                        options={optionsEmployees}
+                      />
+                    </div>
+
+                    <div className="flex mt-4 justify-between">
+                      <div className="w-[48%] flex flex-col">
+                        <span className="text-xs font-semibold">LOCATION</span>
+                        <Select
+                          mode="multiple"
+                          allowClear
+                          placeholder="Select Location"
+                          className="mt-1"
+                          options={optionsEmployees}
+                        />
+                      </div>
+                      <div className="w-[48%] flex flex-col">
+                        <span className="text-xs font-semibold">POSITION</span>
+                        <Select
+                          mode="multiple"
+                          allowClear
+                          placeholder="Select Position"
+                          className="mt-1"
+                          options={optionsEmployees}
+                        />
+                      </div>
+                    </div>
+                    {!showNotes && (
+                      <button
+                        onClick={() => setShowNotes(true)}
+                        className="mt-2 transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                      >
+                        + ADD NOTES
+                      </button>
+                    )}
+                    {showNotes && (
+                      <div className="mt-4">
+                        <span className="text-xs font-semibold">POSITION</span>
+                        <Input
+                          className="rounded-none border-t-0 border-l-0 border-r-0"
+                          placeholder="Basic usage"
+                        />
+                      </div>
+                    )}
                   </div>
-                  <div className="w-[48%]" >
-                  <span className="text-xs font-semibold">FINISH SHIFT</span>
-                  <TimePicker className="w-full"  />
-                  </div>
-                  </div>
-                </div>,
+                ),
               },
               {
                 key: "2",
                 label: "CREATE TIME OFF",
-                children: <div>
-                  <DatePicker />
-                </div>,
+                children: (
+                  <div>
+                    <DatePicker />
+                  </div>
+                ),
               },
             ]}
           />
