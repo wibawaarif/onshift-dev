@@ -112,10 +112,8 @@ const SchedulerComponent = ({ type }) => {
         totalHours: "10hr",
       },
       schedules: [
-        {
-        },
-        {
-        },
+        {},
+        {},
         {
           id: "ZzPfEddIP86G",
           name: "Alta",
@@ -308,7 +306,6 @@ const SchedulerComponent = ({ type }) => {
             );
           })}
 
-
         {employees &&
           employees.map((row, index) => (
             <Fragment key={index}>
@@ -331,23 +328,23 @@ const SchedulerComponent = ({ type }) => {
 
               {/* schedules */}
               <DragDropContext onDragEnd={updateTable}>
-              {/* DAY */}
-                {type === "day" &&
-                (
-                  <div
-                          className={`flex justify-center items-center col-span-24 bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
-                        >
-                          <div className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2">
-                            <p className="text-[10px] font-semibold">12AM to 12PM</p>
-                            <p className="mt-[1px] text-[10px]">POSITION</p>
-                            <div className="w-[47px] h-[12px] bg-black rounded-xl flex justify-center items-center">
-                              <span className="text-white text-[8px]">
-                                PENDING
-                              </span>
-                            </div>
-                          </div>
+                {/* DAY */}
+                {
+                  type === "day" && (
+                    <div
+                      className={`flex justify-center items-center col-span-24 bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
+                    >
+                      <div className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2">
+                        <p className="text-[10px] font-semibold">
+                          12AM to 12PM
+                        </p>
+                        <p className="mt-[1px] text-[10px]">POSITION</p>
+                        <div className="w-[47px] h-[12px] bg-black rounded-xl flex justify-center items-center">
+                          <span className="text-white text-[8px]">PENDING</span>
                         </div>
-                )
+                      </div>
+                    </div>
+                  )
                   // day.map((row, dataIndex) => {
                   //   return (
                   //     <div key={dataIndex}>
@@ -424,9 +421,7 @@ const SchedulerComponent = ({ type }) => {
             </Fragment>
           ))}
 
-        <div
-          className="col-span-full bg-white h-[60px] border border-[1px] border-[#E5E5E3]"
-        >
+        <div className="col-span-full bg-white h-[60px] border border-[1px] border-[#E5E5E3]">
           <div className="p-4 h-full w-full flex items-center">
             <button>+ Add Employee</button>
           </div>

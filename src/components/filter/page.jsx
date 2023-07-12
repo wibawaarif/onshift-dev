@@ -1,27 +1,34 @@
 "use client";
 import { Input, Checkbox } from "antd";
 import Image from "next/image";
-import Lup from '../../../public/static/svg/lup.svg'
+import { useState, useEffect } from "react";
+import _ from "lodash"
 
-const FilterComponent = () => {
-  const filterExamples = [
-    {
-      name: 'LOCATIONS / (DESELECT ALL)',
-      options: ['Anaheim', 'Santa Barbara']
-    },
-    {
-      name: 'POSITIONS / (DESELECT ALL)',
-      options: ['Surgical Tech', 'Dentist', 'Nurse Practitioner', 'Phlebotomist']
-    },
-    {
-      name: 'EVENTS / (DESELECT ALL)',
-      options: ['Scheduled shifts', 'Unassigned shifts', 'Days off', 'Unavailability']
-    },
-    {
-      name: 'EMPLOYEES / (DESELECT ALL)',
-      options: ['Arif', 'Wibawa', 'David Paul', 'Jared Martin', 'Rena Sofer', 'Rena Sofer', 'Rena Sofer']
-    }
-  ]
+const FilterComponent = ({allFilterList}) => {
+  const allFilterListClone = _.cloneDeep(allFilterList)
+
+  const [filterList, setFilterList] = useState(allFilterListClone)
+  const [filterValue, setFilterValue] = useState("")
+
+  useEffect(() => {
+    const filteredList = allFilterListClone.filter(x => {
+          x.options = x.options.map(y => {
+            if (y?.toLowerCase().includes(filterValue.toLowerCase())) {
+              return y
+            }
+          }).filter(item => item)
+  
+          if (x.options.length === 0) {
+            return false
+          }
+  
+          return true
+        })
+
+    setFilterList(filteredList)
+
+    }, [filterValue])
+
 
 
   return (
@@ -30,12 +37,12 @@ const FilterComponent = () => {
       <div className="px-4">
         <p className="text-sm mt-[33px]">CLEAR FILTER</p>
         <div className="mt-[29px]">
-          <Input placeholder="Search by keyword" className="rounded-sm" prefix={<Image width={20} height={20} src={"/static/svg/lup.svg"} />} />
+          <Input onChange={(e) => e.preventDefault(setFilterValue(e.target.value))} placeholder="Search by keyword" className="rounded-sm" prefix={<Image width={20} height={20} src={"/static/svg/lup.svg"} />} />
         </div>
       </div>
 
       {
-        filterExamples.map((x, index) => (
+        filterList.map((x, index) => (
           <div key={index} className={`${index === 0 ? 'mt-[20px]' : 'mt-[28px]'} px-4 w-full`}>
             <p className="text-[10px] font-medium">{x.name}</p>
             {
@@ -49,14 +56,6 @@ const FilterComponent = () => {
         ))
       }
 
-      {/* <div className="mt-[20px] px-4">
-        <p className="text-[10px] font-medium">LOCATIONS / (DESELECT ALL)</p>
-        <div className="mt-2">
-          <Checkbox>Anaheim</Checkbox>
-          <Checkbox>Santa Barbara</Checkbox>
-        </div>
-      </div> */}
-    
     </div>
   );
 };

@@ -15,6 +15,7 @@ import {
 } from "antd";
 import { useState } from "react";
 import "./style.css";
+
 const Scheduler = () => {
   const [type, setType] = useState("week");
   const [shiftModal, setShiftModal] = useState(false);
@@ -24,6 +25,43 @@ const Scheduler = () => {
   const optionsEmployees = [
     { value: "arif", label: "Arif" },
     { value: "wibawa", label: "Wibawa" },
+  ];
+
+  const filterExamples = [
+    {
+      name: "LOCATIONS / (DESELECT ALL)",
+      options: ["Anaheim", "Santa Barbara"],
+    },
+    {
+      name: "POSITIONS / (DESELECT ALL)",
+      options: [
+        "Surgical Tech",
+        "Dentist",
+        "Nurse Practitioner",
+        "Phlebotomist",
+      ],
+    },
+    {
+      name: "EVENTS / (DESELECT ALL)",
+      options: [
+        "Scheduled shifts",
+        "Unassigned shifts",
+        "Days off",
+        "Unavailability",
+      ],
+    },
+    {
+      name: "EMPLOYEES / (DESELECT ALL)",
+      options: [
+        "Arif",
+        "Wibawa",
+        "David Paul",
+        "Jared Martin",
+        "Rena Sofer",
+        "Rena Sofer",
+        "Rena Sofer",
+      ],
+    },
   ];
 
   const addShift = () => {
@@ -40,20 +78,70 @@ const Scheduler = () => {
     >
       <div className="flex flex-col flex-1">
         <div className="border-b-[1px] border-[#E5E5E3] h-[71px] w-full flex items-center">
-          <div className="px-4 py-1">
-
+          <div className="px-4 py-1 flex w-full">
             <div className="flex border-[1px] border-[#E5E5E5] w-max">
-              <button onClick={() => setType('day')} className={`hover:bg-[#E5E5E3] ${type === 'day' ? 'bg-[#E5E5E3]' : ''} transition duration-300 px-2 py-1 border-r-[1px] border-[#E5E5E5]`}>Day</button>
-              <button onClick={() => setType('week')} className={`hover:bg-[#E5E5E3] ${type === 'week' ? 'bg-[#E5E5E3]' : ''} duration-300 px-2 py-1 border-r-[1px] border-[#E5E5E5]`}>Week</button>
-              <button onClick={() => setType('month')} className={`hover:bg-[#E5E5E3] ${type === 'month' ? 'bg-[#E5E5E3]' : ''} duration-300 px-2 py-1`}>Month</button>
+              <button
+                onClick={() => setType("day")}
+                className={`hover:bg-[#E5E5E3] ${
+                  type === "day" ? "bg-[#E5E5E3]" : ""
+                } transition duration-300 px-2 py-1 border-r-[1px] border-[#E5E5E5]`}
+              >
+                Day
+              </button>
+              <button
+                onClick={() => setType("week")}
+                className={`hover:bg-[#E5E5E3] ${
+                  type === "week" ? "bg-[#E5E5E3]" : ""
+                } duration-300 px-2 py-1 border-r-[1px] border-[#E5E5E5]`}
+              >
+                Week
+              </button>
+              <button
+                onClick={() => setType("month")}
+                className={`hover:bg-[#E5E5E3] ${
+                  type === "month" ? "bg-[#E5E5E3]" : ""
+                } duration-300 px-2 py-1`}
+              >
+                Month
+              </button>
             </div>
 
+            <div className="flex justify-between items-center w-full px-4">
+              <div className="w-48 h-full flex">
+                <DatePicker
+                  className="rounded-none"
+                  format={"MM/DD"}
+                  picker="week"
+                />
+                <button
+                  onClick={() => setType("week")}
+                  className={`hover:bg-[#E5E5E3] duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}
+                >
+                  Today
+                </button>
+              </div>
+
+              <div className="w-max h-full flex">
+                <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+                  Publish Shifts
+                </button>
+                <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+                  Copy Shifts
+                </button>
+                <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+                  Export / Print
+                </button>
+                <button className="hover:bg-[#E5E5E3] duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+                  Statistic
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="flex flex-1">
           <div className="w-[202px] border-r-[1px] border-[#E5E5E3] overflow-y-auto h-[720px]">
-            <FilterComponent />
+            <FilterComponent allFilterList={filterExamples} />
           </div>
 
           <div className="flex-1">
