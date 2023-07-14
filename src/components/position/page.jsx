@@ -5,7 +5,8 @@ import { Input, Avatar, Modal, Select, Tabs, Checkbox } from "antd";
 import { ConfigProvider } from "antd";
 import Image from "next/image";
 
-const Position = async () => {
+
+const PositionComponent = async () => {
   const listOfEmployees = [
     {
       employeeDetail: {
@@ -146,7 +147,6 @@ const Position = async () => {
       ],
     },
   ];
-
   const [positionModal, setPositionModal] = useState(false);
   const [avatarColor, setAvatarColor] = useState("#FFFFFF");
   const [filterValue, setFilterValue] = useState("")
@@ -368,4 +368,4 @@ const Position = async () => {
   );
 };
 
-export default Position;
+export default PositionComponent;
