@@ -17,7 +17,10 @@ const positionSchema = new Schema({
   employees: [{
     type: Schema.Types.ObjectId,
     ref: employee
-  }]
+  }],
+  user: {
+    type: String,
+  }
 }, { timestamps: true })
 
 export default mongoose?.models?.Position || mongoose.model("Position", positionSchema)

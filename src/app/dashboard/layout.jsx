@@ -1,14 +1,30 @@
 "use client"
 
 import Image from "next/image";
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link";
+import { Popover } from "antd";
+import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 const menu = ['schedule', 'employee', 'position', 'location'];
 
 const DashboardLayout = ({children}) => {
   const pathname = usePathname();
   const currentPath = pathname.split('/').pop()
+
+  const session = useSession();
+  const router = useRouter();
+
+  if (session.status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+
+  if (session.status === "unauthenticated") {
+    router?.push("/signin?message=Unauthorized");
+    return
+  }
 
   return (
     <div className="h-screen w-screen bg-white flex">
@@ -39,9 +55,11 @@ const DashboardLayout = ({children}) => {
 
         <div className="flex flex-col justify-between items-center h-24">
         <Image width={24} height={24} alt="schedule-logo" src={"/static/svg/notification.svg"} />
-        <div className="bg-[#E5E5E3] rounded-full w-12 h-12 flex justify-center items-center">
+        <Popover placement="bottomLeft" content={<div className="w-14 flex justify-center items-center"><button onClick={() => signOut({callbackUrl: '/signin'})} className="hover:bg-[#E5E5E3] rounded-lg py-[1px] px-2 cursor-pointer transition duration-300">Logout</button></div>} trigger="click">
+        <div className="bg-[#E5E5E3] cursor-pointer rounded-full w-12 h-12 flex justify-center items-center">
           A
         </div>
+      </Popover>
         </div>  
       </div>
       { children }

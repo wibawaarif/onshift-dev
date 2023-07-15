@@ -2,7 +2,6 @@ async function getData() {
   const res = await fetch("http://localhost:3000/api/shifts", {
     cache: 'no-store'
   })
-  console.log('res', res);
   return res.json();
 }
 

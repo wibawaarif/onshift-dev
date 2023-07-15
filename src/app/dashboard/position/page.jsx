@@ -1,11 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { Input, Avatar, Modal, Select, Tabs, Checkbox } from "antd";
+import { Input, Avatar, Modal, Select, Tabs, Checkbox, message } from "antd";
 import { ConfigProvider } from "antd";
 import Image from "next/image";
+import useSWR, { mutate } from 'swr';
+import { useSession } from "next-auth/react";
 
-const Position = async () => {
+const fetcher = (...args) => fetch(...args).then(res => res.json())
+
+const Position = () => {
+  const session = useSession();
+  let { data, error, isLoading } = useSWR("http://localhost:3000/api/positions", fetcher)
+
   const listOfEmployees = [
     {
       employeeDetail: {
@@ -149,8 +156,13 @@ const Position = async () => {
 
   const [positionModal, setPositionModal] = useState(false);
   const [avatarColor, setAvatarColor] = useState("#FFFFFF");
-  const [filterValue, setFilterValue] = useState("")
-  const [filterList, setFilterList] = useState(listOfEmployees)
+  const [name, setName] = useState("");
+  const [wage, setWage] = useState("");
+  const [wageAmount, setwageAmount] = useState("");
+  const [filterValue, setFilterValue] = useState("");
+  const [filterList, setFilterList] = useState(listOfEmployees);
+  const [search, setSearch] = useState("");
+
   const avatarHexColor = [
     "#FFFFFF",
     "#E5E5E3",
@@ -159,7 +171,6 @@ const Position = async () => {
     "#646466",
   ];
   const wageType = [{ value: "Hourly", label: "Hourly" }];
-
 
   useEffect(() => {
     const filteredList = listOfEmployees.filter(x => x.employeeDetail.name.toLowerCase().includes(filterValue.toLowerCase()))
@@ -177,8 +188,16 @@ const Position = async () => {
     />
   );
 
-  const addPosition = () => {
-    console.log("test");
+  const addPosition = async () => {
+    setPositionModal(false)
+    await fetcher('http://localhost:3000/api/positions', {
+      method: "POST",
+      body: JSON.stringify({ name, color: avatarColor, wageType: wage, wageAmount, employees: ['64b16a6c5d84c4ce0d093683'] }),
+    });
+    mutate('http://localhost:3000/api/positions');
+
+    message.success('Position created')
+
   };
 
   const checkedEmployee = e => {
@@ -197,6 +216,7 @@ const Position = async () => {
         <div className="h-[71px] flex justify-between items-center px-8 py-1 border-b-[1px] border-[#E5E5E3]">
           <div className="w-48 flex">
             <Input
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Position name"
               className="rounded-sm"
               prefix={
@@ -208,32 +228,42 @@ const Position = async () => {
 
         <div className="flex-1">
           <div className="px-8 py-8">
-            <p className="text-2xl font-medium">Positions (1)</p>
+            <p className="text-2xl font-medium">Positions ({data && data.length})</p>
 
-            <div className="h-full w-full mt-6">
-              <div className="w-[300px] h-[97px] border-[1px] border-[#E5E5E3]">
-                <div className="px-4 py-4 flex justify-between">
-                  <div>
-                    <Avatar />
-                  </div>
+            <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
 
-                  <div className="flex flex-col">
-                    <p>Surgical Technologist</p>
-                    <p className="mt-2 text-xs font-light">10 EMPLOYEES</p>
-                  </div>
+              {
+                data && data.map((x, index) => {
+                  return (
+                    <div key={index} className="h-[97px] border-[1px] border-[#E5E5E3]">
+                    <div className="px-4 py-4 flex justify-between">
+                      <div className="flex">
+                        <Avatar className={`bg-[${x.color}]`} />
 
-                  <div>
-                    <Image
-                      className="hover:bg-[#E5E5E3] rotate-90 rounded-xl py-[1px] cursor-pointer transition duration-300"
-                      width={20}
-                      height={20}
-                      alt="action-icon"
-                      src={"/static/svg/action.svg"}
-                    />
+    
+                      <div className="flex flex-col ml-4">
+                        <p>{x.name}</p>
+                        <p className="mt-2 text-xs font-light">{x.employees.length} EMPLOYEES</p>
+                      </div>
+                      </div>
+    
+                      <div>
+                        <Image
+                          className="hover:bg-[#E5E5E3] rotate-90 rounded-xl py-[1px] cursor-pointer transition duration-300"
+                          width={20}
+                          height={20}
+                          alt="action-icon"
+                          src={"/static/svg/action.svg"}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                  )
+                })
+              }
+
             </div>
+
           </div>
         </div>
       </div>
@@ -244,20 +274,20 @@ const Position = async () => {
           <button
             className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
             key="back"
-            onClick={() => setShiftModal(false)}
+            onClick={() => setPositionModal(false)}
           >
             CLOSE
           </button>,
           <button
             className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
             key="submit"
+            onClick={() => addPosition()}
           >
             CREATE
-          </button>,
+          </button>
         ]}
         title="Create Position"
         open={positionModal}
-        onOk={addPosition}
         onCancel={() => setPositionModal(false)}
       >
         <Tabs
@@ -271,6 +301,7 @@ const Position = async () => {
                   <div className="mt-1">
                     <span className="text-xs font-semibold">POSITION NAME</span>
                     <Input
+                      onChange={(e) => setName(e.target.value)}
                       className="rounded-none border-t-0 border-l-0 border-r-0"
                       placeholder="e.g Phlebotomist"
                     />
@@ -284,7 +315,7 @@ const Position = async () => {
                           key={index}
                           onClick={() => setAvatarColor(x)}
                           className={`flex mr-1 cursor-pointer justify-center items-center ${
-                            x === "#FFFFFF"
+                            avatarColor === "#FFFFFF"
                               ? "border-[1px] border-[#E5E5E3]"
                               : undefined
                           } bg-[${x}]`}
@@ -300,6 +331,7 @@ const Position = async () => {
                     <div className="w-[48%] flex flex-col">
                       <span className="text-xs font-semibold">WAGE TYPE</span>
                       <Select
+                        onChange={(e) => setWage(e)}
                         placeholder="Select wage type"
                         className="mt-1"
                         options={wageType}
@@ -308,6 +340,7 @@ const Position = async () => {
                     <div className="w-[48%] flex flex-col">
                       <span className="text-xs font-semibold">WAGE AMOUNT</span>
                       <Input
+                        onChange={(e) => setwageAmount(e.target.value)}
                         className="rounded-none border-t-0 border-l-0 border-r-0"
                         suffix="usd per hour"
                       />
@@ -327,7 +360,7 @@ const Position = async () => {
               children: (
                 <>
                 <Input
-                  onChange={(e) => e.preventDefault(setFilterValue(e.target.value))}
+                  onChange={(e) => setFilterValue(e.target.value)}
                   placeholder="Employee name"
                   className="rounded-sm"
                   prefix={

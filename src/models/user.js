@@ -13,6 +13,9 @@ const userSchema = new Schema({
   role: {
     type: String,
   },
+  type: {
+    type: String,
+  }
 }, { timestamps: true })
 
 export default mongoose?.models?.User || mongoose.model("User", userSchema)

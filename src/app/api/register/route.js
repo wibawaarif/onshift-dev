@@ -7,19 +7,35 @@ export async function POST(req){
     try {
         await connect();
 
-        const {username, email, password: pass} = await req.json()
+        const {username, email, password: pass, type} = await req.json()
 
         const isUserExist = await User.findOne({email})
 
-        if(isUserExist){
-            throw new Error("User already exists")
+        if(isUserExist && type === 'credentials'){
+            throw new Error("Email already exist")
         }
 
-        const hashedPassword = await bcrypt.hash(pass, 10)
+        if(isUserExist && isUserExist.type === 'credentials' && type === 'google') {
+            throw new Error("Email already exist")
+        }
 
-        const newUser = await User.create({username, email, password: hashedPassword})
+        if(isUserExist && type === 'google') {
+            return new NextResponse(JSON.stringify(isUserExist), {status: 200})
+        }
 
-        const {password, ...user} = newUser._doc
+        if (type !== 'google') {
+            const hashedPassword = await bcrypt.hash(pass, 10)
+
+            const newUser = await User.create({username, email, password: hashedPassword, type})
+    
+            const {password, ...user} = newUser._doc
+    
+            return new NextResponse(JSON.stringify(user), {status: 201})
+        }
+
+        const newUser = await User.create({username, email, type})
+
+        const {...user} = newUser._doc
 
         return new NextResponse(JSON.stringify(user), {status: 201})
     } catch (error) {

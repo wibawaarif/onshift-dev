@@ -14,9 +14,13 @@ import {
   Input,
 } from "antd";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import "./style.css";
 
 const Scheduler = () => {
+  const session = useSession();
+  
   const [type, setType] = useState("week");
   const [shiftModal, setShiftModal] = useState(false);
   const [showBreak, setShowBreak] = useState(false);
