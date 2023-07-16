@@ -7,11 +7,12 @@ const locationSchema = new Schema({
       required: true,
       unique: true,
     },
-    latitude: {
+    address: {
       type: String,
     },
-    longitude: {
+    user: {
       type: String,
+      required: true,
     }
 }, { timestamps: true })
 

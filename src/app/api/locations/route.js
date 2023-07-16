@@ -20,7 +20,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const locations = await Location.find({});
+    const locations = await Location.find({user: decodedToken.email}).sort({ createdAt: -1 })
 
     return new NextResponse(JSON.stringify(locations), { status: 200 });
   } catch (err) {
@@ -40,7 +40,7 @@ export const POST = async (request) => {
 
   const body = await request.json();
 
-  const newLocation = new Location(body);
+  const newLocation = new Location({...body, user: decodedToken.email});
 
   try {
     await connect();
