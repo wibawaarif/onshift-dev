@@ -4,15 +4,12 @@ import { useState, useEffect } from "react";
 import { Input, Avatar, Modal, Select, Tabs, Checkbox, message } from "antd";
 import { ConfigProvider } from "antd";
 import Image from "next/image";
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 import { useSession } from "next-auth/react";
 
-const fetcher = (...args) => fetch(...args).then(res => res.json())
+const fetcher = ([url, token]) => fetch(url, { headers: { "authorization" : "Bearer " + token } }).then(res => res.json())
 
 const Position = () => {
-  const session = useSession();
-  let { data, error, isLoading } = useSWR("http://localhost:3000/api/positions", fetcher)
-
   const listOfEmployees = [
     {
       employeeDetail: {
@@ -159,9 +156,15 @@ const Position = () => {
   const [name, setName] = useState("");
   const [wage, setWage] = useState("");
   const [wageAmount, setwageAmount] = useState("");
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [filterValue, setFilterValue] = useState("");
   const [filterList, setFilterList] = useState(listOfEmployees);
   const [search, setSearch] = useState("");
+
+  const session = useSession();
+
+  let { data, error, isLoading, mutate } = useSWR(["http://localhost:3000/api/positions", session.data.user.accessToken], fetcher)
+  let { data: employees } = useSWR(positionModal ? ["http://localhost:3000/api/employees", session.data.user.accessToken] : null, fetcher)
 
   const avatarHexColor = [
     "#FFFFFF",
@@ -190,18 +193,29 @@ const Position = () => {
 
   const addPosition = async () => {
     setPositionModal(false)
-    await fetcher('http://localhost:3000/api/positions', {
+    await fetch('http://localhost:3000/api/positions', {
       method: "POST",
-      body: JSON.stringify({ name, color: avatarColor, wageType: wage, wageAmount, employees: ['64b16a6c5d84c4ce0d093683'] }),
+      body: JSON.stringify({ name, color: avatarColor, wageType: wage, wageAmount, employees: selectedEmployees }),
+      headers: {
+        "authorization" : "Bearer " + session.data.user.accessToken
+      }
     });
-    mutate('http://localhost:3000/api/positions');
+    mutate([...data, { name, color: avatarColor, wageType: wage, wageAmount, employees: selectedEmployees }]);
 
     message.success('Position created')
 
   };
 
   const checkedEmployee = e => {
-    console.log(e.target)
+    let newSelectedEmployees = [...selectedEmployees]
+
+    if (e.target.checked) {
+      newSelectedEmployees.push(e.target.name)
+      setSelectedEmployees(newSelectedEmployees)
+    } else {
+      newSelectedEmployees = newSelectedEmployees.filter(x => x !== e.target.name)
+      setSelectedEmployees(newSelectedEmployees)
+    }
   }
 
   return (
@@ -369,9 +383,9 @@ const Position = () => {
                 />
                 <div className="mt-6">
                   {
-                    filterList.map((x, index) => (
+                    employees && employees.map((x, index) => (
                       <div key={index} className="flex justify-between items-center h-[57px] border-t-[1px] border-[#E5E5E3]">
-                      <Checkbox name={x.employeeDetail} onChange={checkedEmployee} className="font-semibold">{x.employeeDetail.name}</Checkbox>
+                      <Checkbox name={x._id} onChange={checkedEmployee} className="font-semibold">{x.name}</Checkbox>
                       <div className="hover:bg-[#E5E5E3] cursor-pointer rounded-full px-1 py-1">
                       <Image
                         width={20}

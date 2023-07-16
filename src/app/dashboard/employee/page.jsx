@@ -1,13 +1,22 @@
 "use client";
 
-import { ConfigProvider } from "antd";
 import FilterComponent from "@/components/filter/page";
-import { Input, Table, Popover, Modal } from "antd";
+import { ConfigProvider, Input, Table, Popover, Modal, Select, Radio, message } from "antd";
 import Image from "next/image";
 import { useState } from "react";
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
+import useSWR from 'swr';
+import { useSession } from "next-auth/react";
+
+const fetcher = ([url, token]) => fetch(url, { headers: { "authorization" : "Bearer " + token } }).then(res => res.json())
 
 const Employee = () => {
-  const text = <span>Title</span>;
+  const session = useSession();
+
+  const { data: employees, error, isLoading, mutate } = useSWR(["http://localhost:3000/api/employees", session.data.user.accessToken], fetcher)
+
+  const [modalType, setModalType] = useState('');
 
   const content = data => (
     <div>
@@ -48,10 +57,16 @@ const Employee = () => {
     {
       title: "Position",
       dataIndex: "position",
+      render: (_, record) => <div>
+        {record.position ? record.position : '-'}
+      </div>
     },
     {
       title: "Location",
       dataIndex: "location",
+      render: (_, record) => <div>
+      {record.location ? record.location : '-'}
+    </div>
     },
     {
       title: "Email",
@@ -59,11 +74,17 @@ const Employee = () => {
     },
     {
       title: "Phone",
-      dataIndex: "phone",
+      dataIndex: "phoneNumber",
+      render: (_, record) => <div>
+        {`+${record.phoneNumber}`}
+      </div>
     },
     {
       title: "Status",
       dataIndex: "status",
+      render: (_, record) => <div>
+        {record.status? record.status: '-'}
+      </div>
     },
     {
       title: "Action",
@@ -106,6 +127,13 @@ const Employee = () => {
     },
   ];
 
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phoneNumber: '',
+    timezone: '',
+    role: 'Employee',
+  })
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [employeeModal, setEmployeeModal] = useState(false);
   const [action, setAction] = useState(false);
@@ -119,13 +147,24 @@ const Employee = () => {
     onChange: onSelectChange,
   };
 
-  const addEmployee = () => {
-    console.log('test');
+  const addEmployee = async () => {
+    setEmployeeModal(false)
+    await fetch('http://localhost:3000/api/employees', {
+      method: "POST",
+      body: JSON.stringify(form),
+      headers: {
+        "authorization" : "Bearer " + session.data.user.accessToken
+      }
+    });
+    mutate([...employees, form]);
+
+    message.success('Position created')
   }
 
   const deleteEmployee = data => {
     console.log('data', data)
   }
+
   return (
     <ConfigProvider
       theme={{
@@ -171,7 +210,7 @@ const Employee = () => {
             >
               <Table
                 columns={columns}
-                dataSource={data}
+                dataSource={employees}
                 rowSelection={rowSelection}
                 title={() => (
                   <div className="py-2">
@@ -192,23 +231,82 @@ const Employee = () => {
               CANCEL
             </button>,
             <button
+              onClick={modalType === 'add' ? addEmployee : modalType === 'edit' ? editEmployee : deleteEmployee}
               className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
               key="submit"
             >
               CONFIRM
             </button>,
           ]}
-          title="Delete Employee"
+          title={`${modalType === 'add' ? 'Create Employee' : modalType === 'edit' ? 'Edit Employee' : 'Delete Employee'}`}
           open={employeeModal}
-          onOk={addEmployee}
           onCancel={() => setEmployeeModal(false)}
         > 
-          <p>Are you sure want to delete this data ?</p>
+
+        {
+          modalType === 'add' && (
+            <div className="mt-4 mb-4">
+            <div>
+              <span className="text-xs font-semibold">FULL NAME</span>
+              <Input
+                onChange={e => setForm(prev => { return {...prev, name: e.target.value} })}
+                className="rounded-none border-t-0 border-l-0 border-r-0"
+                placeholder="e.g John Doe"
+              />
+            </div>
+
+            <div className="mt-3">
+              <span className="text-xs font-semibold">EMAIL</span>
+              <Input
+                onChange={e => setForm(prev => { return {...prev, email: e.target.value} })}
+                className="rounded-none border-t-0 border-l-0 border-r-0"
+                placeholder="company@gmail.com" 
+              />
+            </div>
+
+            <div className="mt-3">
+              <span className="text-xs font-semibold">PHONE</span>
+              <PhoneInput
+                onChange={phone => setForm(prev => { return {...prev, phoneNumber: phone} })}
+                buttonStyle={{borderTop: '0', borderLeft: '0', borderRight: '0',background: 'white'}}
+                searchStyle={{border: '0', borderBottomWidth: '1px'}}
+                inputStyle={{borderRadius: '0', borderTop: '0', borderLeft: '0', borderRight: '0', width: '100%'}}
+                country={'us'}
+              />
+            </div>
+
+            <div className="flex flex-col mt-3">
+              <span className="text-xs font-semibold">TIMEZONE</span>
+              <Select
+                onSelect={e => setForm(prev => { return {...prev, timezone: e} })}
+                options={[{value: 'UTC-5', label: '(UTC-5) Eastern Standard Time'}]}
+                className="mt-3"
+                bordered={false}
+                style={{borderBottom: '1px solid #E5E5E3'}}
+                placeholder="e.g (UTC-5) Eastern Standard Time"
+              />
+            </div>
+
+            <div className="flex flex-col mt-3">
+              <span className="text-xs font-semibold">ROLE</span>
+              <Radio.Group className="mt-3" onChange={e => setForm(prev => { return {...prev, role: e.target.value} })} value={form.role}>
+                <Radio value={'Employee'}>Employee</Radio>
+                <Radio value={'Administrator'}>Administrator</Radio>
+              </Radio.Group>
+            </div>    
+          </div>
+          )
+        }
+
+
+        {
+          modalType === 'delete' && <p>Are you sure want to delete this data ?</p>
+        }
 
         </Modal>
         
         <button
-          onClick={() => setEmployeeModal(true)}
+          onClick={() => setEmployeeModal(true) & setModalType('add') }
           className="hover:opacity-80 transition duration-300 absolute bottom-10 right-10 w-[180px] h-[40px] bg-black text-white rounded-full text-[14px]"
         >
           + CREATE EMPLOYEE

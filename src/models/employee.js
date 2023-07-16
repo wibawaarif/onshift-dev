@@ -3,24 +3,25 @@ import user from './user';
 import organization from './organization';
 
 const employeeSchema = new Schema({
-    firstName: {
+    name: {
       type: String,
     },
-    lastName: {
+    email: {
       type: String,
-    },
-    hireDate: {
-      type: Date,
     },
     user: {
-      type: mongoose.Types.ObjectId,
-      ref: user,
+      type: String,
       required: true,
     },
-    organization: {
-      type: mongoose.Types.ObjectId,
-      ref: organization,
-      required: true,
+    phoneNumber: {
+      type: Number,
+    },
+    timezone: {
+      type: String,
+    },
+    role: {
+      type: String,
+      enum: ['Employee', 'Administrator']
     }
 }, { timestamps: true })
 

@@ -20,6 +20,7 @@ const positionSchema = new Schema({
   }],
   user: {
     type: String,
+    required: true,
   }
 }, { timestamps: true })
 

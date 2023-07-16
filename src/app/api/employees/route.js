@@ -20,7 +20,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const employees = await Employee.find({}).populate('user', 'username email').populate('organization');
+    const employees = await Employee.find({user: decodedToken.email}).sort({ createdAt: -1 });
 
     return new NextResponse(JSON.stringify(employees), { status: 200 });
   } catch (err) {
@@ -40,7 +40,7 @@ export const POST = async (request) => {
   
   const body = await request.json();
 
-  const newEmployee = new Employee(body);
+  const newEmployee = new Employee({...body, user: decodedToken.email});
 
   try {
     await connect();
