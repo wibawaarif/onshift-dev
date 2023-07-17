@@ -51,7 +51,7 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account.provider === "google") {
-          const response = await fetch("http://localhost:3000/api/register", {
+          const response = await fetch("https://onshift-dev.vercel.app/api/register", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

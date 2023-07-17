@@ -17,11 +17,11 @@ const Location = () => {
 
   const session = useSession();
 
-  let { data: locations, error, isLoading, mutate } = useSWR(["http://localhost:3000/api/locations", session.data.user.accessToken], fetcher)
+  let { data: locations, error, isLoading, mutate } = useSWR(["https://onshift-dev.vercel.app/api/locations", session.data.user.accessToken], fetcher)
 
   const addLocation = async () => {
     setLocationModal(false)
-    await fetch('http://localhost:3000/api/locations', {
+    await fetch('https://onshift-dev.vercel.app/api/locations', {
       method: "POST",
       body: JSON.stringify(form),
       headers: {
