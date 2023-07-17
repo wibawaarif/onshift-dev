@@ -145,7 +145,6 @@ const Employee = () => {
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [employeeModal, setEmployeeModal] = useState(false);
-  const [action, setAction] = useState(false);
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
