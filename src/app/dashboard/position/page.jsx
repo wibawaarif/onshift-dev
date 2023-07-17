@@ -167,7 +167,7 @@ const Position = () => {
       setAvatarColor(data.color);
       setId(data._id);
 
-      const grabIdEmployee = data.employees.map(x => x._id);
+      const grabIdEmployee = data.employees?.map(x => x._id);
       setSelectedEmployees(grabIdEmployee);
     }
 
@@ -209,7 +209,7 @@ const Position = () => {
 
             <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
               {data &&
-                data.map((x, index) => {
+                data?.map((x, index) => {
                   return (
                     <div
                       key={index}
@@ -333,7 +333,7 @@ const Position = () => {
                     <div className="mt-4">
                       <span className="text-xs font-semibold">COLOR</span>
                       <div className="border-b-[1px] border-[#E5E5E3] flex py-2 mt-1">
-                        {avatarHexColor.map((x, index) => (
+                        {avatarHexColor?.map((x, index) => (
                           <Avatar
                             key={index}
                             onClick={() => setAvatarColor(x)}
@@ -400,7 +400,7 @@ const Position = () => {
                     />
                     <div className="mt-6">
                       {employees &&
-                        employees.map((x, index) => (
+                        employees?.map((x, index) => (
                           <div
                             key={index}
                             className="flex justify-between items-center h-[57px] border-t-[1px] border-[#E5E5E3]"
@@ -409,7 +409,7 @@ const Position = () => {
                               name={x._id}
                               onChange={checkedEmployee}
                               className="font-semibold"
-                              checked={selectedEmployees.some(y => y === x._id) ? true : false}
+                              checked={selectedEmployees?.some(y => y === x._id) ? true : false}
                             >
                               {x.name}
                             </Checkbox>
