@@ -32,7 +32,7 @@ const Employee = () => {
     isLoading,
     mutate,
   } = useSWR(
-    ["https://onshift-dev.vercel.app/api/employees", session.data.user.accessToken],
+    ["http://localhost:3000/api/employees", session.data.user.accessToken],
     fetcher
   );
 
@@ -157,7 +157,7 @@ const Employee = () => {
 
   const addEmployee = async () => {
     setEmployeeModal(false);
-    await fetch("https://onshift-dev.vercel.app/api/employees", {
+    await fetch("http://localhost:3000/api/employees", {
       method: "POST",
       body: JSON.stringify(form),
       headers: {
@@ -171,7 +171,7 @@ const Employee = () => {
 
   const editEmployee = async () => {
     setEmployeeModal(false);
-    await fetch(`https://onshift-dev.vercel.app/api/employees/${id}`, {
+    await fetch(`http://localhost:3000/api/employees/${id}`, {
       method: "PUT",
       body: JSON.stringify(form),
       headers: {
@@ -187,7 +187,7 @@ const Employee = () => {
 
   const deleteEmployee = async () => {
     setEmployeeModal(false);
-    await fetch(`https://onshift-dev.vercel.app/api/employees/${id}`, {
+    await fetch(`http://localhost:3000/api/employees/${id}`, {
       method: "DELETE",
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,

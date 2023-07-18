@@ -1,6 +1,4 @@
 import mongoose, { Schema } from 'mongoose';
-import user from './user';
-import organization from './organization';
 
 const employeeSchema = new Schema({
     name: {
@@ -19,6 +17,12 @@ const employeeSchema = new Schema({
     timezone: {
       type: String,
     },
+    shifts: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Shift',
+      }
+    ],
     role: {
       type: String,
       enum: ['Employee', 'Administrator']

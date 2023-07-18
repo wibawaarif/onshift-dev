@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Shift from "@/models/shift";
+import Employee from "@/models/employee";
 import { verifyJwtToken } from '@/lib/jwt'
 
 export const GET = async (request) => {
@@ -40,12 +41,34 @@ export const POST = async (request) => {
 
   const body = await request.json();
 
-  const newShift = new Shift(body);
+  const newShift = new Shift({...body, user: decodedToken.email});
 
   try {
     await connect();
 
     await newShift.save();
+
+    if (body.employees.length > 0) {
+      for (let i=0; i < body.employees.length; i++) {
+        const findEmployee = await Employee.findOne({user: decodedToken.email, _id: body.employees[i]})
+        let newEmployees;
+  
+        if (findEmployee.shifts) {
+          newEmployees = [...findEmployee.shifts, newShift._id]
+        } else {
+          newEmployees = [newShift._id]
+        }
+  
+        console.log(newEmployees);
+  
+        findEmployee.set({
+          ...findEmployee,
+          shifts: newEmployees,
+        })
+  
+        await findEmployee.save();
+      }
+    }
 
     return new NextResponse(JSON.stringify(newShift), { status: 201 });
   } catch (err) {

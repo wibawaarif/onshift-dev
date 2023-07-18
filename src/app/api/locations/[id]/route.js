@@ -16,6 +16,12 @@ export const PUT = async (request, { params }) => {
   const { id } = params;
   const body = await request.json();
 
+  const findExistedLocation = await Location.findOne({user: decodedToken.email, name: body.name})
+
+  if (findExistedLocation && String(findExistedLocation._id) !== id) {
+    return new NextResponse(JSON.stringify({error: "Location already exists"}), { status: 400 });
+  }
+
   try {
     await connect();
 
@@ -33,7 +39,7 @@ export const PUT = async (request, { params }) => {
   }
 }
 
-export const DELETE = async (_, { params }) => {
+export const DELETE = async (request, { params }) => {
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
 

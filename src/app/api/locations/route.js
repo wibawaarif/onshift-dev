@@ -40,6 +40,12 @@ export const POST = async (request) => {
 
   const body = await request.json();
 
+  const location = await Location.findOne({user: decodedToken.email, name: body.name})
+
+  if (location) {
+    return new NextResponse(JSON.stringify({error: "Location already exists"}), { status: 400 });
+  }
+
   const newLocation = new Location({...body, user: decodedToken.email});
 
   try {

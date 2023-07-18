@@ -40,12 +40,12 @@ const Position = () => {
   const session = useSession();
 
   let { data, error, isLoading, mutate } = useSWR(
-    ["https://onshift-dev.vercel.app/api/positions", session.data.user.accessToken],
+    ["http://localhost:3000/api/positions", session.data.user.accessToken],
     fetcher
   );
   let { data: employees } = useSWR(
     positionModal
-      ? ["https://onshift-dev.vercel.app/api/employees", session.data.user.accessToken]
+      ? ["http://localhost:3000/api/employees", session.data.user.accessToken]
       : null,
     fetcher
   );
@@ -79,7 +79,7 @@ const Position = () => {
 
   const addPosition = async () => {
     setPositionModal(false);
-    await fetch("https://onshift-dev.vercel.app/api/positions", {
+    await fetch("http://localhost:3000/api/positions", {
       method: "POST",
       body: JSON.stringify({
         name,
@@ -110,7 +110,7 @@ const Position = () => {
 
   const editPosition = async () => {
     setPositionModal(false);
-    await fetch(`https://onshift-dev.vercel.app/api/positions/${id}`, {
+    await fetch(`http://localhost:3000/api/positions/${id}`, {
       method: "PUT",
       body: JSON.stringify({
         name,
@@ -132,7 +132,7 @@ const Position = () => {
 
   const deletePosition = async () => {
     setPositionModal(false);
-    await fetch(`https://onshift-dev.vercel.app/api/positions/${id}`, {
+    await fetch(`http://localhost:3000/api/positions/${id}`, {
       method: "DELETE",
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,

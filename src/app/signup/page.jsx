@@ -48,7 +48,7 @@ const SignUpPage = () => {
       await signIn("credentials", {
         email,
         password,
-        callbackUrl: "https://onshift-dev.vercel.app/dashboard/schedule",
+        callbackUrl: "http://localhost:3000/dashboard/schedule",
       });
     }
   };
@@ -125,7 +125,7 @@ const SignUpPage = () => {
             <button
               onClick={() => {
                 signIn("google", {
-                  callbackUrl: "https://onshift-dev.vercel.app/dashboard/schedule",
+                  callbackUrl: "http://localhost:3000/dashboard/schedule",
                 });
               }}
               className="bg-white rounded-md flex items-center justify-center text-black text-sm hover:bg-stone-100 transtion duration-300 border-2 border-black border-opacity-50 w-full"

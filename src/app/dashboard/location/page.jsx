@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Input, Modal, message, ConfigProvider } from "antd";
+import { Input, Modal, message, ConfigProvider, Popover } from "antd";
 import Image from "next/image";
 import useSWR from 'swr';
 import { useSession } from "next-auth/react";
@@ -10,6 +10,9 @@ const fetcher = ([url, token]) => fetch(url, { headers: { "authorization" : "Bea
 
 const Location = () => {
   const [locationModal, setLocationModal] = useState(false);
+  const [id, setId] = useState("");
+  const [popover, setPopover] = useState(false);
+  const [actionType, setActionType] = useState("");
   const [form, setForm] = useState({
     name: '',
     address: '',
@@ -17,20 +20,94 @@ const Location = () => {
 
   const session = useSession();
 
-  let { data: locations, error, isLoading, mutate } = useSWR(["https://onshift-dev.vercel.app/api/locations", session.data.user.accessToken], fetcher)
+  let { data: locations, error, isLoading, mutate } = useSWR(["http://localhost:3000/api/locations", session.data.user.accessToken], fetcher)
+
+  const clearFields = () => {
+    setForm({
+      name: '',
+      address: '',
+    })
+    setId('')
+  };
 
   const addLocation = async () => {
     setLocationModal(false)
-    await fetch('https://onshift-dev.vercel.app/api/locations', {
+    const data = await fetch('http://localhost:3000/api/locations', {
       method: "POST",
       body: JSON.stringify(form),
       headers: {
         "authorization" : "Bearer " + session.data.user.accessToken
       }
     });
+
+    const res = await data.json();
+
+    if (res.error === 'Location already exists') {
+      message.error('Location already exists')
+      clearFields()
+      return 
+    }
     mutate([...locations, form]);
 
     message.success('Location created')
+    clearFields()
+  };
+
+  const editLocation = async () => {
+    setLocationModal(false)
+    const data = await fetch(`http://localhost:3000/api/locations/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(form),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    console.log(data);
+    const res = await data.json();
+
+    if (res.error === 'Location already exists') {
+      message.error('Location already exists')
+      clearFields()
+      return 
+    }
+    mutate([...locations]);
+
+    message.success('Location updated')
+    clearFields()
+  };
+
+  const deleteLocation = async () => {
+    setLocationModal(false);
+    await fetch(`http://localhost:3000/api/locations/${id}`, {
+      method: "DELETE",
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    mutate([...locations]);
+
+    message.success("Location deleted");
+  };
+
+  const handleAction = (type, data) => {
+    setActionType(type);
+
+    if (type === "edit") {
+      setId(data._id);
+      const newForm = {
+        name: data.name,
+        address: data.address,
+      };
+
+      setForm(newForm)
+    }
+
+    if (type === "delete") {
+      setId(data);
+    }
+
+    setLocationModal(true);
+    setPopover(false);
   };
 
   return (
@@ -71,6 +148,31 @@ const Location = () => {
                     </div>
   
                     <div>
+                    <Popover
+                            content={
+                              <div className="flex flex-col items-start">
+                                <button onClick={() => handleAction("edit", x)}>
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleAction("delete", x._id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            }
+                            placement="bottomRight"
+                            title="Action"
+                            trigger="click"
+                            open={popover === index}
+                            onOpenChange={(e) => {
+                              if (e) {
+                                setPopover(index);
+                              } else {
+                                setPopover(null);
+                              }
+                            }}
+                          >
                       <Image
                         className="hover:bg-[#E5E5E3] rotate-90 rounded-xl py-[1px] cursor-pointer transition duration-300"
                         width={20}
@@ -78,6 +180,7 @@ const Location = () => {
                         alt="action-icon"
                         src={"/static/svg/action.svg"}
                       />
+                          </Popover>
                     </div>
                   </div>
                 </div>
@@ -94,25 +197,45 @@ const Location = () => {
           <button
             className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
             key="back"
-            onClick={() => setShiftModal(false)}
+            onClick={() => setLocationModal(false)}
           >
             CANCEL
           </button>,
           <button
-            onClick={addLocation}
+          onClick={
+            actionType === "edit"
+              ? editLocation
+              : actionType === "add"
+              ? addLocation
+              : deleteLocation
+          }
             className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
             key="submit"
           >
-            CREATE
+                        {actionType === "edit"
+              ? "EDIT"
+              : actionType === "add"
+              ? "CREATE"
+              : "CONFIRM"}
           </button>,
         ]}
-        title="Create Location"
+        title={
+          actionType === "edit"
+            ? "Edit Location"
+            : actionType === "add"
+            ? "Create Location"
+            : "Delete Location"
+        }
         open={locationModal}
         onCancel={() => setLocationModal(false)}
       >
-        <div className="mt-4">
+        {
+          actionType !== 'delete' && 
+          <>
+           <div className="mt-4">
           <span className="text-xs font-semibold">LOCATION NAME</span>
           <Input
+            value={form.name}
             onChange={e => setForm(prev => { return {...prev, name: e.target.value} })}
             className="rounded-none border-t-0 border-l-0 border-r-0"
             placeholder="e.g My Location"
@@ -122,15 +245,27 @@ const Location = () => {
         <div className="mt-4">
           <span className="text-xs font-semibold">ADDRESS</span>
           <Input
+            value={form.address}
             onChange={e => setForm(prev => { return {...prev, address: e.target.value} })}
             className="rounded-none border-t-0 border-l-0 border-r-0"
             placeholder="e.g Silicon Valley B.320"
           />
         </div>
+          </>
+        }
+
+        {
+          actionType === 'delete' && (
+            <div>
+            <p>Are you sure want to delete this location?</p>
+          </div>
+          )
+        }
+       
       </Modal>
 
       <button
-        onClick={() => setLocationModal(true)}
+        onClick={() => setLocationModal(true) & setActionType('add') & clearFields()}
         className="hover:opacity-80 transition duration-300 absolute bottom-10 right-10 w-[180px] h-[40px] bg-black text-white rounded-full text-[14px]"
       >
         + CREATE LOCATION

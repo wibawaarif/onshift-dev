@@ -1,5 +1,4 @@
 import mongoose, { Schema } from 'mongoose';
-import employee from './employee';
 
 const positionSchema = new Schema({
   name: {
@@ -16,7 +15,7 @@ const positionSchema = new Schema({
   },
   employees: [{
     type: Schema.Types.ObjectId,
-    ref: employee
+    ref: 'Employee'
   }],
   user: {
     type: String,

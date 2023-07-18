@@ -20,7 +20,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const employees = await Employee.find({user: decodedToken.email}).sort({ createdAt: -1 });
+    const employees = await Employee.find({user: decodedToken.email}).sort({ createdAt: -1 }).populate('shifts', 'date startTime endTime location position')
 
     return new NextResponse(JSON.stringify(employees), { status: 200 });
   } catch (err) {

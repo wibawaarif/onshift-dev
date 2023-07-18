@@ -5,7 +5,8 @@ import { Avatar } from "antd";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Fragment, useState, useEffect } from "react";
 
-const SchedulerComponent = ({ type }) => {
+const SchedulerComponent = ({ type, employees }) => {
+  console.log(employees);
   const listOfEmployees = [
     {
       employeeDetail: {
@@ -147,12 +148,12 @@ const SchedulerComponent = ({ type }) => {
     },
   ];
 
-  const [employees, setEmployees] = useState([]);
+  // const [employees, setEmployees] = useState([]);
   const [rowIndex, setRowIndex] = useState(null);
 
-  useEffect(() => {
-    setEmployees(listOfEmployees);
-  }, []);
+  // useEffect(() => {
+  //   setEmployees(listOfEmployees);
+  // }, []);
 
   const week = [
     "Mon 7",
@@ -192,22 +193,22 @@ const SchedulerComponent = ({ type }) => {
   ];
 
   const updateTable = (result) => {
-    if (
-      result.destination &&
-      result.source.droppableId !== result.destination.droppableId
-    ) {
-      let newListOfEmployees = [...employees];
-      newListOfEmployees[result.source.index].schedules[
-        result.destination.droppableId
-      ] =
-        newListOfEmployees[result.source.index].schedules[
-          result.source.droppableId
-        ];
-      newListOfEmployees[result.source.index].schedules[
-        result.source.droppableId
-      ] = {};
-      setEmployees(newListOfEmployees);
-    }
+    // if (
+    //   result.destination &&
+    //   result.source.droppableId !== result.destination.droppableId
+    // ) {
+    //   let newListOfEmployees = [...employees];
+    //   newListOfEmployees[result.source.index].schedules[
+    //     result.destination.droppableId
+    //   ] =
+    //     newListOfEmployees[result.source.index].schedules[
+    //       result.source.droppableId
+    //     ];
+    //   newListOfEmployees[result.source.index].schedules[
+    //     result.source.droppableId
+    //   ] = {};
+    //   setEmployees(newListOfEmployees);
+    // }
   };
 
   return (
@@ -319,7 +320,7 @@ const SchedulerComponent = ({ type }) => {
                     <Avatar size={32} className="mr-2" />
                     <div className="flex flex-col justify-between">
                       <span className="text-[14px]">
-                        {row.employeeDetail.name}
+                        {row.name}
                       </span>
                     </div>
                   </div>
@@ -338,10 +339,10 @@ const SchedulerComponent = ({ type }) => {
                         <p className="text-[10px] font-semibold">
                           12AM to 12PM
                         </p>
-                        <p className="mt-[1px] text-[10px]">POSITION</p>
-                        <div className="w-[47px] h-[12px] bg-black rounded-xl flex justify-center items-center">
+                        {/* <p className="mt-[1px] text-[10px]">POSITION</p> */}
+                        {/* <div className="w-[47px] h-[12px] bg-black rounded-xl flex justify-center items-center">
                           <span className="text-white text-[8px]">PENDING</span>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   )
@@ -370,7 +371,7 @@ const SchedulerComponent = ({ type }) => {
 
                 {/* WEEK */}
                 {type === "week" &&
-                  row.schedules.map((dataItem, dataIndex) => (
+                  week.map((dataItem, dataIndex) => (
                     <div key={dataIndex}>
                       <Droppable droppableId={`${dataIndex}`}>
                         {(provided) => (
@@ -417,6 +418,7 @@ const SchedulerComponent = ({ type }) => {
                       </Droppable>
                     </div>
                   ))}
+
               </DragDropContext>
             </Fragment>
           ))}

@@ -1,5 +1,6 @@
 "use client";
 
+import useSWR from "swr";
 import SchedulerComponent from "@/components/scheduler/page";
 import FilterComponent from "@/components/filter/page";
 import Image from "next/image";
@@ -12,19 +13,52 @@ import {
   Divider,
   Select,
   Input,
+  message,
 } from "antd";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import "./style.css";
+
+const fetcher = ([url, token]) =>
+  fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
+    res.json()
+  );
 
 const Scheduler = () => {
   const session = useSession();
-  
+
   const [type, setType] = useState("week");
   const [shiftModal, setShiftModal] = useState(false);
   const [showBreak, setShowBreak] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
+  const [form, setForm] = useState({
+    date: "",
+    startTime: "",
+    endTime: "",
+    employees: [],
+    location: "",
+    position: "",
+  });
+//   let { data: shifts } = useSWR(
+// ["http://localhost:3000/api/shifts", session.data.user.accessToken],
+//     fetcher
+//   );
+  let { data: locations, mutate } = useSWR(
+    shiftModal
+      ? ["http://localhost:3000/api/locations", session.data.user.accessToken]
+      : null,
+    fetcher
+  );
+  let { data: positions } = useSWR(
+    shiftModal
+      ? ["http://localhost:3000/api/positions", session.data.user.accessToken]
+      : null,
+    fetcher
+  );
+  let { data: employees } = useSWR(
+  ["http://localhost:3000/api/employees", session.data.user.accessToken],
+    fetcher
+  );
 
   const optionsEmployees = [
     { value: "arif", label: "Arif" },
@@ -68,8 +102,20 @@ const Scheduler = () => {
     },
   ];
 
-  const addShift = () => {
-    console.log("test");
+  const addShift = async () => {
+    setShiftModal(false);
+    await fetch("http://localhost:3000/api/shifts", {
+      method: "POST",
+      body: JSON.stringify(form),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    // mutate([
+    //   ...shifts, form
+    // ]);
+
+    message.success("Shift created");
   };
 
   return (
@@ -149,7 +195,7 @@ const Scheduler = () => {
           </div>
 
           <div className="flex-1">
-            <SchedulerComponent type={type} />
+            <SchedulerComponent employees={employees} type={type} />
           </div>
         </div>
 
@@ -164,6 +210,7 @@ const Scheduler = () => {
               CANCEL
             </button>,
             <button
+              onClick={addShift}
               className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
               key="submit"
             >
@@ -172,7 +219,6 @@ const Scheduler = () => {
           ]}
           title="Create New Shift"
           open={shiftModal}
-          onOk={addShift}
           onCancel={() => setShiftModal(false)}
         >
           <Tabs
@@ -185,7 +231,14 @@ const Scheduler = () => {
                   <div>
                     <div className="flex flex-col">
                       <span className="text-xs font-semibold">DATE</span>
-                      <DatePicker className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0" />
+                      <DatePicker
+                        onChange={(date, dateString) =>
+                          setForm((prev) => {
+                            return { ...prev, date: dateString };
+                          })
+                        }
+                        className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
+                      />
                     </div>
 
                     <div className="flex mt-4 justify-between">
@@ -193,16 +246,29 @@ const Scheduler = () => {
                         <span className="text-xs font-semibold">
                           START SHIFT
                         </span>
-                        <TimePicker className="w-full rounded-none border-t-0 border-l-0 border-r-0" />
+                        <TimePicker
+                          onChange={(e) =>
+                            setForm((prev) => {
+                              return { ...prev, startTime: e };
+                            })
+                          }
+                          className="w-full rounded-none border-t-0 border-l-0 border-r-0"
+                        />
                       </div>
                       <div className="w-[48%]">
                         <span className="text-xs font-semibold">
                           FINISH SHIFT
                         </span>
-                        <TimePicker className="w-full rounded-none border-t-0 border-l-0 border-r-0" />
+                        <TimePicker
+                          onChange={(e) =>
+                            setForm((prev) => {
+                              return { ...prev, endTime: e };
+                            })
+                          }
+                          className="w-full rounded-none border-t-0 border-l-0 border-r-0"
+                        />
                       </div>
                     </div>
-
                     <div className="mt-6">
                       {!showBreak && (
                         <button
@@ -249,20 +315,26 @@ const Scheduler = () => {
 
                     <div className="flex flex-col">
                       <span className="text-xs font-semibold">EMPLOYEE</span>
-                      <Image
+                      {/* <Image
                         className="absolute bottom-[29.5%] z-50"
                         width={20}
                         height={20}
                         alt="schedule-logo"
                         src={"/static/svg/employee.svg"}
-                      />
+                      /> */}
                       <Select
                         mode="multiple"
                         allowClear
                         placeholder="Select Employee"
-                        defaultValue={["arif"]}
                         className="mt-1"
-                        options={optionsEmployees}
+                        options={employees?.map((x) => {
+                          return { label: x.name, value: x._id };
+                        })}
+                        onChange={(e) =>
+                          setForm((prev) => {
+                            return { ...prev, employees: e };
+                          })
+                        }
                       />
                     </div>
 
@@ -270,21 +342,31 @@ const Scheduler = () => {
                       <div className="w-[48%] flex flex-col">
                         <span className="text-xs font-semibold">LOCATION</span>
                         <Select
-                          mode="multiple"
-                          allowClear
                           placeholder="Select Location"
                           className="mt-1"
-                          options={optionsEmployees}
+                          options={locations?.map((x) => {
+                            return { label: x.name, value: x._id };
+                          })}
+                          onChange={(e) =>
+                            setForm((prev) => {
+                              return { ...prev, location: e };
+                            })
+                          }
                         />
                       </div>
                       <div className="w-[48%] flex flex-col">
                         <span className="text-xs font-semibold">POSITION</span>
                         <Select
-                          mode="multiple"
-                          allowClear
                           placeholder="Select Position"
                           className="mt-1"
-                          options={optionsEmployees}
+                          options={positions?.map((x) => {
+                            return { label: x.name, value: x._id };
+                          })}
+                          onChange={(e) =>
+                            setForm((prev) => {
+                              return { ...prev, position: e };
+                            })
+                          }
                         />
                       </div>
                     </div>
