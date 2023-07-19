@@ -7,7 +7,7 @@ import { Popover } from "antd";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 
-const menu = ['schedule', 'employee', 'position', 'location'];
+const menu = ['schedule', 'employee', 'position', 'location', 'timesheet'];
 
 const DashboardLayout = ({children}) => {
   const pathname = usePathname();
@@ -33,7 +33,7 @@ const DashboardLayout = ({children}) => {
           <span className="text-sm">Onshift</span>
         </div>
 
-        <div className="flex flex-col justify-between items-center h-40">
+        <div className="flex flex-col justify-between items-center h-52">
           {
             menu.map((x, index) => (
               <Link href={`/dashboard/${x}`} key={index}>

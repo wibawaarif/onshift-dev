@@ -1,7 +1,4 @@
 import mongoose, { Schema } from 'mongoose';
-import location from './location';
-import position from './position';
-import employee from './employee';
 
 const shiftSchema = new Schema({
   date: {
@@ -15,7 +12,7 @@ const shiftSchema = new Schema({
   },
   location: {
     type: mongoose.Types.ObjectId,
-    ref: location,
+    ref: 'Location',
   },
   position: {
     type: mongoose.Types.ObjectId,

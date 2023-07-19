@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Shift from "@/models/shift";
 import Employee from "@/models/employee";
+import Location from "@/models/location";
+import Position from "@/models/position";
 import { verifyJwtToken } from '@/lib/jwt'
 
 export const GET = async (request) => {
@@ -21,7 +23,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const shifts = await Shift.find({}).populate('location');
+    const shifts = await Shift.find({}).populate({ path: 'location', select: 'name', model: Location }).populate({ path: 'position', select: 'name', model: Position })
 
     return new NextResponse(JSON.stringify(shifts), { status: 200 });
   } catch (err) {

@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Employee from "@/models/employee";
-import { verifyJwtToken } from '@/lib/jwt'
+import Location from "@/models/location";
+import Shift from "@/models/shift";
+import Position from "@/models/position";
+import { verifyJwtToken } from '@/lib/jwt';
 
 export const GET = async (request) => {
   const accessToken = request.headers.get("authorization")
@@ -20,7 +23,21 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const employees = await Employee.find({user: decodedToken.email}).sort({ createdAt: -1 }).populate('shifts', 'date startTime endTime location position')
+    const employees = await Employee.find({user: decodedToken.email}).sort({ createdAt: -1 })
+    .populate({
+      path: 'shifts',
+      model: Shift,
+      select: 'date startTime endTime location position employees',
+      populate: [{
+        path: 'location',
+        select: 'name address',
+        model: Location,
+      }, {
+        path: 'position',
+        select: 'name',
+        model: Position,
+      }],
+    });
 
     return new NextResponse(JSON.stringify(employees), { status: 200 });
   } catch (err) {

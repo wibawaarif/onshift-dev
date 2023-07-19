@@ -4,166 +4,25 @@ import Image from "next/image";
 import { Avatar } from "antd";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Fragment, useState, useEffect } from "react";
+import dayjs from "dayjs";
 
-const SchedulerComponent = ({ type, employees }) => {
+const SchedulerComponent = ({ type, employees, editShift }) => {
   console.log(employees);
-  const listOfEmployees = [
-    {
-      employeeDetail: {
-        name: "Arif Wibawa",
-        totalHours: "12hr",
-      },
-      schedules: [
-        {
-          id: "h7yUg1iD4cSISD",
-          name: "Austin",
-          time: "1:00A - 5:00P",
-          total: "7hrs",
-        },
-        {
-          id: "DUvZnxWuK14co90ZlDQZ",
-          name: "Jessie",
-          time: "1am to 5pm",
-          total: "89hrs",
-        },
-        {
-          id: "4B58mk3Oi",
-          name: "Irene",
-          time: "11am to 7pm",
-          total: "38hrs",
-        },
-        {
-          id: "ss0IBd6bIvfn0",
-          name: "Ernest",
-          time: "11am to 5pm",
-          total: "17hrs",
-        },
-        {
-          id: "nO4wLQVEUOwRC",
-          name: "Sallie",
-          time: "12am to 10pm",
-          total: "9hrs",
-        },
-        {
-          id: "zsJS3WkAHEeXb7E4nMqs",
-          name: "Isabelle",
-          time: "12am to 10pm",
-          total: "7hrs",
-        },
-        {
-          id: "JYnaeCT6ZuXafu",
-          name: "Etta",
-          time: "8am to 7pm",
-          total: "68hrs",
-        },
-      ],
-    },
-    {
-      employeeDetail: {
-        name: "John Doe",
-        totalHours: "8hr",
-      },
-      schedules: [
-        {
-          id: "z2EnspI7zkLOkQU7yd",
-          name: "Lettie",
-          time: "10am to 2pm",
-          total: "71hrs",
-        },
-        {
-          id: "1QINY",
-          name: "Blanche",
-          time: "5am to 7pm",
-          total: "91hrs",
-        },
-        {
-          id: "ZzPfEddIP86G",
-          name: "Alta",
-          time: "11am to 9pm",
-          total: "69hrs",
-        },
-        {
-          id: "hbfFNEqsn430nXyf",
-          name: "Linnie",
-          time: "6am to 6pm",
-          total: "88hrs",
-        },
-        {
-          // name: "Genevieve",
-          // time: "3am to 4pm",
-          // total: "99hrs",
-        },
-        {
-          id: "fZf6GnLVyrmImJ2nmbwp",
-          name: "Genevieve",
-          time: "5am to 6pm",
-          total: "72hrs",
-        },
-        {
-          id: "datxunAzma3K0EYa",
-          name: "Craig",
-          time: "12am to 1pm",
-          total: "57hrs",
-        },
-      ],
-    },
-    {
-      employeeDetail: {
-        name: "Martin Lex",
-        totalHours: "10hr",
-      },
-      schedules: [
-        {},
-        {},
-        {
-          id: "ZzPfEddIP86G",
-          name: "Alta",
-          time: "11am to 9pm",
-          total: "69hrs",
-        },
-        {
-          id: "hbfFNEqsn430nXyf",
-          name: "Linnie",
-          time: "6am to 6pm",
-          total: "88hrs",
-        },
-        {
-          // name: "Genevieve",
-          // time: "3am to 4pm",
-          // total: "99hrs",
-        },
-        {
-          id: "fZf6GnLVyrmImJ2nmbwp",
-          name: "Genevieve",
-          time: "5am to 6pm",
-          total: "72hrs",
-        },
-        {
-          id: "datxunAzma3K0EYa",
-          name: "Craig",
-          time: "12am to 1pm",
-          total: "57hrs",
-        },
-      ],
-    },
-  ];
+    // Get the current date
+  const currentDate = dayjs();
+
+  // Get the start date of the current week (Sunday)
+  const startDate = currentDate.startOf('week');
+
+  const weekSchedule = [];
+
+  for (let i = 1; i < 8; i++) {
+    const date = startDate.add(i, 'day');
+    weekSchedule.push(date.format('YYYY-MM-DD'));
+  }
 
   // const [employees, setEmployees] = useState([]);
   const [rowIndex, setRowIndex] = useState(null);
-
-  // useEffect(() => {
-  //   setEmployees(listOfEmployees);
-  // }, []);
-
-  const week = [
-    "Mon 7",
-    "Tue 8",
-    "Wed 9",
-    "Thu 10",
-    "Fri 11",
-    "Sat 12",
-    "Sun 13",
-  ];
 
   const day = [
     "12AM",
@@ -193,6 +52,7 @@ const SchedulerComponent = ({ type, employees }) => {
   ];
 
   const updateTable = (result) => {
+    console.log(result);
     // if (
     //   result.destination &&
     //   result.source.droppableId !== result.destination.droppableId
@@ -289,13 +149,13 @@ const SchedulerComponent = ({ type, employees }) => {
           })}
 
         {type === "week" &&
-          week.map((x) => {
+          weekSchedule.map((x) => {
             return (
               <div
                 className="bg-white flex justify-center items-center h-[40px] border-b-[1px] border-r-[1px] border-[#E5E5E3]"
                 key={x}
               >
-                <span className="text-slate-700">{x}</span>
+                <span className="text-slate-700">{dayjs(x).format('ddd D')}</span>
                 <Image
                   className="ml-[8px]"
                   alt="chart"
@@ -328,7 +188,7 @@ const SchedulerComponent = ({ type, employees }) => {
               </div>
 
               {/* schedules */}
-              <DragDropContext onDragEnd={updateTable}>
+              <DragDropContext onDragEnd={editShift}>
                 {/* DAY */}
                 {
                   type === "day" && (
@@ -371,9 +231,9 @@ const SchedulerComponent = ({ type, employees }) => {
 
                 {/* WEEK */}
                 {type === "week" &&
-                  week.map((dataItem, dataIndex) => (
+                  weekSchedule.map((dataItem, dataIndex) => (
                     <div key={dataIndex}>
-                      <Droppable droppableId={`${dataIndex}`}>
+                      <Droppable droppableId={`${dataItem}`}>
                         {(provided) => (
                           <div
                             {...provided.droppableProps}
@@ -382,10 +242,12 @@ const SchedulerComponent = ({ type, employees }) => {
                               dataIndex === 0 ? "first-child" : ""
                             } bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
                           >
-                            {dataItem.id && (
-                              <Draggable
-                                key={dataItem.id}
-                                draggableId={`${dataItem.id}`}
+
+                            {
+                              row.shifts && row.shifts.map((z, index) => (
+                                dayjs(z.date).format('YYYY-MM-DD') === dataItem && <Draggable
+                                key={z._id}
+                                draggableId={`${z._id}`}
                                 index={index}
                               >
                                 {(provided) => (
@@ -396,22 +258,19 @@ const SchedulerComponent = ({ type, employees }) => {
                                     onMouseEnter={() => setRowIndex(index)}
                                     className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
                                   >
-                                    <p className="text-[10px] font-semibold">
-                                      {dataItem.time} · {dataItem.total}
+                                    <p className="text-[10px] font-bold">
+                                      {dayjs(z.startTime).format('h:mma')} - {dayjs(z.endTime).format('h:mma')} · {dayjs(z.endTime).diff(dayjs(z.startTime), 'hour')}H
                                     </p>
                                     <p className="mt-[1px] text-[10px]">
-                                      LOCATION · POSITI...
+                                      { z.location.name } {z.position?.name ? `- ${z.position.name}` : undefined}
                                     </p>
-                                    <div className="w-[47px] h-[12px] bg-black rounded-xl flex justify-center items-center">
-                                      <span className="text-white text-[8px]">
-                                        PENDING
-                                      </span>
-                                    </div>
                                     {provided.placeholder}
                                   </div>
                                 )}
                               </Draggable>
-                            )}
+                              ))
+                            }
+
                             {provided.placeholder}
                           </div>
                         )}

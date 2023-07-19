@@ -18,6 +18,7 @@ import {
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
 
 const fetcher = ([url, token]) =>
   fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
@@ -37,25 +38,25 @@ const Scheduler = () => {
     endTime: "",
     employees: [],
     location: "",
-    position: "",
+    position: null,
   });
-//   let { data: shifts } = useSWR(
-// ["http://localhost:3000/api/shifts", session.data.user.accessToken],
-//     fetcher
-//   );
-  let { data: locations, mutate } = useSWR(
+  const { data: shifts, mutate: mutateShifts } = useSWR(
+["http://localhost:3000/api/shifts", session.data.user.accessToken],
+    fetcher
+  );
+  const { data: locations } = useSWR(
     shiftModal
       ? ["http://localhost:3000/api/locations", session.data.user.accessToken]
       : null,
     fetcher
   );
-  let { data: positions } = useSWR(
+  const { data: positions } = useSWR(
     shiftModal
       ? ["http://localhost:3000/api/positions", session.data.user.accessToken]
       : null,
     fetcher
   );
-  let { data: employees } = useSWR(
+  const { data: employees, mutate: mutateEmployees } = useSWR(
   ["http://localhost:3000/api/employees", session.data.user.accessToken],
     fetcher
   );
@@ -111,12 +112,31 @@ const Scheduler = () => {
         authorization: "Bearer " + session.data.user.accessToken,
       },
     });
-    // mutate([
-    //   ...shifts, form
-    // ]);
+    mutateEmployees([
+      ...employees
+    ]);
 
     message.success("Shift created");
   };
+  
+
+  const editShift = async result => {
+    if (
+      result.destination &&
+      result.source.droppableId !== result.destination.droppableId
+    ) { 
+      await fetch(`http://localhost:3000/api/shifts/${result.draggableId}`, {
+        method: "PUT",
+        body: JSON.stringify({date: dayjs(result.destination.droppableId)}),
+        headers: {
+          authorization: "Bearer " + session.data.user.accessToken,
+        },
+      });
+      mutateEmployees([...employees]);
+
+      message.success("Shift updated");
+  }
+  }
 
   return (
     <ConfigProvider
@@ -195,7 +215,7 @@ const Scheduler = () => {
           </div>
 
           <div className="flex-1">
-            <SchedulerComponent employees={employees} type={type} />
+            <SchedulerComponent editShift={editShift} employees={employees} listOfShifts={shifts} type={type} />
           </div>
         </div>
 
