@@ -14,10 +14,15 @@ module.exports = {
       },
       gridTemplateColumns: {
         '25': 'repeat(30, minmax(0px, 1fr))',
+        '30': 'repeat(30, minmax(0px, 1fr))',
+        '38': 'repeat(38, minmax(0px, 1fr))',
       },
       gridColumn: {
         'span-24': 'span 24 / span 24',
         'span-25': 'span 25 / span 25'
+      },
+      gridColumnStart: {
+        '37': '37',
       }
     },
   },
