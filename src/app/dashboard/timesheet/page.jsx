@@ -29,7 +29,7 @@ const Timesheet = () => {
 
 
   const { data: employees, mutate: mutateEmployees } = useSWR(
-    [`${process.env.NEXTAUTH_URL}/api/employees`, session.data.user.accessToken],
+    [`/api/employees`, session.data.user.accessToken],
       fetcher
     );
   

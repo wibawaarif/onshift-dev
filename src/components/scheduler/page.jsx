@@ -5,9 +5,13 @@ import { Avatar } from "antd";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Fragment, useState, useEffect } from "react";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 
 const SchedulerComponent = ({ type, employees, editShift }) => {
-  console.log(employees);
     // Get the current date
   const currentDate = dayjs();
 
@@ -51,25 +55,9 @@ const SchedulerComponent = ({ type, employees, editShift }) => {
     "11PM",
   ];
 
-  const updateTable = (result) => {
-    console.log(result);
-    // if (
-    //   result.destination &&
-    //   result.source.droppableId !== result.destination.droppableId
-    // ) {
-    //   let newListOfEmployees = [...employees];
-    //   newListOfEmployees[result.source.index].schedules[
-    //     result.destination.droppableId
-    //   ] =
-    //     newListOfEmployees[result.source.index].schedules[
-    //       result.source.droppableId
-    //     ];
-    //   newListOfEmployees[result.source.index].schedules[
-    //     result.source.droppableId
-    //   ] = {};
-    //   setEmployees(newListOfEmployees);
-    // }
-  };
+  const test = data => {
+    console.log(data);
+  }
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -245,7 +233,7 @@ const SchedulerComponent = ({ type, employees, editShift }) => {
 
                             {
                               row.shifts && row.shifts.map((z, index) => (
-                                dayjs(z.date).format('YYYY-MM-DD') === dataItem && <Draggable
+                                (dayjs(z.date).format('YYYY-MM-DD') === dataItem || ( z?.repeatedShift?.repeatedDays.includes(dayjs(dataItem).format('YYYY-MM-DD')))  ) && <Draggable
                                 key={z._id}
                                 draggableId={`${z._id}`}
                                 index={index}
@@ -257,6 +245,7 @@ const SchedulerComponent = ({ type, employees, editShift }) => {
                                     {...provided.dragHandleProps}
                                     onMouseEnter={() => setRowIndex(index)}
                                     className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
+                                    onClick={() => test(row)}
                                   >
                                     <p className="text-[10px] font-bold">
                                       {dayjs(z.startTime).format('h:mma')} - {dayjs(z.endTime).format('h:mma')} · {dayjs(z.endTime).diff(dayjs(z.startTime), 'hour')}H

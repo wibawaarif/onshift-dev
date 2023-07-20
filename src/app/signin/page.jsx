@@ -116,7 +116,7 @@ const SignIn = () => {
             <div className="flex justify-between lg:w-full lg:mt-[50px]">
               <button
                 onClick={() => {
-                  signIn("google", { callbackUrl: `${process.env.NEXTAUTH_URL}/dashboard/schedule` });
+                  signIn("google", { callbackUrl: `/dashboard/schedule` });
                 }}
                 className="bg-white flex items-center justify-center text-black text-sm hover:bg-stone-100 transtion duration-300 border-2 border-black border-opacity-50 lg:w-[47.5%] lg:h-[52px]"
               >

@@ -27,7 +27,7 @@ export const GET = async (request) => {
     .populate({
       path: 'shifts',
       model: Shift,
-      select: 'date startTime endTime location position employees',
+      select: 'date startTime endTime location position employees repeatedShift notes break',
       populate: [{
         path: 'location',
         select: 'name address',

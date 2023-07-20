@@ -20,7 +20,7 @@ const Location = () => {
 
   const session = useSession();
 
-  let { data: locations, error, isLoading, mutate } = useSWR([`${process.env.NEXTAUTH_URL}/api/locations`, session.data.user.accessToken], fetcher)
+  let { data: locations, error, isLoading, mutate } = useSWR([`/api/locations`, session.data.user.accessToken], fetcher)
 
   const clearFields = () => {
     setForm({
@@ -32,7 +32,7 @@ const Location = () => {
 
   const addLocation = async () => {
     setLocationModal(false)
-    const data = await fetch(`${process.env.NEXTAUTH_URL}/api/locations`, {
+    const data = await fetch(`/api/locations`, {
       method: "POST",
       body: JSON.stringify(form),
       headers: {
@@ -55,7 +55,7 @@ const Location = () => {
 
   const editLocation = async () => {
     setLocationModal(false)
-    const data = await fetch(`${process.env.NEXTAUTH_URL}/api/locations/${id}`, {
+    const data = await fetch(`/api/locations/${id}`, {
       method: "PUT",
       body: JSON.stringify(form),
       headers: {
@@ -78,7 +78,7 @@ const Location = () => {
 
   const deleteLocation = async () => {
     setLocationModal(false);
-    await fetch(`${process.env.NEXTAUTH_URL}/api/locations/${id}`, {
+    await fetch(`/api/locations/${id}`, {
       method: "DELETE",
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,

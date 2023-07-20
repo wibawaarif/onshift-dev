@@ -5,10 +5,13 @@ const shiftSchema = new Schema({
     type: Date,
   },
   startTime: {
-    type: Date
+    type: Date,
   },
   endTime: {
-    type: Date
+    type: Date,
+  },
+  break: {
+    type: String,
   },
   location: {
     type: mongoose.Types.ObjectId,
@@ -22,6 +25,17 @@ const shiftSchema = new Schema({
     type: mongoose.Types.ObjectId,
     ref: 'Employee',
   }],
+  repeatedShift: {
+    isRepeated: {
+      type: Boolean,
+    },
+    repeatedDays: [{
+      type: String,
+    }],
+    endDate: {
+      type: Date,
+    }
+  },
   notes: {
     type: String,
   }
