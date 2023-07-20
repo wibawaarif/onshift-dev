@@ -1,5 +1,5 @@
 async function getData() {
-  const res = await fetch("http://localhost:3000/api/shifts", {
+  const res = await fetch(`${process.env.NEXTAUTH_URL}/api/shifts`, {
     cache: 'no-store'
   })
   return res.json();

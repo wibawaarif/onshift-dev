@@ -41,23 +41,23 @@ const Scheduler = () => {
     position: null,
   });
   const { data: shifts, mutate: mutateShifts } = useSWR(
-["http://localhost:3000/api/shifts", session.data.user.accessToken],
+[`${process.env.NEXTAUTH_URL}/api/shifts`, session.data.user.accessToken],
     fetcher
   );
   const { data: locations } = useSWR(
     shiftModal
-      ? ["http://localhost:3000/api/locations", session.data.user.accessToken]
+      ? [`${process.env.NEXTAUTH_URL}/api/locations`, session.data.user.accessToken]
       : null,
     fetcher
   );
   const { data: positions } = useSWR(
     shiftModal
-      ? ["http://localhost:3000/api/positions", session.data.user.accessToken]
+      ? [`${process.env.NEXTAUTH_URL}/api/positions`, session.data.user.accessToken]
       : null,
     fetcher
   );
   const { data: employees, mutate: mutateEmployees } = useSWR(
-  ["http://localhost:3000/api/employees", session.data.user.accessToken],
+  [`${process.env.NEXTAUTH_URL}/api/employees`, session.data.user.accessToken],
     fetcher
   );
 
@@ -105,7 +105,7 @@ const Scheduler = () => {
 
   const addShift = async () => {
     setShiftModal(false);
-    await fetch("http://localhost:3000/api/shifts", {
+    await fetch(`${process.env.NEXTAUTH_URL}/api/shifts`, {
       method: "POST",
       body: JSON.stringify(form),
       headers: {
@@ -125,7 +125,7 @@ const Scheduler = () => {
       result.destination &&
       result.source.droppableId !== result.destination.droppableId
     ) { 
-      await fetch(`http://localhost:3000/api/shifts/${result.draggableId}`, {
+      await fetch(`${process.env.NEXTAUTH_URL}/api/shifts/${result.draggableId}`, {
         method: "PUT",
         body: JSON.stringify({date: dayjs(result.destination.droppableId)}),
         headers: {

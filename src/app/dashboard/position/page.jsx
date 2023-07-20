@@ -40,12 +40,12 @@ const Position = () => {
   const session = useSession();
 
   let { data, error, isLoading, mutate } = useSWR(
-    ["http://localhost:3000/api/positions", session.data.user.accessToken],
+    [`${process.env.NEXTAUTH_URL}/api/positions`, session.data.user.accessToken],
     fetcher
   );
   let { data: employees } = useSWR(
     positionModal
-      ? ["http://localhost:3000/api/employees", session.data.user.accessToken]
+      ? [`${process.env.NEXTAUTH_URL}/api/employees`, session.data.user.accessToken]
       : null,
     fetcher
   );
@@ -79,7 +79,7 @@ const Position = () => {
 
   const addPosition = async () => {
     setPositionModal(false);
-    await fetch("http://localhost:3000/api/positions", {
+    await fetch(`${process.env.NEXTAUTH_URL}/api/positions`, {
       method: "POST",
       body: JSON.stringify({
         name,
@@ -110,7 +110,7 @@ const Position = () => {
 
   const editPosition = async () => {
     setPositionModal(false);
-    await fetch(`http://localhost:3000/api/positions/${id}`, {
+    await fetch(`${process.env.NEXTAUTH_URL}/api/positions/${id}`, {
       method: "PUT",
       body: JSON.stringify({
         name,
@@ -132,7 +132,7 @@ const Position = () => {
 
   const deletePosition = async () => {
     setPositionModal(false);
-    await fetch(`http://localhost:3000/api/positions/${id}`, {
+    await fetch(`${process.env.NEXTAUTH_URL}/api/positions/${id}`, {
       method: "DELETE",
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,
