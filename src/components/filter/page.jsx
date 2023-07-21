@@ -1,24 +1,22 @@
 "use client";
 import { Input, Checkbox } from "antd";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import _ from "lodash"
 
-const FilterComponent = ({allFilterList}) => {
-  const allFilterListClone = _.cloneDeep(allFilterList)
-
-  const [filterList, setFilterList] = useState(allFilterListClone)
+const FilterComponent = ({allFilterList, checkedFilter, selectedFilter}) => {
+  const [filterList, setFilterList] = useState(allFilterList)
   const [filterValue, setFilterValue] = useState("")
 
   useEffect(() => {
-    const filteredList = allFilterListClone.filter(x => {
-          x.options = x.options.map(y => {
+    const filteredList = _.cloneDeep(allFilterList)?.filter(x => {
+          x.options = x?.options?.map(y => {
             if (y?.toLowerCase().includes(filterValue.toLowerCase())) {
               return y
             }
           }).filter(item => item)
   
-          if (x.options.length === 0) {
+          if (x?.options?.length === 0) {
             return false
           }
   
@@ -27,7 +25,7 @@ const FilterComponent = ({allFilterList}) => {
 
     setFilterList(filteredList)
 
-    }, [filterValue])
+    }, [filterValue, allFilterList])
 
 
 
@@ -42,13 +40,13 @@ const FilterComponent = ({allFilterList}) => {
       </div>
 
       {
-        filterList.map((x, index) => (
+        filterList?.map((x, index) => (
           <div key={index} className={`${index === 0 ? 'mt-[20px]' : 'mt-[28px]'} px-4 w-full`}>
             <p className="text-[10px] font-medium">{x.name}</p>
             {
-              x.options.map((y, index2) => (
+              x?.options?.map((y, index2) => (
                 <div key={index2} className="mt-1">
-                  <Checkbox className="font-semibold">{y}</Checkbox>
+                  <Checkbox name={y} checked={selectedFilter?.some(z => z === y) ? true : false} onChange={checkedFilter} className="font-semibold">{y}</Checkbox>
               </div>
               ))
             }

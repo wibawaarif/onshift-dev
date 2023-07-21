@@ -10,15 +10,14 @@ import {
   ConfigProvider,
   DatePicker,
   TimePicker,
-  Divider,
   Select,
   Input,
   message,
-  Popover
+  Popover,
 } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import _ from "lodash";
 import dayjs from "dayjs";
 
 const fetcher = ([url, token]) =>
@@ -29,12 +28,32 @@ const fetcher = ([url, token]) =>
 const Scheduler = () => {
   const session = useSession();
 
+  const { data: shifts, mutate: mutateShifts } = useSWR(
+    [`/api/shifts`, session.data.user.accessToken],
+    fetcher
+  );
+  const { data: locations } = useSWR(
+    [`/api/locations`, session.data.user.accessToken],
+    fetcher
+  );
+  const { data: positions } = useSWR(
+    [`/api/positions`, session.data.user.accessToken],
+    fetcher
+  );
+  const { data: employees, mutate: mutateEmployees } = useSWR(
+    [`/api/employees`, session.data.user.accessToken],
+    fetcher
+  );
+
   const [type, setType] = useState("week");
   const [shiftModal, setShiftModal] = useState(false);
   const [showBreak, setShowBreak] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [popover, setPopover] = useState(false);
   const [selectedRepeatedDays, setSelectedRepeatedDays] = useState([]);
+  const [clonedEmployees, setClonedEmployees] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState([]);
+  const [weeklyDateValue, setWeeklyDateValue] = useState(dayjs());
   const [form, setForm] = useState({
     date: "",
     startTime: "",
@@ -42,97 +61,100 @@ const Scheduler = () => {
     employees: [],
     location: "",
     position: null,
-    notes: '',
+    notes: "",
     break: null,
     repeatedShift: {
       isRepeated: false,
+      startRepeatedWeek: null,
       repeatedDays: [],
       endDate: null,
-    }
+    },
   });
-  const { data: shifts, mutate: mutateShifts } = useSWR(
-[`/api/shifts`, session.data.user.accessToken],
-    fetcher
-  );
-  const { data: locations } = useSWR(
-    shiftModal
-      ? [`/api/locations`, session.data.user.accessToken]
-      : null,
-    fetcher
-  );
-  const { data: positions } = useSWR(
-    shiftModal
-      ? [`/api/positions`, session.data.user.accessToken]
-      : null,
-    fetcher
-  );
-  const { data: employees, mutate: mutateEmployees } = useSWR(
-  [`/api/employees`, session.data.user.accessToken],
-    fetcher
-  );
+
+  useEffect(() => {
+    setClonedEmployees(_.cloneDeep(employees));
+  }, [employees]);
+
+  useEffect(() => {
+    const filteredList = _.cloneDeep(employees)?.filter((x) => {
+      return selectedFilter?.some(
+        (y) =>
+          x.name === y ||
+          x?.shifts?.some(
+            (z) => z?.location?.name === y || z?.position?.name === y
+          )
+      );
+    });
+
+    if (selectedFilter?.length > 0) {
+      setClonedEmployees(filteredList);
+    } else {
+      setClonedEmployees(_.cloneDeep(employees));
+    }
+  }, [selectedFilter]);
 
   const disabledDate = (current) => {
     // Can not select days before today and today
-    return current && current < dayjs().endOf('day');
+    return current && current < dayjs().endOf("day");
   };
 
-  const filterExamples = [
+  const filterOptions = [
     {
       name: "LOCATIONS / (DESELECT ALL)",
-      options: ["Anaheim", "Santa Barbara"],
+      options: locations?.map((location) => location.name),
     },
     {
       name: "POSITIONS / (DESELECT ALL)",
-      options: [
-        "Surgical Tech",
-        "Dentist",
-        "Nurse Practitioner",
-        "Phlebotomist",
-      ],
-    },
-    {
-      name: "EVENTS / (DESELECT ALL)",
-      options: [
-        "Scheduled shifts",
-        "Unassigned shifts",
-        "Days off",
-        "Unavailability",
-      ],
+      options: positions?.map((position) => position.name),
     },
     {
       name: "EMPLOYEES / (DESELECT ALL)",
-      options: [
-        "Arif",
-        "Wibawa",
-        "David Paul",
-        "Jared Martin",
-        "Rena Sofer",
-        "Rena Sofer",
-        "Rena Sofer",
-      ],
+      options: employees?.map((employee) => employee.name),
     },
   ];
 
-  const checkRepeatedDays = index => setSelectedRepeatedDays(prev => {
-    const getDay = dayjs().day(index + 1).format('YYYY-MM-DD')
-    if (prev.includes(getDay)) {
-      return prev.filter(x => x !== getDay)
+  const weeklyDateChange = (date, dateString) => {
+    setWeeklyDateValue(date);
+  };
+
+  const checkedFilter = (e) => {
+    let newSelectedFilter = [...selectedFilter];
+
+    if (e.target.checked) {
+      newSelectedFilter.push(e.target.name);
+      setSelectedFilter(newSelectedFilter);
     } else {
-      return [...prev, getDay]
+      newSelectedFilter = newSelectedFilter.filter((x) => x !== e.target.name);
+      setSelectedFilter(newSelectedFilter);
     }
-  })
+  };
+  const checkRepeatedDays = (index) =>
+    setSelectedRepeatedDays((prev) => {
+      const getDay = dayjs()
+        .day(index + 1)
+        .format("dddd");
+      if (prev.includes(getDay)) {
+        return prev.filter((x) => x !== getDay);
+      } else {
+        return [...prev, getDay];
+      }
+    });
 
   const endRepeatedShift = (date, dateString) =>
-  setForm((prev) => {
-    return { ...prev, repeatedShift: { ...prev.repeatedShift, endDate: dateString } };
-  })
+    setForm((prev) => {
+      return {
+        ...prev,
+        repeatedShift: { ...prev.repeatedShift, endDate: dateString },
+      };
+    });
 
   const addShift = async () => {
     if (selectedRepeatedDays.length > 0) {
-      let newForm = form
-      newForm.repeatedShift.isRepeated = true
-      newForm.repeatedShift.repeatedDays = selectedRepeatedDays
-      setForm(newForm)
+      let newForm = form;
+      newForm.repeatedShift.isRepeated = true;
+      newForm.repeatedShift.repeatedDays = selectedRepeatedDays;
+      newForm.repeatedShift.startRepeatedWeek = dayjs().startOf('week').add(1, 'week').add(1, 'day')
+      setForm(newForm);
     }
     setShiftModal(false);
     await fetch(`/api/shifts`, {
@@ -142,24 +164,21 @@ const Scheduler = () => {
         authorization: "Bearer " + session.data.user.accessToken,
       },
     });
-    mutateEmployees([
-      ...employees
-    ]);
+    mutateEmployees([...employees]);
 
     message.success("Shift created");
 
     clearFields();
   };
-  
 
-  const editShift = async result => {
+  const editShift = async (result) => {
     if (
       result.destination &&
       result.source.droppableId !== result.destination.droppableId
-    ) { 
+    ) {
       await fetch(`/api/shifts/${result.draggableId}`, {
         method: "PUT",
-        body: JSON.stringify({date: dayjs(result.destination.droppableId)}),
+        body: JSON.stringify({ date: dayjs(result.destination.droppableId) }),
         headers: {
           authorization: "Bearer " + session.data.user.accessToken,
         },
@@ -167,8 +186,8 @@ const Scheduler = () => {
       mutateEmployees([...employees]);
 
       message.success("Shift updated");
-  }
-  }
+    }
+  };
 
   const clearFields = () => {
     setForm({
@@ -178,14 +197,14 @@ const Scheduler = () => {
       employees: [],
       location: "",
       position: null,
-      notes: '',
-      break: '',
+      notes: "",
+      break: "",
       repeatedShift: {
         isRepeated: false,
         repeatedDays: [],
         endDate: null,
-      }
-    })
+      },
+    });
   };
 
   return (
@@ -200,42 +219,72 @@ const Scheduler = () => {
         <div className="border-b-[1px] border-[#E5E5E3] h-[71px] w-full flex items-center">
           <div className="px-4 py-1 flex w-full">
             <div className="flex border-[1px] border-[#E5E5E5] w-max">
-              <button
+              {/* <button
                 onClick={() => setType("day")}
                 className={`hover:bg-[#E5E5E3] ${
                   type === "day" ? "bg-[#E5E5E3]" : ""
                 } transition duration-300 px-2 py-1 border-r-[1px] border-[#E5E5E5]`}
               >
                 Day
-              </button>
+              </button> */}
               <button
                 onClick={() => setType("week")}
                 className={`hover:bg-[#E5E5E3] ${
                   type === "week" ? "bg-[#E5E5E3]" : ""
                 } duration-300 px-2 py-1 border-r-[1px] border-[#E5E5E5]`}
               >
-                Week
+                Weekly
               </button>
-              <button
+              {/* <button
                 onClick={() => setType("month")}
                 className={`hover:bg-[#E5E5E3] ${
                   type === "month" ? "bg-[#E5E5E3]" : ""
                 } duration-300 px-2 py-1`}
               >
                 Month
-              </button>
+              </button> */}
             </div>
 
             <div className="flex justify-between items-center w-full px-4">
-              <div className="w-48 h-full flex">
+              <div className="w-72 h-full flex">
+                <button
+                  onClick={() =>
+                    setWeeklyDateValue(weeklyDateValue.subtract(1, "week"))
+                  }
+                  className={`hover:bg-[#E5E5E3] duration-300 px-2 py-1 border-l-[1px] border-b-[1px] border-t-[1px] border-[#E5E5E5]`}
+                >
+                  <Image
+                    width={20}
+                    height={20}
+                    className="mt-[3px] rotate-90"
+                    alt="arrow-down"
+                    src={"/static/svg/arrow-down.svg"}
+                  />
+                </button>
                 <DatePicker
                   className="rounded-none"
-                  format={"MM/DD"}
+                  onChange={weeklyDateChange}
                   picker="week"
+                  format={(value) => `${dayjs(value).startOf('week').add(1, 'day').format('D MMM')} - ${dayjs(value).endOf('week').add(1, 'day').format('D MMM')}`}
+                  value={weeklyDateValue}
                 />
                 <button
+                  onClick={() =>
+                    setWeeklyDateValue(weeklyDateValue.add(1, "week"))
+                  }
+                  className={`hover:bg-[#E5E5E3] duration-300 px-2 py-1 border-r-[1px] border-b-[1px] border-t-[1px] border-[#E5E5E5]`}
+                >
+                  <Image
+                    width={20}
+                    height={20}
+                    className="mt-[3px] -rotate-90"
+                    alt="arrow-down"
+                    src={"/static/svg/arrow-down.svg"}
+                  />
+                </button>
+                <button
                   onClick={() => setType("week")}
-                  className={`hover:bg-[#E5E5E3] duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}
+                  className={`hover:bg-[#E5E5E3] ml-4 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}
                 >
                   Today
                 </button>
@@ -261,11 +310,21 @@ const Scheduler = () => {
 
         <div className="flex flex-1">
           <div className="w-[202px] border-r-[1px] border-[#E5E5E3] overflow-y-auto h-[720px]">
-            <FilterComponent allFilterList={filterExamples} />
+            <FilterComponent
+              selectedFilter={selectedFilter}
+              checkedFilter={checkedFilter}
+              allFilterList={filterOptions}
+            />
           </div>
 
           <div className="flex-1">
-            <SchedulerComponent editShift={editShift} employees={employees} listOfShifts={shifts} type={type} />
+            <SchedulerComponent
+              weeklyDateValue={weeklyDateValue}
+              editShift={editShift}
+              employees={clonedEmployees}
+              listOfShifts={shifts}
+              type={type}
+            />
           </div>
         </div>
 
@@ -311,45 +370,70 @@ const Scheduler = () => {
                         className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
                       />
                       <Popover
-                            content={
-                              <div className="flex flex-col">
-                                <div className="flex">
-                                {
-                                  Array.from(Array(7)).map((x,index) => <p onClick={() => checkRepeatedDays(index)} className={`px-4 py-1 bg-white border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${selectedRepeatedDays.includes(dayjs().day(index + 1).format('YYYY-MM-DD')) ? 'bg-[#F7F7F5]' : undefined}`} key={index}>{dayjs().day(index + 1).format('ddd')}</p>
-                                  )
-                                }
-                                </div>
-                                <span className="text-xs font-semibold mt-4">ENDS</span>
-                                <DatePicker
-                                  disabledDate={disabledDate}
-                                  onChange={endRepeatedShift}
-                                  className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
-                                />
-                              </div>
-                            }
-                            placement="bottomLeft"
-                            title="Repeat On"
-                            trigger="click"
-                            open={popover === 'isRepeated'}
-                            onOpenChange={(e) => {
-                              if (e) {
-                                setPopover('isRepeated');
-                              } else {
-                                setPopover(null);
-                              }
-                            }}
-                          >
-                          <div className="mt-2 flex items-center hover:cursor-pointer">
-                            <p className="text-stone-500 hover:text-black text-sm">{ popover === 'isRepeated' ? 'Hide Repeat' : 'Repeat' }</p>
-                            <Image
-                              width={18}
-                              height={18}
-                              className={`mt-[3px] ${popover === 'isRepeated' ? 'rotate-180' : undefined}`}
-                              alt="arrow-down"
-                              src={"/static/svg/arrow-down.svg"}
+                        content={
+                          <div className="flex flex-col">
+                            <div className="flex">
+                              {Array.from(Array(7)).map((x, index) => (
+                                <p
+                                  onClick={() => checkRepeatedDays(index)}
+                                  className={`px-4 py-1 bg-white border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${
+                                    selectedRepeatedDays.includes(
+                                      dayjs()
+                                        .day(index + 1)
+                                        .format("dddd")
+                                    )
+                                      ? "bg-stone-300"
+                                      : undefined
+                                  }`}
+                                  key={index}
+                                >
+                                  {dayjs()
+                                    .day(index + 1)
+                                    .format("ddd")}
+                                </p>
+                              ))}
+                            </div>
+                            <span className="text-xs font-semibold mt-4">
+                              ENDS
+                            </span>
+                            <DatePicker
+                              disabledDate={disabledDate}
+                              onChange={endRepeatedShift}
+                              className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
                             />
                           </div>
-                          </Popover>
+                        }
+                        placement="bottomLeft"
+                        title="Repeat On"
+                        trigger="click"
+                        open={popover === "isRepeated"}
+                        onOpenChange={(e) => {
+                          if (e) {
+                            setPopover("isRepeated");
+                          } else {
+                            setPopover(null);
+                          }
+                        }}
+                      >
+                        <div className="mt-2 flex items-center hover:cursor-pointer">
+                          <p className="text-stone-500 hover:text-black text-sm">
+                            {popover === "isRepeated"
+                              ? "Hide Repeat"
+                              : "Repeat"}
+                          </p>
+                          <Image
+                            width={18}
+                            height={18}
+                            className={`mt-[3px] ${
+                              popover === "isRepeated"
+                                ? "rotate-180"
+                                : undefined
+                            }`}
+                            alt="arrow-down"
+                            src={"/static/svg/arrow-down.svg"}
+                          />
+                        </div>
+                      </Popover>
                     </div>
 
                     <div className="flex mt-4 justify-between">
@@ -393,31 +477,62 @@ const Scheduler = () => {
                       {showBreak && (
                         <div className="flex flex-col h-16 justify-center">
                           <div className="mt-3">
-                            <button onClick={() => setForm((prev) => {
-                            return { ...prev, break: '15' };
-                          })} className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${form.break === '15' ? 'bg-[#F7F7F5]' : undefined}`}>
+                            <button
+                              onClick={() =>
+                                setForm((prev) => {
+                                  return { ...prev, break: "15" };
+                                })
+                              }
+                              className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
+                                form.break === "15" ? "bg-[#F7F7F5]" : undefined
+                              }`}
+                            >
                               15 min
                             </button>
-                            <button onClick={() => setForm((prev) => {
-                            return { ...prev, break: '30' };
-                          })} className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${form.break === '30' ? 'bg-[#F7F7F5]' : undefined}`}>
+                            <button
+                              onClick={() =>
+                                setForm((prev) => {
+                                  return { ...prev, break: "30" };
+                                })
+                              }
+                              className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
+                                form.break === "30" ? "bg-[#F7F7F5]" : undefined
+                              }`}
+                            >
                               30 min
                             </button>
-                            <button onClick={() => setForm((prev) => {
-                            return { ...prev, break: '45' };
-                          })} className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${form.break === '45' ? 'bg-[#F7F7F5]' : undefined}`}>
+                            <button
+                              onClick={() =>
+                                setForm((prev) => {
+                                  return { ...prev, break: "45" };
+                                })
+                              }
+                              className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
+                                form.break === "45" ? "bg-[#F7F7F5]" : undefined
+                              }`}
+                            >
                               45 min
                             </button>
-                            <button onClick={() => setForm((prev) => {
-                            return { ...prev, break: '60' };
-                          })} className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${form.break === '60' ? 'bg-[#F7F7F5]' : undefined}`}>
+                            <button
+                              onClick={() =>
+                                setForm((prev) => {
+                                  return { ...prev, break: "60" };
+                                })
+                              }
+                              className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
+                                form.break === "60" ? "bg-[#F7F7F5]" : undefined
+                              }`}
+                            >
                               60 min
                             </button>
                             <div className="mt-2">
                               <button
-                                onClick={() => setShowBreak(false) & setForm((prev) => {
-                                  return { ...prev, break: null };
-                                })}
+                                onClick={() =>
+                                  setShowBreak(false) &
+                                  setForm((prev) => {
+                                    return { ...prev, break: null };
+                                  })
+                                }
                                 className="transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
                               >
                                 DELETE BREAK
@@ -497,9 +612,11 @@ const Scheduler = () => {
                       <div className="mt-4">
                         <span className="text-xs font-semibold">NOTES</span>
                         <Input
-                          onChange={e => setForm(prev => {
-                            return { ...prev, notes: e.target.value };
-                          })}
+                          onChange={(e) =>
+                            setForm((prev) => {
+                              return { ...prev, notes: e.target.value };
+                            })
+                          }
                           className="rounded-none border-t-0 border-l-0 border-r-0"
                           placeholder="Basic usage"
                         />

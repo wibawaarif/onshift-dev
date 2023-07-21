@@ -11,18 +11,22 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
-const SchedulerComponent = ({ type, employees, editShift }) => {
-    // Get the current date
-  const currentDate = dayjs();
+const SchedulerComponent = ({
+  type,
+  employees,
+  editShift,
+  weeklyDateValue,
+}) => {
+  // Get the current date
 
   // Get the start date of the current week (Sunday)
-  const startDate = currentDate.startOf('week');
+  const startDate = weeklyDateValue.startOf("week");
 
   const weekSchedule = [];
 
   for (let i = 1; i < 8; i++) {
-    const date = startDate.add(i, 'day');
-    weekSchedule.push(date.format('YYYY-MM-DD'));
+    const date = startDate.add(i, "day");
+    weekSchedule.push(date.format("YYYY-MM-DD"));
   }
 
   // const [employees, setEmployees] = useState([]);
@@ -55,9 +59,9 @@ const SchedulerComponent = ({ type, employees, editShift }) => {
     "11PM",
   ];
 
-  const test = data => {
+  const test = (data) => {
     console.log(data);
-  }
+  };
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -143,7 +147,9 @@ const SchedulerComponent = ({ type, employees, editShift }) => {
                 className="bg-white flex justify-center items-center h-[40px] border-b-[1px] border-r-[1px] border-[#E5E5E3]"
                 key={x}
               >
-                <span className="text-slate-700">{dayjs(x).format('ddd D')}</span>
+                <span className="text-slate-700">
+                  {dayjs(x).format("ddd D")}
+                </span>
                 <Image
                   className="ml-[8px]"
                   alt="chart"
@@ -167,9 +173,7 @@ const SchedulerComponent = ({ type, employees, editShift }) => {
                   <div className="flex items-center">
                     <Avatar size={32} className="mr-2" />
                     <div className="flex flex-col justify-between">
-                      <span className="text-[14px]">
-                        {row.name}
-                      </span>
+                      <span className="text-[14px]">{row.name}</span>
                     </div>
                   </div>
                 </div>
@@ -230,35 +234,79 @@ const SchedulerComponent = ({ type, employees, editShift }) => {
                               dataIndex === 0 ? "first-child" : ""
                             } bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
                           >
-
-                            {
-                              row.shifts && row.shifts.map((z, index) => (
-                                (dayjs(z.date).format('YYYY-MM-DD') === dataItem || ( z?.repeatedShift?.repeatedDays.includes(dayjs(dataItem).format('YYYY-MM-DD')))  ) && <Draggable
-                                key={z._id}
-                                draggableId={`${z._id}`}
-                                index={index}
-                              >
-                                {(provided) => (
+                            {row.shifts &&
+                              row.shifts.map((z, index) =>
+                              // const isAnyDayWithinRange = daysArray.some(day => {
+                              //   const dayToCheck = startRepeatedDate.day();
+                              //   return dayToCheck >= startRepeatedDate.day() && dayToCheck <= endRepeatedDate.day();
+                              // });
+                                z?.repeatedShift?.repeatedDays?.some(x => x === dayjs(dataItem).format('dddd'))
+                                ? (
+                                   // repeated week
                                   <div
-                                    {...provided.draggableProps}
-                                    ref={provided.innerRef}
-                                    {...provided.dragHandleProps}
-                                    onMouseEnter={() => setRowIndex(index)}
+                                    key={index}
                                     className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
-                                    onClick={() => test(row)}
                                   >
+                                    {JSON.stringify(dayjs(z?.repeatedShift?.startRepeatedWeek).isSameOrAfter(dayjs(dataItem)))}
                                     <p className="text-[10px] font-bold">
-                                      {dayjs(z.startTime).format('h:mma')} - {dayjs(z.endTime).format('h:mma')} · {dayjs(z.endTime).diff(dayjs(z.startTime), 'hour')}H
+                                      {dayjs(z.startTime).format("h:mma")} -{" "}
+                                      {dayjs(z.endTime).format("h:mma")} ·{" "}
+                                      {dayjs(z.endTime).diff(
+                                        dayjs(z.startTime),
+                                        "hour"
+                                      )}
+                                      H
                                     </p>
                                     <p className="mt-[1px] text-[10px]">
-                                      { z.location.name } {z.position?.name ? `- ${z.position.name}` : undefined}
+                                      {z.location.name}{" "}
+                                      {z.position?.name
+                                        ? `- ${z.position.name}`
+                                        : undefined}
                                     </p>
-                                    {provided.placeholder}
                                   </div>
-                                )}
-                              </Draggable>
-                              ))
-                            }
+                                ) : (
+                                  dayjs(z.date).format("YYYY-MM-DD") ===
+                                    dataItem && (
+                                    // non repeated week
+                                    <Draggable
+                                      key={z._id}
+                                      draggableId={`${z._id}`}
+                                      index={index}
+                                    >
+                                      {(provided) => (
+                                        <div
+                                          {...provided.draggableProps}
+                                          ref={provided.innerRef}
+                                          {...provided.dragHandleProps}
+                                          onMouseEnter={() =>
+                                            setRowIndex(index)
+                                          }
+                                          className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
+                                          onClick={() => test(row)}
+                                        >
+                                          <p className="text-[10px] font-bold">
+                                            {dayjs(z.startTime).format("h:mma")}{" "}
+                                            - {dayjs(z.endTime).format("h:mma")}{" "}
+                                            ·{" "}
+                                            {dayjs(z.endTime).diff(
+                                              dayjs(z.startTime),
+                                              "hour"
+                                            )}
+                                            H
+                                          </p>
+                                          <p className="mt-[1px] text-[10px]">
+                                            {z.location.name}{" "}
+                                            {z.position?.name
+                                              ? `- ${z.position.name}`
+                                              : undefined}
+                                          </p>
+                                          {provided.placeholder}
+                                        </div>
+                                      )}
+                                    </Draggable>
+                                  )
+                                )
+                              )}
 
                             {provided.placeholder}
                           </div>
@@ -266,7 +314,6 @@ const SchedulerComponent = ({ type, employees, editShift }) => {
                       </Droppable>
                     </div>
                   ))}
-
               </DragDropContext>
             </Fragment>
           ))}

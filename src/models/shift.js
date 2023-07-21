@@ -29,6 +29,9 @@ const shiftSchema = new Schema({
     isRepeated: {
       type: Boolean,
     },
+    startRepeatedWeek: {
+      type: Date,
+    },
     repeatedDays: [{
       type: String,
     }],
