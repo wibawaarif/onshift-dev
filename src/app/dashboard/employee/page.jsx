@@ -12,7 +12,7 @@ import {
   message,
 } from "antd";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import useSWR from "swr";
@@ -26,6 +26,15 @@ const fetcher = ([url, token]) =>
 const Employee = () => {
   const session = useSession();
 
+
+  const { data: locations } = useSWR(
+    [`/api/locations`, session.data.user.accessToken],
+    fetcher
+  );
+  const { data: positions } = useSWR(
+    [`/api/positions`, session.data.user.accessToken],
+    fetcher
+  );
   const {
     data: employees,
     error,
@@ -36,30 +45,46 @@ const Employee = () => {
     fetcher
   );
 
+  const [clonedEmployees, setClonedEmployees] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState([]);
+  const [searchEmployeesInput, setSearchEmployeesInput] = useState('');
   const [actionType, setActionType] = useState("");
   const [popover, setPopover] = useState(false);
 
-  const filterExamples = [
+  useEffect(() => {
+    setClonedEmployees(_.cloneDeep(employees));
+  }, [employees]);
+
+  useEffect(() => {
+    const filteredList = _.cloneDeep(employees)?.filter((x) => {
+      return selectedFilter?.some(
+        (y) =>
+          x.name === y ||
+          x?.shifts?.some(
+            (z) => z?.location?.name === y || z?.position?.name === y
+          )
+      ) || x.name.includes(searchEmployeesInput)
+    });
+
+    if (selectedFilter?.length > 0 || searchEmployeesInput) {
+      setClonedEmployees(filteredList);
+    } else {
+      setClonedEmployees(_.cloneDeep(employees));
+    }
+  }, [selectedFilter, searchEmployeesInput]);
+
+  const filterOptions = [
     {
       name: "LOCATIONS / (DESELECT ALL)",
-      options: ["Anaheim", "Santa Barbara"],
+      options: locations?.map((location) => location.name),
     },
     {
       name: "POSITIONS / (DESELECT ALL)",
-      options: [
-        "Surgical Tech",
-        "Dentist",
-        "Nurse Practitioner",
-        "Phlebotomist",
-      ],
+      options: positions?.map((position) => position.name),
     },
     {
-      name: "ROLE / (DESELECT ALL)",
-      options: ["Administrator", "Employee"],
-    },
-    {
-      name: "STATUS / (DESELECT ALL)",
-      options: ["Not invited", "Pending Approval", "Invited", "Joined"],
+      name: "EMPLOYEES / (DESELECT ALL)",
+      options: employees?.map((employee) => employee.name),
     },
   ];
 
@@ -145,6 +170,18 @@ const Employee = () => {
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [employeeModal, setEmployeeModal] = useState(false);
+
+  const checkedFilter = (e) => {
+    let newSelectedFilter = [...selectedFilter];
+
+    if (e.target.checked) {
+      newSelectedFilter.push(e.target.name);
+      setSelectedFilter(newSelectedFilter);
+    } else {
+      newSelectedFilter = newSelectedFilter.filter((x) => x !== e.target.name);
+      setSelectedFilter(newSelectedFilter);
+    }
+  };
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -242,13 +279,16 @@ const Employee = () => {
     >
       <div className="flex flex-1">
         <div className="w-[202px] border-r-[1px] border-[#E5E5E3] overflow-y-auto h-[720px]">
-          <FilterComponent allFilterList={filterExamples} />
+          <FilterComponent               selectedFilter={selectedFilter}
+              checkedFilter={checkedFilter}
+              allFilterList={filterOptions} />
         </div>
 
         <div className="flex-1 flex flex-col">
           <div className="h-[71px] flex justify-between items-center px-4 py-1 border-b-[1px] border-[#E5E5E3]">
             <div className="w-48 flex">
               <Input
+                onChange={e => setSearchEmployeesInput(e.target.value)}
                 placeholder="Employee name"
                 className="rounded-sm"
                 prefix={
@@ -277,7 +317,7 @@ const Employee = () => {
             >
               <Table
                 columns={columns}
-                dataSource={employees}
+                dataSource={clonedEmployees}
                 rowSelection={rowSelection}
                 title={() => (
                   <div className="py-2">

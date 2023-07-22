@@ -113,7 +113,7 @@ const TimesheetsComponent = ({ employees }) => {
                                       {dayjs(z.startTime).format('h:mma')} - {dayjs(z.endTime).format('h:mma')} · {dayjs(z.endTime).diff(dayjs(z.startTime), 'hour')}H
                                     </p>
                                     <p className="mt-[1px] text-[10px]">
-                                      { z.location.name } {z.position?.name ? `- ${z.position.name}` : undefined}
+                                      { z?.location?.name } {z.position?.name ? `- ${z.position.name}` : undefined}
                                     </p>
                                     {provided.placeholder}
                                   </div>

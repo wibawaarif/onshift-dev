@@ -65,7 +65,7 @@ const Scheduler = () => {
     startTime: "",
     endTime: "",
     employees: [],
-    location: "",
+    location: null,
     position: null,
     notes: "",
     break: null,

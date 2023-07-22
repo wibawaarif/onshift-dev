@@ -257,8 +257,8 @@ const SchedulerComponent = ({
                                       H
                                     </p>
                                     <p className="mt-[1px] text-[10px]">
-                                      {z.location.name}{" "}
-                                      {z.position?.name
+                                      {z?.location?.name}{" "}
+                                      {z?.position?.name
                                         ? `- ${z.position.name}`
                                         : undefined}
                                     </p>
@@ -294,8 +294,8 @@ const SchedulerComponent = ({
                                             H
                                           </p>
                                           <p className="mt-[1px] text-[10px]">
-                                            {z.location.name}{" "}
-                                            {z.position?.name
+                                            {z?.location?.name}{" "}
+                                            {z?.position?.name
                                               ? `- ${z.position.name}`
                                               : undefined}
                                           </p>
