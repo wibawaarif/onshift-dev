@@ -19,6 +19,12 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import _ from "lodash";
 import dayjs from "dayjs";
+import updateLocale from 'dayjs/plugin/updateLocale';
+
+dayjs.extend(updateLocale)
+dayjs.updateLocale('en', {
+    weekStart: 1
+})
 
 const fetcher = ([url, token]) =>
   fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
@@ -94,8 +100,16 @@ const Scheduler = () => {
   }, [selectedFilter]);
 
   const disabledDate = (current) => {
-    // Can not select days before today and today
-    return current && current < dayjs().endOf("day");
+
+  // const currentDate = dayjs(current);
+
+
+  // const startOfWeek = dayjs().startOf('week')
+  // const endOfWeek = dayjs().endOf('week')
+
+  // return currentDate.isBefore(startOfWeek) || currentDate.isAfter(endOfWeek);
+
+  return current && current < dayjs().endOf('day');
   };
 
   const filterOptions = [
@@ -148,12 +162,12 @@ const Scheduler = () => {
       };
     });
 
-  const addShift = async () => {
+  const addShift = async () => {  
     if (selectedRepeatedDays.length > 0) {
       let newForm = form;
       newForm.repeatedShift.isRepeated = true;
       newForm.repeatedShift.repeatedDays = selectedRepeatedDays;
-      newForm.repeatedShift.startRepeatedWeek = dayjs().startOf('week').add(1, 'week').add(1, 'day')
+      newForm.repeatedShift.startRepeatedWeek = dayjs(newForm.date).endOf('week');
       setForm(newForm);
     }
     setShiftModal(false);
@@ -251,7 +265,8 @@ const Scheduler = () => {
                   onClick={() =>
                     setWeeklyDateValue(weeklyDateValue.subtract(1, "week"))
                   }
-                  className={`hover:bg-[#E5E5E3] duration-300 px-2 py-1 border-l-[1px] border-b-[1px] border-t-[1px] border-[#E5E5E5]`}
+                  disabled={weeklyDateValue.startOf('week').isSameOrBefore(dayjs().startOf('week'))}
+                  className={`hover:bg-[#E5E5E3] disabled:bg-stone-100 duration-300 px-2 py-1 border-l-[1px] border-b-[1px] border-t-[1px] border-[#E5E5E5]`}
                 >
                   <Image
                     width={20}
@@ -265,8 +280,9 @@ const Scheduler = () => {
                   className="rounded-none"
                   onChange={weeklyDateChange}
                   picker="week"
-                  format={(value) => `${dayjs(value).startOf('week').add(1, 'day').format('D MMM')} - ${dayjs(value).endOf('week').add(1, 'day').format('D MMM')}`}
+                  format={(value) => `${dayjs(value).startOf('week').format('D MMM')} - ${dayjs(value).endOf('week').format('D MMM')}`}
                   value={weeklyDateValue}
+                  disabledDate={disabledDate}
                 />
                 <button
                   onClick={() =>
@@ -283,7 +299,7 @@ const Scheduler = () => {
                   />
                 </button>
                 <button
-                  onClick={() => setType("week")}
+                  onClick={() => setWeeklyDateValue(dayjs())}
                   className={`hover:bg-[#E5E5E3] ml-4 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}
                 >
                   Today
@@ -397,7 +413,6 @@ const Scheduler = () => {
                               ENDS
                             </span>
                             <DatePicker
-                              disabledDate={disabledDate}
                               onChange={endRepeatedShift}
                               className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
                             />

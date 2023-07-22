@@ -24,7 +24,7 @@ const SchedulerComponent = ({
 
   const weekSchedule = [];
 
-  for (let i = 1; i < 8; i++) {
+  for (let i = 0; i < 7; i++) {
     const date = startDate.add(i, "day");
     weekSchedule.push(date.format("YYYY-MM-DD"));
   }
@@ -240,14 +240,13 @@ const SchedulerComponent = ({
                               //   const dayToCheck = startRepeatedDate.day();
                               //   return dayToCheck >= startRepeatedDate.day() && dayToCheck <= endRepeatedDate.day();
                               // });
-                                z?.repeatedShift?.repeatedDays?.some(x => x === dayjs(dataItem).format('dddd'))
+                              dayjs(dataItem).diff(dayjs(z?.repeatedShift?.endTime), 'day') >= dayjs(z?.repeatedShift?.startRepeatedWeek).diff(dayjs(z?.repeatedShift?.endTime), 'day') && dayjs(dataItem).diff(dayjs(z?.repeatedShift?.endDate), 'day') < 0 && z?.repeatedShift?.repeatedDays?.some(x => x === dayjs(dataItem).format('dddd'))
                                 ? (
                                    // repeated week
                                   <div
                                     key={index}
                                     className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
                                   >
-                                    {JSON.stringify(dayjs(z?.repeatedShift?.startRepeatedWeek).isSameOrAfter(dayjs(dataItem)))}
                                     <p className="text-[10px] font-bold">
                                       {dayjs(z.startTime).format("h:mma")} -{" "}
                                       {dayjs(z.endTime).format("h:mma")} ·{" "}

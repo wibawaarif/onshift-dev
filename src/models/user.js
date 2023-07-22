@@ -16,7 +16,29 @@ const userSchema = new Schema({
   },
   type: {
     type: String,
+  },
+  emiratesId: {
+    type: Number,
+  },
+  birthDate: {
+    type: Date,
+  },
+  contacts: {
+    type: Object
+  },
+  fatherName: {
+    type: String,
+  },
+  motherName: {
+    type: String,
+  },
+  totalProgramHours: {
+    type: Number,
+  },
+  contract: {
+    type: Object,
   }
+
 }, { timestamps: true })
 
 export default mongoose?.models?.User || mongoose.model("User", userSchema)
