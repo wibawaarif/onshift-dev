@@ -58,6 +58,8 @@ const Scheduler = () => {
   const [clonedEmployees, setClonedEmployees] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState([]);
   const [weeklyDateValue, setWeeklyDateValue] = useState(dayjs());
+  const [actionType, setActionType] = useState(null);
+  const [Id, setId] = useState(null);
   const [form, setForm] = useState({
     date: "",
     startTime: "",
@@ -139,28 +141,39 @@ const Scheduler = () => {
     }
   };
   const checkRepeatedDays = index => {
-
     setSelectedRepeatedDays((prev) => {
       const getDay = dayjs()
         .day(index + 1)
         .format("dddd");
       if (prev.includes(getDay)) {
-        console.log('test');
         return prev.filter((x) => x !== getDay);
       } else {
-        console.log('masuk');
         return [...prev, getDay];
       }
     });
   }
 
-  const endRepeatedShift = (date, dateString) =>
+  const endRepeatedShift = date => {  
     setForm((prev) => {
       return {
         ...prev,
-        repeatedShift: { ...prev.repeatedShift, endDate: dateString },
+        repeatedShift: { ...prev.repeatedShift, endDate: date },
       };
     });
+  }
+
+  const editShiftModal = data => {
+    setId(data._id)
+    setForm(prev => { return { ...prev, ...data, location: data?.location?._id, position: data?.position?._id, startTime: dayjs(data.startTime), endTime: dayjs(data.endTime), date: dayjs(data.date), repeatedShift: {...prev.repeatedShift, startRepeatedWeek: dayjs(data.repeatedShift.startRepeatedWeek), endDate: dayjs(data.repeatedShift.endDate)} } })
+    setActionType('edit')
+    setShiftModal(true)
+  } 
+
+  const addShiftFromTable = (date, id) => {
+    setForm(prev => { return { ...prev, date, employees: [...prev.employees, id] } })
+    setActionType('add')
+    setShiftModal(true)
+  }
 
   const addShift = async () => {
     if (selectedRepeatedDays.length > 0) {
@@ -187,6 +200,21 @@ const Scheduler = () => {
     clearFields();
   };
 
+  const editDraggableShift = async () => {
+    await fetch(`/api/shifts/${Id}`, {
+      method: "PUT",
+      body: JSON.stringify(form),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    setShiftModal(false);
+    mutateEmployees([...employees]);
+
+    message.success("Shift updated");
+    clearFields();
+  }
+
   const editShift = async (result) => {
     if (
       result.destination &&
@@ -211,7 +239,7 @@ const Scheduler = () => {
       startTime: "",
       endTime: "",
       employees: [],
-      location: "",
+      location: null,
       position: null,
       notes: "",
       break: "",
@@ -345,8 +373,10 @@ const Scheduler = () => {
 
           <div className="flex-1">
             <SchedulerComponent
+              addShiftFromTable={addShiftFromTable}
               weeklyDateValue={weeklyDateValue}
               editShift={editShift}
+              editShiftModal={editShiftModal}
               employees={clonedEmployees}
               listOfShifts={shifts}
               type={type}
@@ -360,21 +390,21 @@ const Scheduler = () => {
             <button
               className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
               key="back"
-              onClick={() => setShiftModal(false)}
+              onClick={() => setShiftModal(false) & clearFields()}
             >
               CANCEL
             </button>,
             <button
-              onClick={() => addShift()}
+              onClick={actionType === 'add' ? () => addShift() : () => editDraggableShift()}
               className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
               key="submit"
             >
-              CREATE
+              {actionType === 'add' ? 'CREATE' : 'EDIT'}
             </button>,
           ]}
           title="Create New Shift"
           open={shiftModal}
-          onCancel={() => setShiftModal(false)}
+          onCancel={() => setShiftModal(false) & clearFields()}
         >
           <Tabs
             defaultActiveKey="1"
@@ -388,9 +418,10 @@ const Scheduler = () => {
                       <span className="text-xs font-semibold">DATE</span>
                       <DatePicker
                         disabledDate={disabledDate}
-                        onChange={(date, dateString) =>
+                        value={form?.date}
+                        onChange={date =>
                           setForm((prev) => {
-                            return { ...prev, date: dateString };
+                            return { ...prev, date: date };
                           })
                         }
                         className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
@@ -405,7 +436,7 @@ const Scheduler = () => {
                             <p
                               onClick={() => checkRepeatedDays(index)}
                               className={`px-4 py-1 bg-white border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${
-                                selectedRepeatedDays.includes(
+                                selectedRepeatedDays?.includes(
                                   dayjs()
                                     .day(index + 1)
                                     .format("dddd")
@@ -423,7 +454,9 @@ const Scheduler = () => {
                         </div>
                         <span className="text-xs font-semibold mt-4">ENDS</span>
                         <DatePicker
+                          value={form?.repeatedShift?.endDate}
                           disabledDate={disabledDate}
+                          disabled={selectedRepeatedDays?.length === 0}
                           onChange={endRepeatedShift}
                           className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
                         />
@@ -436,6 +469,7 @@ const Scheduler = () => {
                           START SHIFT
                         </span>
                         <TimePicker
+                          value={form?.startTime}
                           onChange={(e) =>
                             setForm((prev) => {
                               return { ...prev, startTime: e };
@@ -449,6 +483,7 @@ const Scheduler = () => {
                           FINISH SHIFT
                         </span>
                         <TimePicker
+                          value={form?.endTime}
                           onChange={(e) =>
                             setForm((prev) => {
                               return { ...prev, endTime: e };
@@ -551,6 +586,7 @@ const Scheduler = () => {
                         allowClear
                         placeholder="Select Employee"
                         className="mt-1"
+                        value={form?.employees}
                         options={employees?.map((x) => {
                           return { label: x.name, value: x._id };
                         })}
@@ -566,6 +602,7 @@ const Scheduler = () => {
                       <div className="w-[48%] flex flex-col">
                         <span className="text-xs font-semibold">LOCATION</span>
                         <Select
+                          value={form?.location}
                           placeholder="Select Location"
                           className="mt-1"
                           options={locations?.map((x) => {
@@ -583,6 +620,7 @@ const Scheduler = () => {
                         <Select
                           placeholder="Select Position"
                           className="mt-1"
+                          value={form?.position}
                           options={positions?.map((x) => {
                             return { label: x.name, value: x._id };
                           })}
@@ -606,6 +644,7 @@ const Scheduler = () => {
                       <div className="mt-4">
                         <span className="text-xs font-semibold">NOTES</span>
                         <Input
+                          value={form?.notes}
                           onChange={(e) =>
                             setForm((prev) => {
                               return { ...prev, notes: e.target.value };
@@ -633,7 +672,7 @@ const Scheduler = () => {
         </Modal>
 
         <button
-          onClick={() => setShiftModal(true)}
+          onClick={() => setShiftModal(true) & setActionType('add')}
           className="hover:opacity-80 transition duration-300 absolute bottom-10 right-10 w-[220px] h-[40px] bg-black text-white rounded-full text-[14px]"
         >
           + CREATE SHIFT / TIME OFF

@@ -6,6 +6,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Fragment, useState } from "react";
 import dayjs from "dayjs";
 import Link from "next/link";
+import PlusLogo from "@public/static/jsx/plus";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
@@ -17,6 +18,8 @@ const SchedulerComponent = ({
   employees,
   editShift,
   weeklyDateValue,
+  addShiftFromTable,
+  editShiftModal
 }) => {
   // Get the current date
 
@@ -228,21 +231,14 @@ const SchedulerComponent = ({
                     <div key={dataIndex}>
                       <Droppable droppableId={`${dataItem}`}>
                         {(provided) => (
-                          <div
+                          dayjs(dataItem).add(1, 'day') < dayjs().endOf("day") ? <div className="col-span-1 bg-stone-200 bg-opacity-75 border border-[1px] border-[#E5E5E3] h-full w-full"  /> : <div
                             {...provided.droppableProps}
                             ref={provided.innerRef}
                             className={`flex justify-center items-center col-span-1 ${
                               dataIndex === 0 ? "first-child" : ""
-                            } bg-white group/item transition duration-300 hover:bg-stone-200 hover:bg-opacity-50 cursor-pointer border border-[1px] border-[#E5E5E3] h-full w-full`}
+                            } bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
                           >
-                          <Image
-                            width={24}
-                            height={24}
-                            alt="plus"
-                            className="text-black fill-black bg-black group/edit invisible group-hover/item:visible"
-                            src={"/static/svg/plus.svg"}
-                          />
-                            {row.shifts &&
+                            {row?.shifts?.length !== 0 ? (
                               row.shifts.map((z, index) =>
                                 dayjs(dataItem).diff(
                                   dayjs(z?.repeatedShift?.endTime),
@@ -275,7 +271,13 @@ const SchedulerComponent = ({
                                       )}
                                       H
                                     </p>
-                                    <div className="flex justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full">
+                                    <div
+                                      className={`flex ${
+                                        !z?.position?.name &&
+                                        !z?.location?.name &&
+                                        "invisible"
+                                      } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
+                                    >
                                       <span className="text-white text-[10px]">
                                         {z?.location?.name && z?.position?.name
                                           ? `${z?.location.name} • ${z?.position.name}`
@@ -285,53 +287,78 @@ const SchedulerComponent = ({
                                       </span>
                                     </div>
                                   </div>
-                                ) : (
-                                  dayjs(z.date).format("YYYY-MM-DD") ===
-                                    dataItem && (
-                                    // non repeated week
-                                    <Draggable
-                                      key={z._id}
-                                      draggableId={`${z._id}`}
-                                      index={index}
-                                    >
-                                      {(provided) => (
+                                ) : dayjs(z.date).format("YYYY-MM-DD") ===
+                                  dataItem ? (
+                                  // non repeated week
+                                  <Draggable
+                                    key={z._id}
+                                    draggableId={`${z._id}`}
+                                    index={index}
+                                  >
+                                    {(provided) => (
+                                      <div
+                                        {...provided.draggableProps}
+                                        ref={provided.innerRef}
+                                        {...provided.dragHandleProps}
+                                        onMouseEnter={() => setRowIndex(index)}
+                                        className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
+                                        onClick={() => editShiftModal(z)}
+                                      >
+                                        <p className="text-[10px] font-bold">
+                                          {dayjs(z.startTime).format("h:mma")} -{" "}
+                                          {dayjs(z.endTime).format("h:mma")} ·{" "}
+                                          {dayjs(z.endTime).diff(
+                                            dayjs(z.startTime),
+                                            "hour"
+                                          )}
+                                          H
+                                        </p>
                                         <div
-                                          {...provided.draggableProps}
-                                          ref={provided.innerRef}
-                                          {...provided.dragHandleProps}
-                                          onMouseEnter={() =>
-                                            setRowIndex(index)
-                                          }
-                                          className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
-                                          onClick={() => test(row)}
+                                          className={`flex ${
+                                            !z?.position?.name &&
+                                            !z?.location?.name &&
+                                            "invisible"
+                                          } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
                                         >
-                                          <p className="text-[10px] font-bold">
-                                            {dayjs(z.startTime).format("h:mma")}{" "}
-                                            - {dayjs(z.endTime).format("h:mma")}{" "}
-                                            ·{" "}
-                                            {dayjs(z.endTime).diff(
-                                              dayjs(z.startTime),
-                                              "hour"
-                                            )}
-                                            H
-                                          </p>
-                                          <div className="flex justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full">
-                                            <span className="text-white text-[10px]">
-                                              {z?.location?.name &&
-                                              z?.position?.name
-                                                ? `${z?.location.name} • ${z?.position.name}`
-                                                : z?.location?.name
-                                                ? `${z?.location?.name}`
-                                                : `${z?.position?.name}`}
-                                            </span>
-                                          </div>
-                                          {provided.placeholder}
+                                          <span className="text-white text-[10px]">
+                                            {z?.location?.name &&
+                                            z?.position?.name
+                                              ? `${z?.location.name} • ${z?.position.name}`
+                                              : z?.location?.name
+                                              ? `${z?.location?.name}`
+                                              : `${z?.position?.name}`}
+                                          </span>
                                         </div>
-                                      )}
-                                    </Draggable>
-                                  )
+                                        {provided.placeholder}
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ) : (
+                                  // manually create shift
+                                  <div
+                                    onClick={() =>
+                                      addShiftFromTable(
+                                        dayjs(dataItem),
+                                        row._id
+                                      )
+                                    }
+                                    className={`flex justify-center items-center col-span-1 bg-white group/item transition duration-300 hover:bg-stone-200 hover:bg-opacity-50 cursor-pointer h-full w-full`}
+                                  >
+                                    <PlusLogo className="fill-slate-500 w-8 h-8 group/edit invisible group-hover/item:visible" />
+                                  </div>
                                 )
-                              )}
+                              )
+                            ) : (
+                              // manually create shift
+                              <div
+                                onClick={() =>
+                                  addShiftFromTable(dayjs(dataItem), row._id)
+                                }
+                                className={`flex justify-center items-center col-span-1 bg-white group/item transition duration-300 hover:bg-stone-200 hover:bg-opacity-50 cursor-pointer h-full w-full`}
+                              >
+                                <PlusLogo className="fill-slate-500 w-8 h-8 group/edit invisible group-hover/item:visible" />
+                              </div>
+                            )}
 
                             {provided.placeholder}
                           </div>

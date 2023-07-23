@@ -440,26 +440,7 @@ const Employee = () => {
                 />
               </div>
 
-              {/* <div className="flex flex-col mt-3">
-                <span className="text-xs font-semibold">TIMEZONE</span>
-                <Select
-                  defaultValue={form.timezone}
-                  onSelect={(e) =>
-                    setForm((prev) => {
-                      return { ...prev, timezone: e };
-                    })
-                  }
-                  options={[
-                    { value: "UTC-5", label: "(UTC-5) Eastern Standard Time" },
-                  ]}
-                  className="mt-3"
-                  bordered={false}
-                  style={{ borderBottom: "1px solid #E5E5E3" }}
-                  placeholder="e.g (UTC-5) Eastern Standard Time"
-                />
-              </div> */}
-
-              <div className="mt-3">
+              {/* <div className="mt-3">
                 <span className="text-xs font-semibold">POSITION</span>
                 <Input
                   value={form.email}
@@ -472,7 +453,7 @@ const Employee = () => {
                   className="rounded-none border-t-0 border-l-0 border-r-0"
                   placeholder="company@gmail.com"
                 />
-              </div>
+              </div> */}
 
               <div className="flex flex-col mt-3">
                 <span className="text-xs font-semibold">PLATFORM</span>
