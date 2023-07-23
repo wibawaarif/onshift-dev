@@ -13,18 +13,17 @@ import {
   Select,
   Input,
   message,
-  Popover,
 } from "antd";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import _ from "lodash";
 import dayjs from "dayjs";
-import updateLocale from 'dayjs/plugin/updateLocale';
+import updateLocale from "dayjs/plugin/updateLocale";
 
-dayjs.extend(updateLocale)
-dayjs.updateLocale('en', {
-    weekStart: 1
-})
+dayjs.extend(updateLocale);
+dayjs.updateLocale("en", {
+  weekStart: 1,
+});
 
 const fetcher = ([url, token]) =>
   fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
@@ -55,7 +54,6 @@ const Scheduler = () => {
   const [shiftModal, setShiftModal] = useState(false);
   const [showBreak, setShowBreak] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
-  const [popover, setPopover] = useState(false);
   const [selectedRepeatedDays, setSelectedRepeatedDays] = useState([]);
   const [clonedEmployees, setClonedEmployees] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState([]);
@@ -100,16 +98,14 @@ const Scheduler = () => {
   }, [selectedFilter]);
 
   const disabledDate = (current) => {
+    // const currentDate = dayjs(current);
 
-  // const currentDate = dayjs(current);
+    // const startOfWeek = dayjs().startOf('week')
+    // const endOfWeek = dayjs().endOf('week')
 
+    // return currentDate.isBefore(startOfWeek) || currentDate.isAfter(endOfWeek);
 
-  // const startOfWeek = dayjs().startOf('week')
-  // const endOfWeek = dayjs().endOf('week')
-
-  // return currentDate.isBefore(startOfWeek) || currentDate.isAfter(endOfWeek);
-
-  return current && current < dayjs().endOf('day');
+    return current && current < dayjs().endOf("day");
   };
 
   const filterOptions = [
@@ -142,17 +138,21 @@ const Scheduler = () => {
       setSelectedFilter(newSelectedFilter);
     }
   };
-  const checkRepeatedDays = (index) =>
+  const checkRepeatedDays = index => {
+
     setSelectedRepeatedDays((prev) => {
       const getDay = dayjs()
         .day(index + 1)
         .format("dddd");
       if (prev.includes(getDay)) {
+        console.log('test');
         return prev.filter((x) => x !== getDay);
       } else {
+        console.log('masuk');
         return [...prev, getDay];
       }
     });
+  }
 
   const endRepeatedShift = (date, dateString) =>
     setForm((prev) => {
@@ -162,12 +162,14 @@ const Scheduler = () => {
       };
     });
 
-  const addShift = async () => {  
+  const addShift = async () => {
     if (selectedRepeatedDays.length > 0) {
       let newForm = form;
       newForm.repeatedShift.isRepeated = true;
       newForm.repeatedShift.repeatedDays = selectedRepeatedDays;
-      newForm.repeatedShift.startRepeatedWeek = dayjs(newForm.date).endOf('week');
+      newForm.repeatedShift.startRepeatedWeek = dayjs(newForm.date).endOf(
+        "week"
+      );
       setForm(newForm);
     }
     setShiftModal(false);
@@ -265,7 +267,9 @@ const Scheduler = () => {
                   onClick={() =>
                     setWeeklyDateValue(weeklyDateValue.subtract(1, "week"))
                   }
-                  disabled={weeklyDateValue.startOf('week').isSameOrBefore(dayjs().startOf('week'))}
+                  disabled={weeklyDateValue
+                    .startOf("week")
+                    .isSameOrBefore(dayjs().startOf("week"))}
                   className={`hover:bg-[#E5E5E3] disabled:bg-stone-100 duration-300 px-2 py-1 border-l-[1px] border-b-[1px] border-t-[1px] border-[#E5E5E5]`}
                 >
                   <Image
@@ -280,7 +284,13 @@ const Scheduler = () => {
                   className="rounded-none"
                   onChange={weeklyDateChange}
                   picker="week"
-                  format={(value) => `${dayjs(value).startOf('week').format('D MMM')} - ${dayjs(value).endOf('week').format('D MMM')}`}
+                  format={(value) =>
+                    `${dayjs(value).startOf("week").format("D MMM")} - ${dayjs(
+                      value
+                    )
+                      .endOf("week")
+                      .format("D MMM")}`
+                  }
                   value={weeklyDateValue}
                   disabledDate={disabledDate}
                 />
@@ -385,70 +395,39 @@ const Scheduler = () => {
                         }
                         className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
                       />
-                      <Popover
-                        content={
-                          <div className="flex flex-col">
-                            <div className="flex">
-                              {Array.from(Array(7)).map((x, index) => (
-                                <p
-                                  onClick={() => checkRepeatedDays(index)}
-                                  className={`px-4 py-1 bg-white border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${
-                                    selectedRepeatedDays.includes(
-                                      dayjs()
-                                        .day(index + 1)
-                                        .format("dddd")
-                                    )
-                                      ? "bg-stone-300"
-                                      : undefined
-                                  }`}
-                                  key={index}
-                                >
-                                  {dayjs()
+
+                      <div className="flex flex-col">
+                        <span className="text-xs font-semibold mt-4">
+                          REPEATED DAYS
+                        </span>
+                        <div className="flex mt-2">
+                          {Array.from(Array(7)).map((x, index) => (
+                            <p
+                              onClick={() => checkRepeatedDays(index)}
+                              className={`px-4 py-1 bg-white border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${
+                                selectedRepeatedDays.includes(
+                                  dayjs()
                                     .day(index + 1)
-                                    .format("ddd")}
-                                </p>
-                              ))}
-                            </div>
-                            <span className="text-xs font-semibold mt-4">
-                              ENDS
-                            </span>
-                            <DatePicker
-                              onChange={endRepeatedShift}
-                              className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
-                            />
-                          </div>
-                        }
-                        placement="bottomLeft"
-                        title="Repeat On"
-                        trigger="click"
-                        open={popover === "isRepeated"}
-                        onOpenChange={(e) => {
-                          if (e) {
-                            setPopover("isRepeated");
-                          } else {
-                            setPopover(null);
-                          }
-                        }}
-                      >
-                        <div className="mt-2 flex items-center hover:cursor-pointer">
-                          <p className="text-stone-500 hover:text-black text-sm">
-                            {popover === "isRepeated"
-                              ? "Hide Repeat"
-                              : "Repeat"}
-                          </p>
-                          <Image
-                            width={18}
-                            height={18}
-                            className={`mt-[3px] ${
-                              popover === "isRepeated"
-                                ? "rotate-180"
-                                : undefined
-                            }`}
-                            alt="arrow-down"
-                            src={"/static/svg/arrow-down.svg"}
-                          />
+                                    .format("dddd")
+                                )
+                                  ? "bg-stone-300"
+                                  : undefined
+                              }`}
+                              key={index}
+                            >
+                              {dayjs()
+                                .day(index + 1)
+                                .format("ddd")}
+                            </p>
+                          ))}
                         </div>
-                      </Popover>
+                        <span className="text-xs font-semibold mt-4">ENDS</span>
+                        <DatePicker
+                          disabledDate={disabledDate}
+                          onChange={endRepeatedShift}
+                          className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
+                        />
+                      </div>
                     </div>
 
                     <div className="flex mt-4 justify-between">

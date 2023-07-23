@@ -164,9 +164,9 @@ const Employee = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    phoneNumber: "",
-    timezone: "",
-    role: "Employee",
+    password: "",
+    phoneNumber: null,
+    platform: "Mobile App",
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [employeeModal, setEmployeeModal] = useState(false);
@@ -245,8 +245,7 @@ const Employee = () => {
         name: data.name,
         email: data.email,
         phoneNumber: data.phoneNumber,
-        timezone: data.timezone,
-        role: data.role,
+        platform: data.platform,
       };
       setForm(newForm);
     }
@@ -263,9 +262,9 @@ const Employee = () => {
     setForm({
       name: "",
       email: "",
-      phoneNumber: "",
-      timezone: "",
-      role: "Employee",
+      password: "",
+      phoneNumber: null,
+      platform: "Mobile App",
     });
   };
 
@@ -302,7 +301,7 @@ const Employee = () => {
                 Import / Export
               </button>
               <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
-                Share link to join
+                Invite Users
               </button>
             </div>
           </div>
@@ -385,6 +384,7 @@ const Employee = () => {
                 <span className="text-xs font-semibold">EMAIL</span>
                 <Input
                   value={form.email}
+                  type="email"
                   onChange={(e) =>
                     setForm((prev) => {
                       return { ...prev, email: e.target.value };
@@ -394,6 +394,24 @@ const Employee = () => {
                   placeholder="company@gmail.com"
                 />
               </div>
+
+              {
+                actionType === 'add' && <div className="mt-3">
+                <span className="text-xs font-semibold">PASSWORD</span>
+                <Input
+                  value={form.password}
+                  type="password"
+                  onChange={(e) =>
+                    setForm((prev) => {
+                      return { ...prev, password: e.target.value };
+                    })
+                  }
+                  className="rounded-none border-t-0 border-l-0 border-r-0"
+                  placeholder="Enter password"
+                />
+              </div>
+              }
+            
 
               <div className="mt-3">
                 <span className="text-xs font-semibold">PHONE</span>
@@ -418,11 +436,11 @@ const Employee = () => {
                     borderRight: "0",
                     width: "100%",
                   }}
-                  country={"us"}
+                  country={"ae"}
                 />
               </div>
 
-              <div className="flex flex-col mt-3">
+              {/* <div className="flex flex-col mt-3">
                 <span className="text-xs font-semibold">TIMEZONE</span>
                 <Select
                   defaultValue={form.timezone}
@@ -439,21 +457,36 @@ const Employee = () => {
                   style={{ borderBottom: "1px solid #E5E5E3" }}
                   placeholder="e.g (UTC-5) Eastern Standard Time"
                 />
+              </div> */}
+
+              <div className="mt-3">
+                <span className="text-xs font-semibold">POSITION</span>
+                <Input
+                  value={form.email}
+                  type="email"
+                  onChange={(e) =>
+                    setForm((prev) => {
+                      return { ...prev, email: e.target.value };
+                    })
+                  }
+                  className="rounded-none border-t-0 border-l-0 border-r-0"
+                  placeholder="company@gmail.com"
+                />
               </div>
 
               <div className="flex flex-col mt-3">
-                <span className="text-xs font-semibold">ROLE</span>
+                <span className="text-xs font-semibold">PLATFORM</span>
                 <Radio.Group
                   className="mt-3"
                   onChange={(e) =>
                     setForm((prev) => {
-                      return { ...prev, role: e.target.value };
+                      return { ...prev, platform: e.target.value };
                     })
                   }
-                  value={form.role}
+                  value={form.platform}
                 >
-                  <Radio value={"Employee"}>Employee</Radio>
-                  <Radio value={"Administrator"}>Administrator</Radio>
+                  <Radio value={"Mobile App"}>Mobile App</Radio>
+                  <Radio value={"Web Portal"}>Web Portal</Radio>
                 </Radio.Group>
               </div>
             </div>

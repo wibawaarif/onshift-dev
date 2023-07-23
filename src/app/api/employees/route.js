@@ -4,6 +4,7 @@ import Employee from "@/models/employee";
 import Location from "@/models/location";
 import Shift from "@/models/shift";
 import Position from "@/models/position";
+import bcrypt from 'bcrypt'
 import { verifyJwtToken } from '@/lib/jwt';
 
 export const GET = async (request) => {
@@ -57,7 +58,9 @@ export const POST = async (request) => {
   
   const body = await request.json();
 
-  const newEmployee = new Employee({...body, user: decodedToken.email});
+  const hashedPassword = await bcrypt.hash(body.password, 10)
+
+  const newEmployee = new Employee({...body, password: hashedPassword, user: decodedToken.email});
 
   try {
     await connect();

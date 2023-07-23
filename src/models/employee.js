@@ -6,6 +6,10 @@ const employeeSchema = new Schema({
     },
     email: {
       type: String,
+      unique: true,
+    },
+    password: {
+      type: String,
     },
     user: {
       type: String,
@@ -14,18 +18,15 @@ const employeeSchema = new Schema({
     phoneNumber: {
       type: Number,
     },
-    timezone: {
-      type: String,
-    },
     shifts: [
       {
         type: mongoose.Types.ObjectId,
         ref: 'Shift',
       }
     ],
-    role: {
+    platform: {
       type: String,
-      enum: ['Employee', 'Administrator']
+      enum: ['Mobile App', 'Web Portal']
     }
 }, { timestamps: true })
 

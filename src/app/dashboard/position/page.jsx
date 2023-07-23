@@ -310,14 +310,7 @@ const Position = () => {
         onCancel={() => setPositionModal(false)}
       >
         {actionType !== "delete" && (
-          <Tabs
-            defaultActiveKey="1"
-            items={[
-              {
-                key: "1",
-                label: "PROFILE",
-                children: (
-                  <>
+                  <div className="mt-4">
                     <div className="mt-1">
                       <span className="text-xs font-semibold">
                         POSITION NAME
@@ -378,57 +371,7 @@ const Position = () => {
                       *Default wage that is displayed in all employees profiles
                       on this position, until custom wage is specified
                     </p>
-                  </>
-                ),
-              },
-              {
-                key: "2",
-                label: "EMPLOYEES",
-                children: (
-                  <>
-                    <Input
-                      onChange={(e) => setFilterValue(e.target.value)}
-                      placeholder="Employee name"
-                      className="rounded-sm"
-                      prefix={
-                        <Image
-                          width={20}
-                          height={20}
-                          src={"/static/svg/lup.svg"}
-                        />
-                      }
-                    />
-                    <div className="mt-6">
-                      {employees &&
-                        employees?.map((x, index) => (
-                          <div
-                            key={index}
-                            className="flex justify-between items-center h-[57px] border-t-[1px] border-[#E5E5E3]"
-                          >
-                            <Checkbox
-                              name={x._id}
-                              onChange={checkedEmployee}
-                              className="font-semibold"
-                              checked={selectedEmployees?.some(y => y === x._id) ? true : false}
-                            >
-                              {x.name}
-                            </Checkbox>
-                            <div className="hover:bg-[#E5E5E3] cursor-pointer rounded-full px-1 py-1">
-                              <Image
-                                width={20}
-                                height={20}
-                                alt="trash-logo"
-                                src={"/static/svg/trash.svg"}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </>
-                ),
-              },
-            ]}
-          />
+                  </div>
         )}
 
         {actionType === "delete" && (

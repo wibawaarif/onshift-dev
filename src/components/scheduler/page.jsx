@@ -3,8 +3,9 @@
 import Image from "next/image";
 import { Avatar } from "antd";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState } from "react";
 import dayjs from "dayjs";
+import Link from "next/link";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
@@ -232,17 +233,35 @@ const SchedulerComponent = ({
                             ref={provided.innerRef}
                             className={`flex justify-center items-center col-span-1 ${
                               dataIndex === 0 ? "first-child" : ""
-                            } bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
+                            } bg-white group/item transition duration-300 hover:bg-stone-200 hover:bg-opacity-50 cursor-pointer border border-[1px] border-[#E5E5E3] h-full w-full`}
                           >
+                          <Image
+                            width={24}
+                            height={24}
+                            alt="plus"
+                            className="text-black fill-black bg-black group/edit invisible group-hover/item:visible"
+                            src={"/static/svg/plus.svg"}
+                          />
                             {row.shifts &&
                               row.shifts.map((z, index) =>
-                              // const isAnyDayWithinRange = daysArray.some(day => {
-                              //   const dayToCheck = startRepeatedDate.day();
-                              //   return dayToCheck >= startRepeatedDate.day() && dayToCheck <= endRepeatedDate.day();
-                              // });
-                              dayjs(dataItem).diff(dayjs(z?.repeatedShift?.endTime), 'day') >= dayjs(z?.repeatedShift?.startRepeatedWeek).diff(dayjs(z?.repeatedShift?.endTime), 'day') && dayjs(dataItem).diff(dayjs(z?.repeatedShift?.endDate), 'day') < 0 && z?.repeatedShift?.repeatedDays?.some(x => x === dayjs(dataItem).format('dddd'))
-                                ? (
-                                   // repeated week
+                                dayjs(dataItem).diff(
+                                  dayjs(z?.repeatedShift?.endTime),
+                                  "day"
+                                ) >=
+                                  dayjs(
+                                    z?.repeatedShift?.startRepeatedWeek
+                                  ).diff(
+                                    dayjs(z?.repeatedShift?.endTime),
+                                    "day"
+                                  ) &&
+                                dayjs(dataItem).diff(
+                                  dayjs(z?.repeatedShift?.endDate),
+                                  "day"
+                                ) < 0 &&
+                                z?.repeatedShift?.repeatedDays?.some(
+                                  (x) => x === dayjs(dataItem).format("dddd")
+                                ) ? (
+                                  // repeated week
                                   <div
                                     key={index}
                                     className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
@@ -256,12 +275,15 @@ const SchedulerComponent = ({
                                       )}
                                       H
                                     </p>
-                                    <p className="mt-[1px] text-[10px]">
-                                      {z?.location?.name}{" "}
-                                      {z?.position?.name
-                                        ? `- ${z.position.name}`
-                                        : undefined}
-                                    </p>
+                                    <div className="flex justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full">
+                                      <span className="text-white text-[10px]">
+                                        {z?.location?.name && z?.position?.name
+                                          ? `${z?.location.name} • ${z?.position.name}`
+                                          : z?.location?.name
+                                          ? `${z?.location?.name}`
+                                          : `${z?.position?.name}`}
+                                      </span>
+                                    </div>
                                   </div>
                                 ) : (
                                   dayjs(z.date).format("YYYY-MM-DD") ===
@@ -293,12 +315,16 @@ const SchedulerComponent = ({
                                             )}
                                             H
                                           </p>
-                                          <p className="mt-[1px] text-[10px]">
-                                            {z?.location?.name}{" "}
-                                            {z?.position?.name
-                                              ? `- ${z.position.name}`
-                                              : undefined}
-                                          </p>
+                                          <div className="flex justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full">
+                                            <span className="text-white text-[10px]">
+                                              {z?.location?.name &&
+                                              z?.position?.name
+                                                ? `${z?.location.name} • ${z?.position.name}`
+                                                : z?.location?.name
+                                                ? `${z?.location?.name}`
+                                                : `${z?.position?.name}`}
+                                            </span>
+                                          </div>
                                           {provided.placeholder}
                                         </div>
                                       )}
@@ -319,7 +345,7 @@ const SchedulerComponent = ({
 
         <div className="col-span-full bg-white h-[60px] border border-[1px] border-[#E5E5E3]">
           <div className="p-4 h-full w-full flex items-center">
-            <button>+ Add Employee</button>
+            <Link href={"/dashboard/employee"}>+ Add Employee</Link>
           </div>
         </div>
       </div>
