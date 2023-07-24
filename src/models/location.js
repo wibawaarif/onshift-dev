@@ -10,6 +10,12 @@ const locationSchema = new Schema({
     address: {
       type: String,
     },
+    latitude: {
+      type: String,
+    },
+    longitude: {
+      type: String,
+    },
     user: {
       type: String,
       required: true,
