@@ -26,7 +26,6 @@ const PlaceComponent = ({style, address, setAddress, setLatitude, setLongitude }
         onPlacesChanged={handlePlaceChanged}
       >
         <input
-          value={address}
           type="text"
           className={`form-control ${style}`}
           placeholder={address}

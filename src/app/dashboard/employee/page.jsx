@@ -1,13 +1,14 @@
 "use client";
 
 import FilterComponent from "@/components/filter/page";
+import { InboxOutlined,DownloadOutlined } from '@ant-design/icons';
 import {
   ConfigProvider,
   Input,
   Table,
   Popover,
   Modal,
-  Select,
+  Upload,
   Radio,
   message,
 } from "antd";
@@ -17,11 +18,56 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
+import Papa from "papaparse";
+import { CSVLink } from "react-csv";
 
 const fetcher = ([url, token]) =>
   fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
     res.json()
   );
+
+const { Dragger } = Upload;
+
+const props = {
+  name: 'file',
+  multiple: false,
+  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+  beforeUpload: (file) => {
+    const isCSV = file.type === "text/csv"
+    if (!isCSV) {
+      message.error(`${file.name} is not a csv file`);
+    }
+    return isCSV || Upload.LIST_IGNORE;
+  },
+  onChange(info) {
+    const { status } = info.file;
+    if (status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
+    if (status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully.`);
+      const reader = new FileReader();
+  
+      reader.onload = (e) => {
+        const contents = e.target.result;
+        Papa.parse(contents, {
+          complete: (parsedData) => {
+            // Process the parsed data here
+            console.log(parsedData.data);
+          },
+          header: true,
+        });
+      };
+
+      reader.readAsText(info.fileList[0].originFileObj)
+    } else if (status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  },
+  onDrop(e) {
+    console.log('Dropped files', e.dataTransfer.files);
+  },
+};
 
 const Employee = () => {
   const session = useSession();
@@ -87,6 +133,33 @@ const Employee = () => {
       options: employees?.map((employee) => employee.name),
     },
   ];
+
+  const headers = [
+    {
+      label: "Full Name",
+      key: "name"
+    },
+    {
+      label: "Email",
+      key: "email"
+    },
+    {
+      label: "Phone Number",
+      key: "phoneNumber"
+    },
+    {
+      label: "Platform",
+      key: "platform"
+    },
+    {
+      label: "Created At",
+      key: "createdAt"
+    },
+    {
+      label: "Shifts",
+      key: "shifts"
+    }
+  ]
 
   const columns = [
     {
@@ -297,7 +370,7 @@ const Employee = () => {
             </div>
 
             <div className="w-max flex">
-              <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+              <button onClick={() => setEmployeeModal(true) & setActionType("exportImport")} className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
                 Import / Export
               </button>
               <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
@@ -328,7 +401,27 @@ const Employee = () => {
           </div>
         </div>
         <Modal
-          footer={[
+          footer={[ actionType === "exportImport" ? <CSVLink
+          data={clonedEmployees.map(x => { return { ...x, shifts: x.shifts.map(z => z.date) }})}
+          headers={headers}
+          filename={"my-file.csv"}
+          key="back"
+          target="_blank"
+        >
+            <div className="flex justify-center items-center">
+          <DownloadOutlined className="mr-2 my-0 py-0" /> <span>DOWNLOAD</span>
+          </div>
+        </CSVLink>        
+        // <button
+        //   className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
+        //   key="back"
+        //   onClick={() => setEmployeeModal(false)}
+        // >
+        //   <div className="flex justify-center items-center">
+        //   <DownloadOutlined className="mr-2 my-0 py-0" /> <span>DOWNLOAD</span>
+        //   </div>
+        // </button> 
+        : 
             <button
               className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
               key="back"
@@ -336,6 +429,15 @@ const Employee = () => {
             >
               CANCEL
             </button>,
+            actionType === "exportImport" ? 
+            <button
+              className="bg-black text-white rounded-sm border-[1px] border-black px-4 py-1 hover:opacity-80"
+              key="submit"
+            >
+              <div>
+              UPLOAD
+              </div>
+            </button> :
             <button
               onClick={
                 actionType === "add"
@@ -359,12 +461,29 @@ const Employee = () => {
               ? "Create Employee"
               : actionType === "edit"
               ? "Edit Employee"
-              : "Delete Employee"
+              : actionType === "exportImport" ? "Export / Import" : "Delete Employee"
           }`}
           open={employeeModal}
           onCancel={() => setEmployeeModal(false)}
         >
-          {actionType !== "delete" && (
+          {
+            actionType === "exportImport" && (
+              <div>
+                  <Dragger maxCount={1} {...props}>
+                    <p className="ant-upload-drag-icon">
+                      <InboxOutlined />
+                    </p>
+                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                    <p className="ant-upload-hint">
+                      Support for a single or bulk upload. Strictly prohibited from uploading company data or other
+                      banned files.
+                    </p>
+                  </Dragger>
+              </div>
+            )
+          }
+
+          {actionType === "add" || actionType === "edit" && (
             <div className="mt-4 mb-4">
               <div>
                 <span className="text-xs font-semibold">FULL NAME</span>
