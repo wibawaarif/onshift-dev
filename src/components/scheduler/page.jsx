@@ -239,7 +239,7 @@ const SchedulerComponent = ({
                             } bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
                           >
                             {row?.shifts?.length !== 0 ? (
-                              row.shifts.map((z, index) =>
+                              row?.shifts?.map((z, index) =>
                                 dayjs(dataItem).diff(
                                   dayjs(z?.repeatedShift?.endTime),
                                   "day"

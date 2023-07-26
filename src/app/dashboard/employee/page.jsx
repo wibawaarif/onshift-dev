@@ -28,47 +28,6 @@ const fetcher = ([url, token]) =>
 
 const { Dragger } = Upload;
 
-const props = {
-  name: 'file',
-  multiple: false,
-  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-  beforeUpload: (file) => {
-    const isCSV = file.type === "text/csv"
-    if (!isCSV) {
-      message.error(`${file.name} is not a csv file`);
-    }
-    return isCSV || Upload.LIST_IGNORE;
-  },
-  onChange(info) {
-    const { status } = info.file;
-    if (status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully.`);
-      const reader = new FileReader();
-  
-      reader.onload = (e) => {
-        const contents = e.target.result;
-        Papa.parse(contents, {
-          complete: (parsedData) => {
-            // Process the parsed data here
-            console.log(parsedData.data);
-          },
-          header: true,
-        });
-      };
-
-      reader.readAsText(info.fileList[0].originFileObj)
-    } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-  onDrop(e) {
-    console.log('Dropped files', e.dataTransfer.files);
-  },
-};
-
 const Employee = () => {
   const session = useSession();
 
@@ -96,6 +55,7 @@ const Employee = () => {
   const [searchEmployeesInput, setSearchEmployeesInput] = useState('');
   const [actionType, setActionType] = useState("");
   const [popover, setPopover] = useState(false);
+  const [uploadedEmployees, setUploadedEmployees] = useState(null);
 
   useEffect(() => {
     setClonedEmployees(_.cloneDeep(employees));
@@ -118,6 +78,48 @@ const Employee = () => {
       setClonedEmployees(_.cloneDeep(employees));
     }
   }, [selectedFilter, searchEmployeesInput]);
+
+  // upload action
+  const props = {
+    name: 'file',
+    multiple: false,
+    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+    beforeUpload: (file) => {
+      const isCSV = file.type === "text/csv"
+      if (!isCSV) {
+        message.error(`${file.name} is not a csv file`);
+      }
+      return isCSV || Upload.LIST_IGNORE;
+    },
+    onChange(info) {
+      const { status } = info.file;
+      if (status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (status === 'done') {
+        message.success(`${info.file.name} file uploaded successfully.`);
+        const reader = new FileReader();
+    
+        reader.onload = (e) => {
+          const contents = e.target.result;
+          Papa.parse(contents, {
+            complete: (parsedData) => {
+              // Process the parsed data here
+              setUploadedEmployees(parsedData.data)
+            },
+            header: true,
+          });
+        };
+  
+        reader.readAsText(info.fileList[0].originFileObj)
+      } else if (status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files);
+    },
+  };
 
   const filterOptions = [
     {
@@ -155,10 +157,6 @@ const Employee = () => {
       label: "Created At",
       key: "createdAt"
     },
-    {
-      label: "Shifts",
-      key: "shifts"
-    }
   ]
 
   const columns = [
@@ -265,15 +263,47 @@ const Employee = () => {
     onChange: onSelectChange,
   };
 
+  const addUploadedEmployees = async () => {
+    setEmployeeModal(false);
+
+    for (let i = 0; i < uploadedEmployees.length; i++) {
+      const res = await fetch(`/api/employees`, {
+        method: "POST",
+        body: JSON.stringify({name: uploadedEmployees[i]['Full Name'], email: uploadedEmployees[i].Email, phoneNumber: uploadedEmployees[i]['Phone Number'], platform: uploadedEmployees[i].Platform, }),
+        headers: {
+          authorization: "Bearer " + session.data.user.accessToken,
+        },
+      });
+      const respMessage = await res.json()
+
+      if (respMessage.info === "email existed") {
+        message.error(`${respMessage.error}`)
+        continue
+      }
+
+      message.success("Employee created");
+    }
+
+    mutate([...employees, form]);
+  };
+
   const addEmployee = async () => {
     setEmployeeModal(false);
-    await fetch(`/api/employees`, {
+    const res = await fetch(`/api/employees`, {
       method: "POST",
       body: JSON.stringify(form),
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,
       },
     });
+
+    const respMessage = await res.json()
+
+    if (respMessage.info === "email existed") {
+      message.error(`${respMessage.error}`)
+      return
+    }
+
     mutate([...employees, form]);
 
     message.success("Employee created");
@@ -401,17 +431,17 @@ const Employee = () => {
           </div>
         </div>
         <Modal
-          footer={[ actionType === "exportImport" ? <CSVLink
-          data={clonedEmployees.map(x => { return { ...x, shifts: x.shifts.map(z => z.date) }})}
+          footer={[ actionType === "exportImport" ? <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"><CSVLink
+          data={clonedEmployees.map(x => { return { ...x, shifts: x?.shifts?.map(z => z.date) }})}
           headers={headers}
           filename={"my-file.csv"}
           key="back"
           target="_blank"
         >
             <div className="flex justify-center items-center">
-          <DownloadOutlined className="mr-2 my-0 py-0" /> <span>DOWNLOAD</span>
+          <DownloadOutlined className="mr-2 my-0 py-0 text-black" /> <span className="text-black">DOWNLOAD</span>
           </div>
-        </CSVLink>        
+        </CSVLink></div>    
         // <button
         //   className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
         //   key="back"
@@ -431,6 +461,7 @@ const Employee = () => {
             </button>,
             actionType === "exportImport" ? 
             <button
+              onClick={() => addUploadedEmployees()}
               className="bg-black text-white rounded-sm border-[1px] border-black px-4 py-1 hover:opacity-80"
               key="submit"
             >
@@ -483,7 +514,7 @@ const Employee = () => {
             )
           }
 
-          {actionType === "add" || actionType === "edit" && (
+          {(actionType === "add" || actionType === "edit") && (
             <div className="mt-4 mb-4">
               <div>
                 <span className="text-xs font-semibold">FULL NAME</span>

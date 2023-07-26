@@ -4,6 +4,9 @@ import useSWR from "swr";
 import SchedulerComponent from "@/components/scheduler/page";
 import FilterComponent from "@/components/filter/page";
 import Image from "next/image";
+import { InboxOutlined,DownloadOutlined } from '@ant-design/icons';
+import Papa from "papaparse";
+import { CSVLink } from "react-csv";
 import {
   Modal,
   Tabs,
@@ -13,12 +16,15 @@ import {
   Select,
   Input,
   message,
+  Upload
 } from "antd";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import _ from "lodash";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
+
+const { Dragger } = Upload;
 
 dayjs.extend(updateLocale);
 dayjs.updateLocale("en", {
@@ -60,6 +66,7 @@ const Scheduler = () => {
   const [weeklyDateValue, setWeeklyDateValue] = useState(dayjs());
   const [actionType, setActionType] = useState(null);
   const [Id, setId] = useState(null);
+  const [uploadedEmployees, setUploadedEmployees] = useState(null);
   const [form, setForm] = useState({
     date: "",
     startTime: "",
@@ -99,6 +106,48 @@ const Scheduler = () => {
     }
   }, [selectedFilter]);
 
+  // upload action
+  const props = {
+    name: 'file',
+    multiple: false,
+    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+    beforeUpload: (file) => {
+      const isCSV = file.type === "text/csv"
+      if (!isCSV) {
+        message.error(`${file.name} is not a csv file`);
+      }
+      return isCSV || Upload.LIST_IGNORE;
+    },
+    onChange(info) {
+      const { status } = info.file;
+      if (status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (status === 'done') {
+        message.success(`${info.file.name} file uploaded successfully.`);
+        const reader = new FileReader();
+    
+        reader.onload = (e) => {
+          const contents = e.target.result;
+          Papa.parse(contents, {
+            complete: (parsedData) => {
+              // Process the parsed data here
+              setUploadedEmployees(parsedData.data)
+            },
+            header: true,
+          });
+        };
+  
+        reader.readAsText(info.fileList[0].originFileObj)
+      } else if (status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    onDrop(e) {
+      console.log('Dropped files', e.dataTransfer.files);
+    },
+  };
+
   const disabledDate = (current) => {
     // const currentDate = dayjs(current);
 
@@ -109,6 +158,53 @@ const Scheduler = () => {
 
     return current && current < dayjs().endOf("day");
   };
+
+  const headers = [
+    {
+      label: "Date",
+      key: "dame"
+    },
+    {
+      label: "Start Time",
+      key: "startTime"
+    },
+    {
+      label: "End Time",
+      key: "endTime"
+    },
+    {
+      label: "Break",
+      key: "break"
+    },
+    {
+      label: "Notes",
+      key: "notes"
+    },
+    {
+      label: "Notes",
+      key: "notes"
+    },
+    {
+      label: "Employees",
+      key: "employees"
+    },
+    {
+      label: "isRepeated",
+      key: "repeatedShift.isRepeated"
+    },
+    {
+      label: "startRepeatedWeek",
+      key: "repeatedShift.startRepeatedWeek"
+    },
+    {
+      label: "repeatedDays",
+      key: "repeatedShift.repeatedDays"
+    },
+    {
+      label: "endDate",
+      key: "repeatedShift.endDate"
+    },
+  ]
 
   const filterOptions = [
     {
@@ -194,6 +290,7 @@ const Scheduler = () => {
       },
     });
     mutateEmployees([...employees]);
+    mutateEmployees([...shifts]);
 
     message.success("Shift created");
 
@@ -351,7 +448,7 @@ const Scheduler = () => {
                 <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
                   Copy Shifts
                 </button>
-                <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+                <button onClick={() => setShiftModal(true) & setActionType("exportImport")} className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
                   Export / Print
                 </button>
                 <button className="hover:bg-[#E5E5E3] duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
@@ -386,7 +483,17 @@ const Scheduler = () => {
 
         {/* MODAL ADD NEW SHIFT / TIME OFF */}
         <Modal
-          footer={[
+          footer={[ actionType === "exportImport" ? <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"><CSVLink
+          data={shifts}
+          headers={headers}
+          filename={"my-file.csv"}
+          key="back"
+          target="_blank"
+        >
+            <div className="flex justify-center items-center">
+          <DownloadOutlined className="mr-2 my-0 py-0 text-black" /> <span className="text-black">DOWNLOAD</span>
+          </div>
+        </CSVLink></div> :
             <button
               className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
               key="back"
@@ -394,6 +501,16 @@ const Scheduler = () => {
             >
               CANCEL
             </button>,
+             actionType === "exportImport" ? 
+             <button
+               onClick={() => addUploadedEmployees()}
+               className="bg-black text-white rounded-sm border-[1px] border-black px-4 py-1 hover:opacity-80"
+               key="submit"
+             >
+               <div>
+               UPLOAD
+               </div>
+             </button> :
             <button
               onClick={actionType === 'add' ? () => addShift() : () => editDraggableShift()}
               className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
@@ -406,7 +523,26 @@ const Scheduler = () => {
           open={shiftModal}
           onCancel={() => setShiftModal(false) & clearFields()}
         >
-          <Tabs
+          {
+            actionType === 'exportImport' &&  (
+              <div>
+                  <Dragger maxCount={1} {...props}>
+                    <p className="ant-upload-drag-icon">
+                      <InboxOutlined />
+                    </p>
+                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                    <p className="ant-upload-hint">
+                      Support for a single or bulk upload. Strictly prohibited from uploading company data or other
+                      banned files.
+                    </p>
+                  </Dragger>
+              </div>
+            )
+          }
+
+          {
+            actionType !== 'exportImport' && 
+            <Tabs
             defaultActiveKey="1"
             items={[
               {
@@ -669,6 +805,7 @@ const Scheduler = () => {
               },
             ]}
           />
+          }
         </Modal>
 
         <button

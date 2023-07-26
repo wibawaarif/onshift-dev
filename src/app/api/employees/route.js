@@ -58,9 +58,20 @@ export const POST = async (request) => {
   
   const body = await request.json();
 
-  const hashedPassword = await bcrypt.hash(body.password, 10)
+  const findExistingEmployee = await Employee.findOne({email: body.email})
 
-  const newEmployee = new Employee({...body, password: hashedPassword, user: decodedToken.email});
+  if (findExistingEmployee) {
+    return new Response(JSON.stringify({ error: `${body.email} already existed`, info: "email existed" }), { status: 400 })
+  }
+
+  let newEmployee;
+
+  if (body.password) {
+    const hashedPassword = await bcrypt.hash(body.password, 10)
+    newEmployee = new Employee({...body, password: hashedPassword, user: decodedToken.email});
+  } else {
+    newEmployee = new Employee({...body, user: decodedToken.email});
+  }
 
   try {
     await connect();
