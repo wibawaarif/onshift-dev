@@ -44,6 +44,13 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
+  jwt: {
+    maxAge: 6 * 24 * 60 * 60,
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 6 * 24 * 60 * 60,
+  },
   pages: {
     signIn: "/signin",
     signOut: "/signin"

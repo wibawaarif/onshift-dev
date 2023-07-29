@@ -19,7 +19,7 @@ const DashboardLayout = ({children}) => {
   if (session.status === "loading") {
     return <p>Loading...</p>;
   }
-
+  console.log(session);
 
   if (session.status === "unauthenticated") {
     router?.push("/signin?message=Unauthorized");
