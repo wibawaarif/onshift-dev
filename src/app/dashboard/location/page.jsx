@@ -23,6 +23,7 @@ const Location = () => {
     address: "",
     latitude: null,
     longitude: null,
+    isSetted: false,
   });
   const [address, setAddress] = useState(null);
   const [latitude, setLatitude] = useState(24.432928);
@@ -43,7 +44,11 @@ const Location = () => {
       address: "",
       latitude: null,
       longitude: null,
+      isSetted: false,
     });
+    setLatitude(24.432928)
+    setLongitude(54.644539)
+    setAddress(null)
     setId("");
   };
 
@@ -113,9 +118,13 @@ const Location = () => {
       const newForm = {
         name: data.name,
         address: data.address,
+        isSetted: true,
       };
-
+      setAddress(data.address);
+      setLatitude(Number(data.latitude));
+      setLongitude(Number(data.longitude));
       setForm(newForm);
+
     }
 
     if (type === "delete") {
@@ -153,10 +162,11 @@ const Location = () => {
               Locations ({locations?.length})
             </p>
 
+            <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
             {locations &&
               locations.map((x, index) => (
                 <div key={index} className="h-full w-full mt-6">
-                  <div className="w-[407px] h-[250px] border-[1px] border-[#E5E5E3]">
+                  <div className="h-[250px] border-[1px] border-[#E5E5E3]">
                     <div className="px-4 py-4 flex justify-between">
                       <div className="flex flex-col">
                         <p>{x.name}</p>
@@ -203,6 +213,7 @@ const Location = () => {
                   </div>
                 </div>
               ))}
+              </div>
           </div>
         </div>
       </div>
@@ -263,7 +274,7 @@ const Location = () => {
 
             <div className="mt-4">
               <span className="text-xs font-semibold">ADDRESS</span>
-              <PlaceComponent address={address} setAddress={setAddress} setLatitude={setLatitude} setLongitude={setLongitude} style="w-full px-2 py-1 border-b-[1px] border-[#E5E5E3]" />
+              <PlaceComponent isSetted={form.isSetted} address={address} setAddress={setAddress} setLatitude={setLatitude} setLongitude={setLongitude} style="w-full px-2 py-1 border-b-[1px] border-[#E5E5E3]" />
               {/* <Input
                 value={form.address}
                 onChange={(e) =>
@@ -277,7 +288,7 @@ const Location = () => {
             </div>
 
             <div className="mt-2 px-1 py-1 border-[1px] border-[#E5E5E3]">
-              <GoogleMaps latitude={latitude} longitude={longitude} setLatitude={setLatitude} setLongitude={setLongitude} />
+              <GoogleMaps isSetted={form.isSetted} latitude={latitude} longitude={longitude} setLatitude={setLatitude} setLongitude={setLongitude} />
             </div>
 
 

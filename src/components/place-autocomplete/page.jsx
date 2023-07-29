@@ -28,7 +28,7 @@ const PlaceComponent = ({style, address, setAddress, setLatitude, setLongitude }
         <input
           type="text"
           className={`form-control ${style}`}
-          placeholder={address}
+          value={address}
         />
       </StandaloneSearchBox>
     </LoadScript>

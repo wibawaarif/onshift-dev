@@ -1,10 +1,10 @@
 
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+import { GoogleMap, Marker, useLoadScript, Circle } from "@react-google-maps/api";
 import { useMemo, useState,useEffect } from "react";
 import PaperPlane from "@public/static/jsx/paperplane"
 import './style.css'
 
-const GoogleMaps = ({setLatitude, setLongitude, latitude, longitude}) => {
+const GoogleMaps = ({isSetted ,setLatitude, setLongitude, latitude, longitude}) => {
   const [map, setMap] = useState(/** @types google.maps.Map */(null));
 
   const { isLoaded } = useLoadScript({
@@ -41,6 +41,9 @@ const GoogleMaps = ({setLatitude, setLongitude, latitude, longitude}) => {
             <PaperPlane className="w-4 h-4" />
           </button>
           <Marker draggable animation={google.maps.Animation.DROP} onDragEnd={changeCoordinate} position={{ lat: latitude, lng: longitude }} />
+          {
+            isSetted && <Circle options={{fillColor: "#FF0000", strokeOpacity: 0.8, strokeColor: "#FF0000", strokeWeight: 2, fillOpacity: 0.35,}} center={{lat: latitude, lng: longitude}} radius={500} />
+          }
         </GoogleMap>
       )}
     </div>
