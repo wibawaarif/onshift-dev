@@ -23,7 +23,7 @@ const Location = () => {
     address: "",
     latitude: null,
     longitude: null,
-    isSetted: false,
+    radius: 500,
   });
   const [address, setAddress] = useState(null);
   const [latitude, setLatitude] = useState(24.432928);
@@ -44,7 +44,7 @@ const Location = () => {
       address: "",
       latitude: null,
       longitude: null,
-      isSetted: false,
+      radius: 500,
     });
     setLatitude(24.432928)
     setLongitude(54.644539)
@@ -118,7 +118,7 @@ const Location = () => {
       const newForm = {
         name: data.name,
         address: data.address,
-        isSetted: true,
+        radius: data.radius,
       };
       setAddress(data.address);
       setLatitude(Number(data.latitude));
@@ -274,24 +274,27 @@ const Location = () => {
 
             <div className="mt-4">
               <span className="text-xs font-semibold">ADDRESS</span>
-              <PlaceComponent isSetted={form.isSetted} address={address} setAddress={setAddress} setLatitude={setLatitude} setLongitude={setLongitude} style="w-full px-2 py-1 border-b-[1px] border-[#E5E5E3]" />
-              {/* <Input
-                value={form.address}
+              <PlaceComponent address={address} setAddress={setAddress} setLatitude={setLatitude} setLongitude={setLongitude} style="w-full px-2 py-1 border-b-[1px] border-[#E5E5E3]" />
+            </div>
+
+            <div className="mt-4">
+              <span className="text-xs font-semibold">RADIUS</span>
+                          <Input
+                          type="number"
+                value={form.radius}
                 onChange={(e) =>
                   setForm((prev) => {
-                    return { ...prev, address: e.target.value };
+                    return { ...prev, radius: Number(e.target.value) };
                   })
                 }
                 className="rounded-none border-t-0 border-l-0 border-r-0"
-                placeholder="e.g Silicon Valley B.320"
-              /> */}
-            </div>
+                placeholder="Enter radius..."
+              />
+              </div>
 
             <div className="mt-2 px-1 py-1 border-[1px] border-[#E5E5E3]">
-              <GoogleMaps isSetted={form.isSetted} latitude={latitude} longitude={longitude} setLatitude={setLatitude} setLongitude={setLongitude} />
+              <GoogleMaps radius={form.radius} latitude={latitude} longitude={longitude} setLatitude={setLatitude} setLongitude={setLongitude} />
             </div>
-
-
           </>
         )}
 

@@ -4,7 +4,7 @@ import { useMemo, useState,useEffect } from "react";
 import PaperPlane from "@public/static/jsx/paperplane"
 import './style.css'
 
-const GoogleMaps = ({isSetted ,setLatitude, setLongitude, latitude, longitude}) => {
+const GoogleMaps = ({radius, setLatitude, setLongitude, latitude, longitude}) => {
   const [map, setMap] = useState(/** @types google.maps.Map */(null));
 
   const { isLoaded } = useLoadScript({
@@ -27,7 +27,7 @@ const GoogleMaps = ({isSetted ,setLatitude, setLongitude, latitude, longitude}) 
 
 
   return (
-    <div className="w-full h-96">
+    <div className="w-full h-80">
       {!isLoaded ? (
         <h1>Loading...</h1>
       ) : (
@@ -41,9 +41,7 @@ const GoogleMaps = ({isSetted ,setLatitude, setLongitude, latitude, longitude}) 
             <PaperPlane className="w-4 h-4" />
           </button>
           <Marker draggable animation={google.maps.Animation.DROP} onDragEnd={changeCoordinate} position={{ lat: latitude, lng: longitude }} />
-          {
-            isSetted && <Circle options={{fillColor: "#FF0000", strokeOpacity: 0.8, strokeColor: "#FF0000", strokeWeight: 2, fillOpacity: 0.35,}} center={{lat: latitude, lng: longitude}} radius={500} />
-          }
+          <Circle options={{fillColor: "#FF0000", strokeOpacity: 0.8, strokeColor: "#FF0000", strokeWeight: 2, fillOpacity: 0.35,}} center={{lat: latitude, lng: longitude}} radius={radius} />
         </GoogleMap>
       )}
     </div>

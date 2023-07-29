@@ -16,6 +16,9 @@ const locationSchema = new Schema({
     longitude: {
       type: String,
     },
+    radius: {
+      type: Number,
+    },
     user: {
       type: String,
       required: true,
