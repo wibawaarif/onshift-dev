@@ -79,59 +79,36 @@ const TimesheetsComponent = ({ employees }) => {
               </div>
 
               {/* timesheets */}
-              <DragDropContext>
 
                 {daysArray &&
                   daysArray.map((dataItem, dataIndex) => (
                     <div key={dataIndex}>
-                      <Droppable droppableId={`${dataItem}`}>
-                        {(provided) => (
+
                           <div
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
                             className={`flex justify-center items-center col-span-1 ${
                               dataIndex === 0 ? "first-child" : ""
                             } bg-[#F2F2F2] h-full w-full`}
                           >
 
                             {
-                              row.shifts && row.shifts.map((z, index) => (
-                                dayjs(z.date).format('YYYY-MM-DD') === dataItem && <Draggable
-                                key={z._id}
-                                draggableId={`${z._id}`}
-                                index={index}
-                              >
-                                {(provided) => (
+                              row.timesheets && row.timesheets.map((z, index) => (
+
+
                                   <div
-                                    {...provided.draggableProps}
-                                    ref={provided.innerRef}
-                                    {...provided.dragHandleProps}
+                                  key={index}
                                     onMouseEnter={() => setRowIndex(index)}
                                     className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
                                   >
-                                    <p className="text-[10px] font-bold">
-                                      {dayjs(z.startTime).format('h:mma')} - {dayjs(z.endTime).format('h:mma')} · {dayjs(z.endTime).diff(dayjs(z.startTime), 'hour')}H
-                                    </p>
-                                    <p className="mt-[1px] text-[10px]">
-                                      { z?.location?.name } {z.position?.name ? `- ${z.position.name}` : undefined}
-                                    </p>
-                                    {provided.placeholder}
+                                    <p className="text-xs">{dayjs(z.date).format('YYYY-MM-DD')}</p>
                                   </div>
-                                )}
-                              </Draggable>
                               ))
                             }
-
-                            {provided.placeholder}
                           </div>
-                        )}
-                      </Droppable>
                     </div>
                   ))}
 
                   <div className="bg-[#F2F2F2] column-start-37 col-span-2">1 hrs</div>
 
-              </DragDropContext>
             </Fragment>
           ))}
       </div>

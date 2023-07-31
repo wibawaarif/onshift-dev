@@ -12,12 +12,9 @@ const timesheetSchema = new Schema({
     ref: 'Employee',
     required: true,
   },
-  totalHours: {
-    type: Number
-  },
   status: {
     type: String,
-    enum: ['Present', 'Absent', 'Week off', 'Paid leave'],
+    enum: ['Present', 'Absent'],
     default: 'Present',
   }
 }, { timestamps: true })

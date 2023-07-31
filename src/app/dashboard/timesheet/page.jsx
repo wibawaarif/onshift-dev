@@ -28,10 +28,25 @@ const Timesheet = () => {
   const session = useSession();
 
 
-  const { data: employees, mutate: mutateEmployees } = useSWR(
-    [`/api/employees`, session.data.user.accessToken],
-      fetcher
-    );
+  // const { data: employees, mutate: mutateEmployees } = useSWR(
+  //   [`/api/employees`, session.data.user.accessToken],
+  //     fetcher
+  //   );
+
+  const employees = [{
+    name: 'John',
+    timesheets: [{
+      date: '2022-07-21' ,
+      startTime: 6,
+      endTime: 12,
+      status: 'Present',
+    }, {
+      date: '2023-07-14' ,
+      startTime: 6,
+      endTime: 12,
+      status: 'Present',
+    }]
+  }]
   
 
   const clearFields = () => {
