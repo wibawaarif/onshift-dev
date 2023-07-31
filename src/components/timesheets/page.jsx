@@ -83,27 +83,29 @@ const TimesheetsComponent = ({ employees }) => {
                 {daysArray &&
                   daysArray.map((dataItem, dataIndex) => (
                     <div key={dataIndex}>
-
-                          <div
-                            className={`flex justify-center items-center col-span-1 ${
-                              dataIndex === 0 ? "first-child" : ""
-                            } bg-[#F2F2F2] h-full w-full`}
+                      
+                      {
+                        row.time
+                      }
+                          {/* <div
+                            className={`flex justify-center items-center col-span-1 bg-white h-full w-full`}
                           >
-
+                            
                             {
                               row.timesheets && row.timesheets.map((z, index) => (
-
-
+                                z.date === dayjs(dataItem).format('YYYY-MM-DD') ?
                                   <div
                                   key={index}
-                                    onMouseEnter={() => setRowIndex(index)}
-                                    className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
+                                    className={`${dayjs(dataItem).format('YYYY-MM-DD') === z.date ? 'bg-green-600' : 'bg-[#E5E5E3]'} h-8 w-4 rounded-sm p-2`}
                                   >
-                                    <p className="text-xs">{dayjs(z.date).format('YYYY-MM-DD')}</p>
+                                  </div> : <div
+                                  key={index}
+                                    className={`bg-[#E5E5E3] h-8 w-4 rounded-sm p-2`}
+                                  >
                                   </div>
                               ))
                             }
-                          </div>
+                          </div> */}
                     </div>
                   ))}
 

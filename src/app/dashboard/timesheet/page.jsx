@@ -18,6 +18,7 @@ import Image from "next/image";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import TimesheetsComponent from "@/components/timesheets/page";
+import dayjs from "dayjs";
 
 const fetcher = ([url, token]) =>
   fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
@@ -36,12 +37,12 @@ const Timesheet = () => {
   const employees = [{
     name: 'John',
     timesheets: [{
-      date: '2022-07-21' ,
+      date: dayjs().date(6).format('YYYY-MM-DD') ,
       startTime: 6,
       endTime: 12,
       status: 'Present',
     }, {
-      date: '2023-07-14' ,
+      date:  dayjs().date(13).format('YYYY-MM-DD') ,
       startTime: 6,
       endTime: 12,
       status: 'Present',
