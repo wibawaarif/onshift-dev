@@ -11,6 +11,7 @@ import {
   Upload,
   Radio,
   message,
+  Select
 } from "antd";
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -231,6 +232,9 @@ const Employee = () => {
       ),
     },
   ];
+
+  const wageType = [{ value: "Hourly", label: "Hourly" }];
+
   const [id, setId] = useState("");
   const [form, setForm] = useState({
     name: "",
@@ -238,6 +242,12 @@ const Employee = () => {
     password: "",
     phoneNumber: null,
     platform: "Mobile App",
+    wageOptions: {
+      category: "Standard",
+      type: null,
+      amount: null,
+    },
+    positions: [],
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [employeeModal, setEmployeeModal] = useState(false);
@@ -349,6 +359,8 @@ const Employee = () => {
         email: data.email,
         phoneNumber: data.phoneNumber,
         platform: data.platform,
+        wageOptions: data.wageOptions,
+        positions: data.positions
       };
       setForm(newForm);
     }
@@ -368,6 +380,12 @@ const Employee = () => {
       password: "",
       phoneNumber: null,
       platform: "Mobile App",
+      wageOptions: {
+        category: "Standard",
+        type: null,
+        amount: null,
+      },
+      positions: [],
     });
   };
 
@@ -604,6 +622,70 @@ const Employee = () => {
                   placeholder="company@gmail.com"
                 />
               </div> */}
+                <div className="mt-3 flex flex-col">
+                        <span className="text-xs font-semibold">POSITION</span>
+                        <Select
+                          mode="multiple"
+                          allowClear
+                          placeholder="Select Position"
+                          className="mt-1"
+                          value={form?.positions}
+                          options={positions?.map((x) => {
+                            return { label: x.name, value: x._id };
+                          })}
+                          onChange={(e) =>
+                            setForm((prev) => {
+                              return { ...prev, positions: e };
+                            })
+                          }
+                        />
+                      </div>
+
+              <div className="flex flex-col mt-3">
+                <span className="text-xs font-semibold">WAGE TYPE</span>
+                <Radio.Group
+                  className="mt-3"
+                  onChange={(e) =>
+                    setForm((prev) => {
+                      return { ...prev, wageOptions: {...prev.wageOptions, category : e.target.value }};
+                    })
+                  }
+                  value={form.wageOptions?.category}
+                >
+                  <Radio value={"Standard"}>Standard</Radio>
+                  <Radio value={"Custom"}>Custom</Radio>
+                </Radio.Group>
+              </div>
+
+              {
+                form.wageOptions?.category === 'Custom' &&  <div className="flex mt-4 justify-between">
+                <div className="w-[48%] flex flex-col">
+                  <span className="text-xs font-semibold">WAGE TYPE</span>
+                  <Select
+                    value={form.wageOptions.type}
+                    onChange={(e) =>  setForm((prev) => {
+                      return { ...prev, wageOptions: {...prev.wageOptions, type : e }};
+                    })}
+                    placeholder="Select wage type"
+                    className="mt-1"
+                    options={wageType}
+                  />
+                </div>
+                <div className="w-[48%] flex flex-col">
+                  <span className="text-xs font-semibold">
+                    WAGE AMOUNT
+                  </span>
+                  <Input
+                    onChange={(e) =>  setForm((prev) => {
+                      return { ...prev, wageOptions: {...prev.wageOptions, amount : e.target.value }};
+                    })}
+                    value={form.wageOptions.amount}
+                    className="rounded-none border-t-0 border-l-0 border-r-0"
+                    suffix="usd per hour"
+                  />
+                </div>
+              </div>
+              }
 
               <div className="flex flex-col mt-3">
                 <span className="text-xs font-semibold">PLATFORM</span>

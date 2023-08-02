@@ -67,6 +67,7 @@ const Scheduler = () => {
   const [actionType, setActionType] = useState(null);
   const [Id, setId] = useState(null);
   const [uploadedEmployees, setUploadedEmployees] = useState(null);
+  const [isFormInvalid, setIsFormInvalid] = useState(true);
   const [form, setForm] = useState({
     date: "",
     startTime: "",
@@ -87,6 +88,27 @@ const Scheduler = () => {
   useEffect(() => {
     setClonedEmployees(_.cloneDeep(employees));
   }, [employees]);
+
+  useEffect(() => {
+
+
+
+    if (form.date !== "" && form.startTime !== "" && form.endTime !== "" && form.location !== null && form.employees.length > 0) {
+      if (selectedRepeatedDays.length > 0) {
+        if (form.repeatedShift.endDate === null) {
+          setIsFormInvalid(true);
+        } else {
+          setIsFormInvalid(false);
+        }
+      } else {
+        setIsFormInvalid(false)
+      }
+      return
+    }
+
+    setIsFormInvalid(true)
+
+  }, [form, selectedRepeatedDays])
 
   useEffect(() => {
     const filteredList = _.cloneDeep(employees)?.filter((x) => {
@@ -512,8 +534,9 @@ const Scheduler = () => {
                </div>
              </button> :
             <button
+              disabled={isFormInvalid}
               onClick={actionType === 'add' ? () => addShift() : () => editDraggableShift()}
-              className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
+              className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
               key="submit"
             >
               {actionType === 'add' ? 'CREATE' : 'EDIT'}
@@ -551,7 +574,7 @@ const Scheduler = () => {
                 children: (
                   <div>
                     <div className="flex flex-col">
-                      <span className="text-xs font-semibold">DATE</span>
+                      <span className="text-xs font-semibold">DATE <span className="text-xs text-red-500">*</span></span>
                       <DatePicker
                         disabledDate={disabledDate}
                         value={form?.date}
@@ -571,14 +594,14 @@ const Scheduler = () => {
                           {Array.from(Array(7)).map((x, index) => (
                             <p
                               onClick={() => checkRepeatedDays(index)}
-                              className={`px-4 py-1 bg-white border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${
+                              className={`px-4 py-1 border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${
                                 selectedRepeatedDays?.includes(
                                   dayjs()
                                     .day(index + 1)
                                     .format("dddd")
                                 )
                                   ? "bg-stone-300"
-                                  : undefined
+                                  : "bg-white"
                               }`}
                               key={index}
                             >
@@ -602,7 +625,7 @@ const Scheduler = () => {
                     <div className="flex mt-4 justify-between">
                       <div className="w-[48%] ">
                         <span className="text-xs font-semibold">
-                          START SHIFT
+                          START SHIFT  <span className="text-xs text-red-500">*</span>
                         </span>
                         <TimePicker
                           value={form?.startTime}
@@ -616,7 +639,7 @@ const Scheduler = () => {
                       </div>
                       <div className="w-[48%]">
                         <span className="text-xs font-semibold">
-                          FINISH SHIFT
+                          FINISH SHIFT  <span className="text-xs text-red-500">*</span>
                         </span>
                         <TimePicker
                           value={form?.endTime}
@@ -709,7 +732,7 @@ const Scheduler = () => {
                     </div>
 
                     <div className="flex flex-col mt-4">
-                      <span className="text-xs font-semibold">EMPLOYEE</span>
+                      <span className="text-xs font-semibold">EMPLOYEE  <span className="text-xs text-red-500">*</span></span>
                       {/* <Image
                         className="absolute bottom-[29.5%] z-50"
                         width={20}
@@ -736,7 +759,7 @@ const Scheduler = () => {
 
                     <div className="flex mt-4 justify-between">
                       <div className="w-[48%] flex flex-col">
-                        <span className="text-xs font-semibold">LOCATION</span>
+                        <span className="text-xs font-semibold">LOCATION  <span className="text-xs text-red-500">*</span></span>
                         <Select
                           value={form?.location}
                           placeholder="Select Location"
