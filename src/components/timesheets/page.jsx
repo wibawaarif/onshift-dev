@@ -2,14 +2,10 @@
 
 import Image from "next/image";
 import { Avatar } from "antd";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Fragment, useState, useEffect } from "react";
+import { Fragment } from "react";
 import dayjs from "dayjs";
 
 const TimesheetsComponent = ({ employees }) => {
-
-    // Get the current date
-  const currentMonth = dayjs().month();
 
   // Get the start date of the current week (Sunday)
   const daysInMonth = dayjs().daysInMonth();
@@ -20,9 +16,6 @@ const TimesheetsComponent = ({ employees }) => {
     const date = dayjs().date(i);
     daysArray.push(date);
   }
-
-  // const [employees, setEmployees] = useState([]);
-  const [rowIndex, setRowIndex] = useState(null);
 
 
   return (
@@ -49,8 +42,8 @@ const TimesheetsComponent = ({ employees }) => {
                 className="bg-[#F7F7F7] py-8 flex flex-col justify-center items-center"
                 key={x}
               >
-                <span className="text-slate-700 text-xs">{dayjs(x).format('DD')}</span>
-                <span className="text-slate-700 text-xs">{dayjs(x).format('dd')[0]}</span>
+                <span className="text-slate-700 font-semibold text-xs">{dayjs(x).format('DD')}</span>
+                <span className="text-slate-700 font-semibold text-xs">{dayjs(x).format('dd')[0]}</span>
 
               </div>
             );
@@ -83,33 +76,27 @@ const TimesheetsComponent = ({ employees }) => {
                 {daysArray &&
                   daysArray.map((dataItem, dataIndex) => (
                     <div key={dataIndex}>
-                      
-                      {
-                        row.time
-                      }
-                          {/* <div
-                            className={`flex justify-center items-center col-span-1 bg-white h-full w-full`}
-                          >
-                            
-                            {
-                              row.timesheets && row.timesheets.map((z, index) => (
-                                z.date === dayjs(dataItem).format('YYYY-MM-DD') ?
-                                  <div
-                                  key={index}
-                                    className={`${dayjs(dataItem).format('YYYY-MM-DD') === z.date ? 'bg-green-600' : 'bg-[#E5E5E3]'} h-8 w-4 rounded-sm p-2`}
-                                  >
-                                  </div> : <div
-                                  key={index}
-                                    className={`bg-[#E5E5E3] h-8 w-4 rounded-sm p-2`}
-                                  >
-                                  </div>
-                              ))
-                            }
-                          </div> */}
+                      <div className="flex justify-center items-center h-full w-full bg-[#F2F2F2]">
+                        {
+                          !row?.timesheets?.map(x => dayjs(x.date).format('MM-DD-YYYY')).includes(dayjs(dataItem).format('MM-DD-YYYY')) && <div className="bg-stone-200 border-r-2 border-black border-opacity-20 h-8 w-8" />
+                        }
+
+                        {
+                          row.timesheets  && row.timesheets.map((timesheet, timesheetIndex) => (
+                          <>
+                              {
+                                dayjs(dataItem).format('MM-DD-YYYY') === dayjs(timesheet.date).format('MM-DD-YYYY') && <div className={`${timesheet.status === 'Present' ? 'bg-green-500' : timesheet.status === 'Absent' ? 'bg-red-500' : 'bg-yellow-500'} border-r-2 border-black border-opacity-20 h-8 w-8 flex justify-center items-center text-white`}>{timesheet.status === 'Present' || timesheet.status === 'Late' ? dayjs(timesheet.endTime).diff(timesheet.startTime, 'hour') : 'A'}</div>
+                              }
+                            </>
+                          ))
+                        }
+                        </div>
                     </div>
                   ))}
 
-                  <div className="bg-[#F2F2F2] column-start-37 col-span-2">1 hrs</div>
+                  
+
+                  <div className="bg-[#F2F2F2] column-start-37 col-span-2 text-sm flex justify-center items-center">{row.total} hrs</div>
 
             </Fragment>
           ))}

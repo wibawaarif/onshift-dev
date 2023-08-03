@@ -35,18 +35,40 @@ const Timesheet = () => {
   //   );
 
   const employees = [{
-    name: 'John',
+    name: '010_REHMAN SAMA',
     timesheets: [{
-      date: dayjs().date(6).format('YYYY-MM-DD') ,
-      startTime: 6,
-      endTime: 12,
+      date: dayjs().date(6) ,
+      startTime: dayjs().date(6).add(4, 'hour'),
+      endTime: dayjs().date(6).add(10, 'hour'),
       status: 'Present',
     }, {
-      date:  dayjs().date(13).format('YYYY-MM-DD') ,
-      startTime: 6,
-      endTime: 12,
+      date:  dayjs().date(13) ,
+      startTime: dayjs().date(13).hour(6),
+      endTime: dayjs().date(13).hour(9),
+      status: 'Late',
+    }, 
+    {
+      date:  dayjs().date(29) ,
+      status: 'Absent',
+    }],
+    total: 9
+  }, {
+    name: '013_KAMRAN SAMA',
+    timesheets: [{
+      date: dayjs().date(2) ,
+      startTime: dayjs().date(13).hour(2),
+      endTime: dayjs().date(13).hour(3),
       status: 'Present',
-    }]
+    }, {
+      date:  dayjs().date(24) ,
+      status: 'Absent',
+    }, {
+      date:  dayjs().date(21) ,
+      startTime: dayjs().date(21).hour(6),
+      endTime: dayjs().date(21).hour(9),
+      status: 'Present',
+    }],
+    total: 4
   }]
   
 
