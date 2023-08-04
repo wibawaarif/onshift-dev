@@ -231,15 +231,15 @@ const Scheduler = () => {
   const filterOptions = [
     {
       name: "LOCATIONS / (DESELECT ALL)",
-      options: locations?.map((location) => location.name),
+      options: locations?.map((location) => location?.name),
     },
     {
       name: "POSITIONS / (DESELECT ALL)",
-      options: positions?.map((position) => position.name),
+      options: positions?.map((position) => position?.name),
     },
     {
       name: "EMPLOYEES / (DESELECT ALL)",
-      options: employees?.map((employee) => employee.name),
+      options: employees?.map((employee) => employee?.name),
     },
   ];
 
@@ -431,6 +431,7 @@ const Scheduler = () => {
                   className="rounded-none"
                   onChange={weeklyDateChange}
                   picker="week"
+                  allowClear={false}
                   format={(value) =>
                     `${dayjs(value).startOf("week").format("D MMM")} - ${dayjs(
                       value
@@ -591,7 +592,7 @@ const Scheduler = () => {
                           REPEATED DAYS
                         </span>
                         <div className="flex mt-2">
-                          {Array.from(Array(7)).map((x, index) => (
+                          {Array.from(Array(7))?.map((x, index) => (
                             <p
                               onClick={() => checkRepeatedDays(index)}
                               className={`px-4 py-1 border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${
