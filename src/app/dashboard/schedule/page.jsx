@@ -91,8 +91,6 @@ const Scheduler = () => {
 
   useEffect(() => {
 
-
-
     if (form.date !== "" && form.startTime !== "" && form.endTime !== "" && form.location !== null && form.employees.length > 0) {
       if (selectedRepeatedDays.length > 0) {
         if (form.repeatedShift.endDate === null) {

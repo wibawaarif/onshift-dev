@@ -399,11 +399,11 @@ const Employee = () => {
     >
       <div className="flex flex-1">
         <div className="w-[202px] border-r-[1px] border-[#E5E5E3] overflow-y-auto h-[720px]">
-          <FilterComponent               selectedFilter={selectedFilter}
+          <FilterComponent 
+              selectedFilter={selectedFilter}
               checkedFilter={checkedFilter}
               allFilterList={filterOptions} />
         </div>
-
         <div className="flex-1 flex flex-col">
           <div className="h-[71px] flex justify-between items-center px-4 py-1 border-b-[1px] border-[#E5E5E3]">
             <div className="w-48 flex">

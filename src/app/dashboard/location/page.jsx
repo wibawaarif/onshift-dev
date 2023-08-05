@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input, Modal, message, ConfigProvider, Popover } from "antd";
 import Image from "next/image";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import PlaceComponent from "@/components/place-autocomplete/page";
 import GoogleMaps from "@/components/google-maps/page";
+import _ from "lodash";
 
 const fetcher = ([url, token]) =>
   fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
@@ -15,7 +16,9 @@ const fetcher = ([url, token]) =>
 
 const Location = () => {
   const [locationModal, setLocationModal] = useState(false);
-  const [id, setId] = useState("");
+  const [id, setId] = useState('');
+  const [clonedLocations, setClonedLocations] = useState([]);
+  const [searchLocationsInput, setSearchLocationsInput] = useState('');
   const [popover, setPopover] = useState(false);
   const [actionType, setActionType] = useState("");
   const [form, setForm] = useState({
@@ -37,6 +40,22 @@ const Location = () => {
     isLoading,
     mutate,
   } = useSWR([`/api/locations`, session.data.user.accessToken], fetcher);
+
+  useEffect(() => {
+    setClonedLocations(_.cloneDeep(locations));
+  }, [locations]);
+
+  useEffect(() => {
+    const filteredList = _.cloneDeep(locations)?.filter((x) => {
+      return x.name.toLocaleLowerCase().includes(searchLocationsInput.toLocaleLowerCase()) || x.address.toLocaleLowerCase().includes(searchLocationsInput.toLocaleLowerCase())
+    });
+
+    if (searchLocationsInput) {
+      setClonedLocations(filteredList);
+    } else {
+      setClonedLocations(_.cloneDeep(locations));
+    }
+  }, [searchLocationsInput]);
 
   const clearFields = () => {
     setForm({
@@ -147,6 +166,7 @@ const Location = () => {
         <div className="h-[71px] flex justify-between items-center px-8 py-1 border-b-[1px] border-[#E5E5E3]">
           <div className="w-48 flex">
             <Input
+              onChange={e => setSearchLocationsInput(e.target.value)}
               placeholder="Location name"
               className="rounded-sm"
               prefix={
@@ -159,12 +179,12 @@ const Location = () => {
         <div className="flex-1">
           <div className="px-8 py-8">
             <p className="text-2xl font-medium">
-              Locations ({locations?.length})
+              Locations ({clonedLocations?.length})
             </p>
 
             <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
-            {locations &&
-              locations.map((x, index) => (
+            {clonedLocations &&
+              clonedLocations.map((x, index) => (
                 <div key={index} className="h-full w-full mt-6">
                   <div className="h-[250px] border-[1px] border-[#E5E5E3]">
                     <div className="px-4 py-4 flex justify-between">

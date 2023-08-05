@@ -15,6 +15,7 @@ import { ConfigProvider } from "antd";
 import Image from "next/image";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
+import _ from "lodash";
 
 const fetcher = ([url, token]) =>
   fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
@@ -23,6 +24,8 @@ const fetcher = ([url, token]) =>
 
 const Position = () => {
 
+  const [clonedPositions, setClonedPositions] = useState([]);
+  const [searchPositionsInput, setSearchPositionsInput] = useState('');
   const [positionModal, setPositionModal] = useState(false);
   const [avatarColor, setAvatarColor] = useState("#FFFFFF");
   const [id, setId] = useState("");
@@ -67,6 +70,22 @@ const Position = () => {
       src={"/static/svg/checklist.svg"}
     />
   );
+
+  useEffect(() => {
+    setClonedPositions(_.cloneDeep(data));
+  }, [data]);
+
+  useEffect(() => {
+    const filteredList = _.cloneDeep(data)?.filter((x) => {
+      return x.name.toLocaleLowerCase().includes(searchPositionsInput.toLocaleLowerCase())
+    });
+
+    if (searchPositionsInput) {
+      setClonedPositions(filteredList);
+    } else {
+      setClonedPositions(_.cloneDeep(data));
+    }
+  }, [searchPositionsInput]);
 
   const clearFields = () => {
     setName("");
@@ -191,7 +210,7 @@ const Position = () => {
         <div className="h-[71px] flex justify-between items-center px-8 py-1 border-b-[1px] border-[#E5E5E3]">
           <div className="w-48 flex">
             <Input
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearchPositionsInput(e.target.value)}
               placeholder="Position name"
               className="rounded-sm"
               prefix={
@@ -204,12 +223,12 @@ const Position = () => {
         <div className="flex-1">
           <div className="px-8 py-8">
             <p className="text-2xl font-medium">
-              Positions ({data && data.length})
+              Positions ({data && clonedPositions?.length})
             </p>
 
             <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
-              {data &&
-                data?.map((x, index) => {
+              {clonedPositions &&
+                clonedPositions?.map((x, index) => {
                   return (
                     <div
                       key={index}
