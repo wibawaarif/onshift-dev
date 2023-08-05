@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Avatar, ConfigProvider, Table, Popover, Drawer, Divider, Modal, DatePicker, TimePicker } from "antd";
+import { Avatar, ConfigProvider, Table, Popover, Drawer, Divider, Modal, DatePicker, TimePicker, Space } from "antd";
 import { useState } from "react";
 import dayjs from "dayjs";
 
@@ -169,6 +169,10 @@ const ApprovalsComponent = ({ employees, monthlyDateValue }) => {
       ),
     },
   ];
+
+  const editTimesheetDetail = () => {
+
+  }
   
 
 
@@ -186,9 +190,10 @@ const ApprovalsComponent = ({ employees, monthlyDateValue }) => {
               />
 
       <Drawer width={1000} title={`Monthly Summary (${dayjs(monthlyDateValue).startOf('month').format('D MMMM')} - ${dayjs(monthlyDateValue).endOf('month').format('D MMMM')})`} placement="right" onClose={() => setTimesheetDrawer(false)} open={timesheetDrawer}>
-        <div className="flex">
+        <div className="flex h-full">
 
-          <div className="w-56 h-64 mr-8 flex flex-col justify-center border-2 border-stone-300 px-3 py-2">
+          <div className="w-56 h-full bg-[#FCFCFC] mr-8 flex flex-col items-center justify-between border-2 border-stone-300 px-3 py-2">
+            <div>
               <div className="flex items-center">
                 <Avatar /> 
                 <p className="ml-2 font-semibold text-stone-500">{currentTimesheet?.name}</p>
@@ -209,6 +214,9 @@ const ApprovalsComponent = ({ employees, monthlyDateValue }) => {
               <p className="text-sm font-semibold text-stone-500">Break</p>
               <p className="font-semibold">50 hrs 32 m</p>
               </div>
+              </div>
+
+              <button className="w-40 bg-[#E5E5E4] h-[40px] font-semibold cursor-pointer hover:bg-stone-300 transition duration-300">Approve</button>
           </div>
 
           <div className="w-full">
@@ -234,10 +242,11 @@ const ApprovalsComponent = ({ employees, monthlyDateValue }) => {
             CLOSE
           </button>,
           <button
+            onClick={() => editTimesheetDetail()}
             className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
             key="submit"
           >
-            Edit
+            EDIT
           </button>,
         ]}
         title="Edit Timesheet"
