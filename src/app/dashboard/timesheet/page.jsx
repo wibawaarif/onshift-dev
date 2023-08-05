@@ -49,6 +49,7 @@ const Timesheet = () => {
   const [section, setSection] = useState('Timesheet');
 
   const employees = useMemo(() => [{
+    _id: 1,
     name: '010_REHMAN SAMA',
     timesheets: [{
       date: dayjs().date(6).subtract(1, 'month'),
@@ -67,6 +68,7 @@ const Timesheet = () => {
     }],
     total: 9
   }, {
+    _id: 2,
     name: '013_KAMRAN SAMA',
     timesheets: [{
       date: dayjs().date(2) ,
@@ -237,7 +239,7 @@ const Timesheet = () => {
 
           <div className="flex-1">
             {
-              section === 'Timesheet' ? <TimesheetsComponent employees={clonedEmployees} monthlyDateValue={monthlyDateValue} /> : <ApprovalsComponent employees={clonedEmployees} />
+              section === 'Timesheet' ? <TimesheetsComponent employees={clonedEmployees} monthlyDateValue={monthlyDateValue} /> : <ApprovalsComponent monthlyDateValue={monthlyDateValue} employees={clonedEmployees} />
             }
           </div>
 
