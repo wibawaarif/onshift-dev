@@ -368,6 +368,8 @@ const Employee = () => {
         message.success("Employee deleted");
       }
     }
+
+    setSelectedRowKeys([]);
   };
 
   const handleAction = (type, data) => {

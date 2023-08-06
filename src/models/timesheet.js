@@ -1,6 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
 
 const timesheetSchema = new Schema({
+  date: {
+    type: Date,
+  },
   startTime: {
     type: Date
   },
@@ -14,7 +17,7 @@ const timesheetSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['Present', 'Absent'],
+    enum: ['Present', 'Absent', 'Late'],
     default: 'Present',
   }
 }, { timestamps: true })
