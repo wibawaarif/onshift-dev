@@ -63,15 +63,19 @@ const Employee = () => {
   }, [employees]);
 
   useEffect(() => {
-    const filteredList = _.cloneDeep(employees)?.filter((x) => {
+    let filteredList = _.cloneDeep(employees)?.filter((x) => {
       return selectedFilter?.some(
         (y) =>
           x.name === y ||
           x?.shifts?.some(
             (z) => z?.location?.name === y || z?.position?.name === y
           )
-      ) || x.name.includes(searchEmployeesInput)
+      )
     });
+
+    if (searchEmployeesInput !== "") {
+      filteredList = _.cloneDeep(employees)?.filter(x => x.name.toLocaleLowerCase().includes(searchEmployeesInput.toLocaleLowerCase()))
+    }
 
     if (selectedFilter?.length > 0 || searchEmployeesInput) {
       setClonedEmployees(filteredList);
@@ -348,6 +352,24 @@ const Employee = () => {
     message.success("Employee deleted");
   };
 
+  const bulkDeleteEmployee = async () => {
+    setEmployeeModal(false);
+
+    if (selectedRowKeys.length > 0) {
+      for (let i = 0; i < selectedRowKeys.length; i++) {
+        await fetch(`/api/employees/${selectedRowKeys[i]}`, {
+          method: "DELETE",
+          headers: {
+            authorization: "Bearer " + session.data.user.accessToken,
+          },
+        });
+        mutate([...employees]);
+
+        message.success("Employee deleted");
+      }
+    }
+  };
+
   const handleAction = (type, data) => {
     setActionType(type);
 
@@ -418,6 +440,14 @@ const Employee = () => {
             </div>
 
             <div className="w-max flex">
+              {
+                selectedRowKeys.length > 0 && (
+                  <button onClick={() => setActionType("bulkDelete") & setEmployeeModal(true)} className="hover:bg-[#E5E5E3] flex items-center justify-center mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+                  Delete
+                  <Image className="ml-1" width={20} height={20} src={"/static/svg/trash.svg"} />
+                </button>
+                )
+              }
               <button onClick={() => setEmployeeModal(true) & setActionType("exportImport")} className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
                 Import / Export
               </button>
@@ -437,6 +467,7 @@ const Employee = () => {
             >
               <Table
                 columns={columns}
+                rowKey={(record) => record._id}
                 dataSource={clonedEmployees}
                 rowSelection={rowSelection}
                 title={() => (
@@ -493,7 +524,7 @@ const Employee = () => {
                   ? addEmployee
                   : actionType === "edit"
                   ? editEmployee
-                  : deleteEmployee
+                  : actionType === "bulkDelete" ? bulkDeleteEmployee : deleteEmployee
               }
               className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
               key="submit"
@@ -530,6 +561,10 @@ const Employee = () => {
                   </Dragger>
               </div>
             )
+          }
+
+          {
+            actionType === 'bulkDelete' && <p>Are you sure want to delete selected employees?</p>
           }
 
           {(actionType === "add" || actionType === "edit") && (
