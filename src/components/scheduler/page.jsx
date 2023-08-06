@@ -19,7 +19,8 @@ const SchedulerComponent = ({
   editShift,
   weeklyDateValue,
   addShiftFromTable,
-  editShiftModal
+  editShiftModal,
+  deleteShiftModal,
 }) => {
   // Get the current date
 
@@ -230,111 +231,44 @@ const SchedulerComponent = ({
                   weekSchedule.map((dataItem, dataIndex) => (
                     <div key={dataIndex}>
                       <Droppable droppableId={`${dataItem}`}>
-                        {(provided) => (
-                          dayjs(dataItem).add(1, 'day') < dayjs().endOf("day") ? <div className="col-span-1 bg-stone-200 bg-opacity-75 border border-[1px] border-[#E5E5E3] h-full w-full"  /> : <div
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                            className={`flex justify-center items-center col-span-1 ${
-                              dataIndex === 0 ? "first-child" : ""
-                            } bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
-                          >
-                            {row?.shifts?.length !== 0 ? (
-                              row?.shifts?.map((z, index) =>
-                                dayjs(dataItem).diff(
-                                  dayjs(z?.repeatedShift?.endTime),
-                                  "day"
-                                ) >=
-                                  dayjs(
-                                    z?.repeatedShift?.startRepeatedWeek
-                                  ).diff(
-                                    dayjs(z?.repeatedShift?.endTime),
-                                    "day"
-                                  ) &&
-                                dayjs(dataItem).diff(
-                                  dayjs(z?.repeatedShift?.endDate),
-                                  "day"
-                                ) < 0 &&
-                                z?.repeatedShift?.repeatedDays?.some(
-                                  (x) => x === dayjs(dataItem).format("dddd")
-                                ) ? (
-                                  // repeated week
-                                  <div
-                                    key={index}
-                                    className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
-                                  >
-                                    <p className="text-[10px] font-bold">
-                                      {dayjs(z.startTime).format("h:mma")} -{" "}
-                                      {dayjs(z.endTime).format("h:mma")} ·{" "}
-                                      {dayjs(z.endTime).diff(
-                                        dayjs(z.startTime),
-                                        "hour"
-                                      )}
-                                      H
-                                    </p>
-                                    <div
-                                      className={`flex ${
-                                        !z?.position?.name &&
-                                        !z?.location?.name &&
-                                        "invisible"
-                                      } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
-                                    >
-                                      <span className="text-white text-[10px]">
-                                        {z?.location?.name && z?.position?.name
-                                          ? `${z?.location.name} • ${z?.position.name}`
-                                          : z?.location?.name
-                                          ? `${z?.location?.name}`
-                                          : `${z?.position?.name}`}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ) : dayjs(z.date).format("YYYY-MM-DD") ===
-                                  dataItem ? (
-                                  // non repeated week
-                                  <Draggable
-                                    key={z._id}
-                                    draggableId={`${z._id}`}
-                                    index={index}
-                                  >
-                                    {(provided) => (
-                                      <div
-                                        {...provided.draggableProps}
-                                        ref={provided.innerRef}
-                                        {...provided.dragHandleProps}
-                                        onMouseEnter={() => setRowIndex(index)}
-                                        className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
-                                        onClick={() => editShiftModal(z)}
-                                      >
-                                        <p className="text-[10px] font-bold">
-                                          {dayjs(z.startTime).format("h:mma")} -{" "}
-                                          {dayjs(z.endTime).format("h:mma")} ·{" "}
-                                          {dayjs(z.endTime).diff(
-                                            dayjs(z.startTime),
-                                            "hour"
-                                          )}
-                                          H
-                                        </p>
-                                        <div
-                                          className={`flex ${
-                                            !z?.position?.name &&
-                                            !z?.location?.name &&
-                                            "invisible"
-                                          } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
-                                        >
-                                          <span className="text-white text-[10px]">
-                                            {z?.location?.name &&
-                                            z?.position?.name
-                                              ? `${z?.location.name} • ${z?.position.name}`
-                                              : z?.location?.name
-                                              ? `${z?.location?.name}`
-                                              : `${z?.position?.name}`}
-                                          </span>
-                                        </div>
-                                        {provided.placeholder}
-                                      </div>
-                                    )}
-                                  </Draggable>
-                                ) : (
-                                  // manually create shift
+                        {(provided) =>
+                          dayjs(dataItem).add(1, "day") <
+                          dayjs().endOf("day") ? (
+                            <div className="col-span-1 bg-stone-200 bg-opacity-75 border border-[1px] border-[#E5E5E3] h-full w-full" />
+                          ) : (
+                            <div
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                              className={`flex justify-center items-center col-span-1 ${
+                                dataIndex === 0 ? "first-child" : ""
+                              } bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
+                            >
+                              {!row?.shifts
+                                ?.map((x) => dayjs(x.date).format("MM-DD-YYYY"))
+                                .includes(
+                                  dayjs(dataItem).format("MM-DD-YYYY")
+                                ) &&
+                                !row?.shifts?.some(
+                                  (z, index) =>
+                                    dayjs(dataItem).diff(
+                                      dayjs(z?.repeatedShift?.endTime),
+                                      "day"
+                                    ) >=
+                                      dayjs(
+                                        z?.repeatedShift?.startRepeatedWeek
+                                      ).diff(
+                                        dayjs(z?.repeatedShift?.endTime),
+                                        "day"
+                                      ) &&
+                                    dayjs(dataItem).diff(
+                                      dayjs(z?.repeatedShift?.endDate),
+                                      "day"
+                                    ) < 0 &&
+                                    z?.repeatedShift?.repeatedDays?.some(
+                                      (x) =>
+                                        x === dayjs(dataItem).format("dddd")
+                                    )
+                                ) && (
                                   <div
                                     onClick={() =>
                                       addShiftFromTable(
@@ -346,23 +280,141 @@ const SchedulerComponent = ({
                                   >
                                     <PlusLogo className="fill-slate-500 w-8 h-8 group/edit invisible group-hover/item:visible" />
                                   </div>
-                                )
-                              )
-                            ) : (
-                              // manually create shift
-                              <div
-                                onClick={() =>
-                                  addShiftFromTable(dayjs(dataItem), row._id)
-                                }
-                                className={`flex justify-center items-center col-span-1 bg-white group/item transition duration-300 hover:bg-stone-200 hover:bg-opacity-50 cursor-pointer h-full w-full`}
-                              >
-                                <PlusLogo className="fill-slate-500 w-8 h-8 group/edit invisible group-hover/item:visible" />
-                              </div>
-                            )}
+                                )}
 
-                            {provided.placeholder}
-                          </div>
-                        )}
+                              {row?.shifts?.length !== 0 && (
+                                row?.shifts?.map((z, index) =>
+                                  dayjs(dataItem).diff(
+                                    dayjs(z?.repeatedShift?.endTime),
+                                    "day"
+                                  ) >=
+                                    dayjs(
+                                      z?.repeatedShift?.startRepeatedWeek
+                                    ).diff(
+                                      dayjs(z?.repeatedShift?.endTime),
+                                      "day"
+                                    ) &&
+                                  dayjs(dataItem).diff(
+                                    dayjs(z?.repeatedShift?.endDate),
+                                    "day"
+                                  ) < 0 &&
+                                  z?.repeatedShift?.repeatedDays?.some(
+                                    (x) => x === dayjs(dataItem).format("dddd")
+                                  ) ? (
+                                    // repeated week
+                                    <div
+                                      key={index}
+                                      className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
+                                    >
+                                      <p className="text-[10px] font-bold">
+                                        {dayjs(z.startTime).format("h:mma")} -{" "}
+                                        {dayjs(z.endTime).format("h:mma")} ·{" "}
+                                        {dayjs(z.endTime).diff(
+                                          dayjs(z.startTime),
+                                          "hour"
+                                        )}
+                                        H
+                                      </p>
+                                      <div
+                                        className={`flex ${
+                                          !z?.position?.name &&
+                                          !z?.location?.name &&
+                                          "invisible"
+                                        } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
+                                      >
+                                        <span className="text-white text-[10px]">
+                                          {z?.location?.name &&
+                                          z?.position?.name
+                                            ? `${z?.location.name} • ${z?.position.name}`
+                                            : z?.location?.name
+                                            ? `${z?.location?.name}`
+                                            : `${z?.position?.name}`}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    dayjs(z.date).format("YYYY-MM-DD") ===
+                                      dataItem && (
+                                      // non repeated week
+                                      <Draggable
+                                        key={z._id}
+                                        draggableId={`${z._id}`}
+                                        index={index}
+                                      >
+                                        {(provided) => (
+                                          <div
+                                            {...provided.draggableProps}
+                                            ref={provided.innerRef}
+                                            {...provided.dragHandleProps}
+                                            className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
+                                          >
+                                            <p className="text-[10px] font-bold">
+                                              {dayjs(z.startTime).format(
+                                                "h:mma"
+                                              )}{" "}
+                                              -{" "}
+                                              {dayjs(z.endTime).format("h:mma")}{" "}
+                                              ·{" "}
+                                              {dayjs(z.endTime).diff(
+                                                dayjs(z.startTime),
+                                                "hour"
+                                              )}
+                                              H
+                                            </p>
+                                            <div
+                                              className={`flex ${
+                                                !z?.position?.name &&
+                                                !z?.location?.name &&
+                                                "invisible"
+                                              } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
+                                            >
+                                              <span className="text-white text-[10px]">
+                                                {z?.location?.name &&
+                                                z?.position?.name
+                                                  ? `${z?.location.name} • ${z?.position.name}`
+                                                  : z?.location?.name
+                                                  ? `${z?.location?.name}`
+                                                  : `${z?.position?.name}`}
+                                              </span>
+                                            </div>
+                                            <div className="relative">
+                                              <Image
+                                                onClick={() =>
+                                                  editShiftModal(z)
+                                                }
+                                                onMouseEnter={() =>
+                                                  setRowIndex(index)
+                                                }
+                                                width={16}
+                                                height={16}
+                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 right-3"
+                                                alt="trash"
+                                                src={"/static/svg/edit.svg"}
+                                              />
+                                              <Image
+                                                onClick={() =>
+                                                  deleteShiftModal(z._id)
+                                                }
+                                                width={16}
+                                                height={16}
+                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 -right-1"
+                                                alt="trash"
+                                                src={"/static/svg/trash.svg"}
+                                              />
+                                            </div>
+                                            {provided.placeholder}
+                                          </div>
+                                        )}
+                                      </Draggable>
+                                    )
+                                  )
+                                )
+                              )}
+
+                              {provided.placeholder}
+                            </div>
+                          )
+                        }
                       </Droppable>
                     </div>
                   ))}

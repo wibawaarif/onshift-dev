@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Shift from "@/models/shift";
+import Employee from "@/models/employee";
 import { verifyJwtToken } from '@/lib/jwt'
 
 export const PUT = async (request, { params }) => {
@@ -48,9 +49,15 @@ export const DELETE = async (request, { params }) => {
   try {
     await connect();
 
-    await Position.findByIdAndDelete(id);
+    await Shift.findByIdAndDelete(id);
 
-    return new NextResponse("Position has been deleted", { status: 200 });
+    await Employee.updateOne({
+      $pull: {
+        shifts: id
+      }
+    })
+
+    return new NextResponse("Shift has been deleted", { status: 200 });
   } catch (err) {
     return new NextResponse(err, { status: 500 });
   }

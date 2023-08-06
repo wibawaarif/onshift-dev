@@ -280,12 +280,25 @@ const Scheduler = () => {
 
   const editShiftModal = data => {
     setId(data._id)
-    setForm(prev => { return { ...prev, ...data, location: data?.location?._id, position: data?.position?._id, startTime: dayjs(data.startTime), endTime: dayjs(data.endTime), date: dayjs(data.date), repeatedShift: {...prev.repeatedShift, startRepeatedWeek: dayjs(data.repeatedShift.startRepeatedWeek), endDate: dayjs(data.repeatedShift.endDate)} } })
+    if (data.repeatedShift.repeatedDays.length > 0) {
+      setSelectedRepeatedDays(data.repeatedShift.repeatedDays)
+      setForm(prev => { return { ...prev, ...data, location: data?.location?._id, position: data?.position?._id, startTime: dayjs(data.startTime), endTime: dayjs(data.endTime), date: dayjs(data.date), repeatedShift: {...prev.repeatedShift, startRepeatedWeek: dayjs(data.repeatedShift.startRepeatedWeek), endDate: dayjs(data.repeatedShift.endDate)} } })
+    } else {
+      setForm(prev => { return { ...prev, ...data, location: data?.location?._id, position: data?.position?._id, startTime: dayjs(data.startTime), endTime: dayjs(data.endTime), date: dayjs(data.date) } })
+    }
+    
     setActionType('edit')
     setShiftModal(true)
   } 
 
+  const deleteShiftModal = id => {
+    setId(id)
+    setActionType('delete')
+    setShiftModal(true)
+  } 
+
   const addShiftFromTable = (date, id) => {
+    setSelectedRepeatedDays([])
     setForm(prev => { return { ...prev, date, employees: [...prev.employees, id] } })
     setActionType('add')
     setShiftModal(true)
@@ -318,6 +331,16 @@ const Scheduler = () => {
   };
 
   const editDraggableShift = async () => {
+    if (selectedRepeatedDays.length > 0) {
+      let newForm = form;
+      newForm.repeatedShift.isRepeated = true;
+      newForm.repeatedShift.repeatedDays = selectedRepeatedDays;
+      newForm.repeatedShift.startRepeatedWeek = dayjs(newForm.date).endOf(
+        "week"
+      );
+      setForm(newForm);
+    }
+
     await fetch(`/api/shifts/${Id}`, {
       method: "PUT",
       body: JSON.stringify(form),
@@ -348,6 +371,19 @@ const Scheduler = () => {
 
       message.success("Shift updated");
     }
+  };
+
+  const deleteShift = async () => {
+    setShiftModal(false);
+    await fetch(`/api/shifts/${Id}`, {
+      method: "DELETE",
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    mutateEmployees([...employees]);
+
+    message.success("Shift deleted");
   };
 
   const clearFields = () => {
@@ -495,6 +531,7 @@ const Scheduler = () => {
               weeklyDateValue={weeklyDateValue}
               editShift={editShift}
               editShiftModal={editShiftModal}
+              deleteShiftModal={deleteShiftModal}
               employees={clonedEmployees}
               listOfShifts={shifts}
               type={type}
@@ -533,12 +570,12 @@ const Scheduler = () => {
                </div>
              </button> :
             <button
-              disabled={isFormInvalid}
-              onClick={actionType === 'add' ? () => addShift() : () => editDraggableShift()}
+              disabled={isFormInvalid && actionType !== 'delete'}
+              onClick={actionType === 'add' ? () => addShift() : actionType === 'delete' ? () => deleteShift() : () => editDraggableShift()}
               className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
               key="submit"
             >
-              {actionType === 'add' ? 'CREATE' : 'EDIT'}
+              {actionType === 'add' ? 'CREATE' : actionType === 'delete' ? 'CONFIRM' : 'EDIT'}
             </button>,
           ]}
           title="Create New Shift"
@@ -563,7 +600,10 @@ const Scheduler = () => {
           }
 
           {
-            actionType !== 'exportImport' && 
+            actionType === 'delete' && <p>Are you sure want to delete this shift?</p>
+          }
+          {
+            (actionType === 'add' || actionType === 'edit') && 
             <Tabs
             defaultActiveKey="1"
             items={[
@@ -584,7 +624,6 @@ const Scheduler = () => {
                         }
                         className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
                       />
-
                       <div className="flex flex-col">
                         <span className="text-xs font-semibold mt-4">
                           REPEATED DAYS
@@ -831,7 +870,7 @@ const Scheduler = () => {
         </Modal>
 
         <button
-          onClick={() => setShiftModal(true) & setActionType('add')}
+          onClick={() => setActionType('add') & setShiftModal(true)}
           className="hover:opacity-80 transition duration-300 absolute bottom-10 right-10 w-[220px] h-[40px] bg-black text-white rounded-full text-[14px]"
         >
           + CREATE SHIFT / TIME OFF
