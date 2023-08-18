@@ -1,28 +1,25 @@
 "use client"
 
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import Link from "next/link";
 import { Popover } from "antd";
-import { signOut } from "next-auth/react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 const menu = ['schedule', 'employee', 'position', 'location', 'timesheet'];
 
-const DashboardLayout = ({children}) => {
+const DashboardLayout = async ({children}) => {
   const pathname = usePathname();
   const currentPath = pathname.split('/').pop()
 
   const session = useSession();
-  const router = useRouter();
 
   if (session.status === "loading") {
     return <p>Loading...</p>;
   }
-  console.log(session);
 
   if (session.status === "unauthenticated") {
-    router?.push("/signin?message=Unauthorized");
+    signOut({callbackUrl: '/signin?message=Unauthorized'})
     return
   }
 

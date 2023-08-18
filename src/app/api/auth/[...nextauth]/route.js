@@ -21,20 +21,20 @@ const handler = NextAuth({
         const user = await User.findOne({ email });
 
         if (!user) {
-          throw new Error("User not found");
+          throw new Error("Email unregistered");
         }
 
         const comparePass = await bcrypt.compare(password, user.password);
         if (!comparePass) {
           throw new Error("Invalid credentials");
         } else {
-          const { password, ...currentUser } = user._doc;
+          const { ...currentUser } = user._doc;
 
-          const accessToken = signJwtToken(currentUser, { expiresIn: "6d" });
+          const accessToken = signJwtToken(currentUser, { expiresIn: 6 * 24 * 60 * 60, });
 
           return {
             ...currentUser,
-            accessToken,
+            accessToken
           };
         }
       },
@@ -44,16 +44,16 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
+  database: process.env.MONGO_URI,
   jwt: {
     maxAge: 6 * 24 * 60 * 60,
   },
   session: {
-    strategy: "jwt",
+    jwt: true,
     maxAge: 6 * 24 * 60 * 60,
   },
   pages: {
     signIn: "/signin",
-    signOut: "/signin"
   },
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -77,22 +77,6 @@ const handler = NextAuth({
       }
 
       return true
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.accessToken = user.accessToken;
-        token._id = user._id;
-      }
-
-      return token;
-    },
-    async session({ session, token }) {
-      if (token) {
-        session.user._id = token._id;
-        session.user.accessToken = token.accessToken;
-      }
-
-      return session;
     },
   },
   secret: process.env.JWT_SECRET,
