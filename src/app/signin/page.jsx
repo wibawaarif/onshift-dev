@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import Link from "next/link";
-import { message } from "antd";
+import { message, Input, Checkbox } from "antd";
+import { MailOutlined } from "@ant-design/icons";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -68,9 +68,55 @@ const SignIn = () => {
   };
 
   return (
-    <div className="bg-[#FAFAFA] flex justify-center items-center h-screen w-screen">
+    <div className="bg-[#FAFAFA] flex flex-col justify-center items-center h-screen w-screen">
       {contextHolder}
-      <div className="flex flex-col items-center">
+
+      <div className="w-full h-12 px-28 flex items-center shadow-md">
+        <p className="font-bold text-xl">onshift</p>
+      </div>
+
+      <div className="flex flex-1 w-full">
+          <div className="bg-black w-1/2 h-full flex justify-center items-center">
+          <Image
+          height={404}
+          width={559}
+          alt="OnShift"
+          src={"/static/img/onshift.png"}
+        />
+          </div>
+
+          <div className="w-1/2 h-full flex justify-center items-center">
+            
+            <div className="w-[531px] h-[520px] shadow-lg px-6 py-6">
+              
+              <p className="text-3xl font-bold">Sign in</p>
+
+              <div>
+                  <span>Email</span>
+                  <Input placeholder="Enter your email" prefix={<MailOutlined />} className="py-2" />
+              </div>
+
+              <div>
+                  <span>Password</span>
+                  <Input.Password placeholder="Enter your email" className="py-2" />
+              </div>
+
+              <div className="flex justify-between">
+                <Checkbox >Remember me</Checkbox>
+
+                <span>Forgot password?</span>
+              </div>
+
+
+
+
+            </div>
+
+          </div>
+
+      </div>
+
+      {/* <div className="flex flex-col items-center">
         <Image
           height={27}
           width={110}
@@ -150,7 +196,7 @@ const SignIn = () => {
             Sign up
           </Link>
         </p>
-      </div>
+      </div> */}
     </div>
   );
 };

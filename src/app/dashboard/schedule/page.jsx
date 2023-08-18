@@ -168,16 +168,16 @@ const Scheduler = () => {
     },
   };
 
-  const disabledDate = (current) => {
-    // const currentDate = dayjs(current);
+    const disabledDate = (current) => {
+      // const currentDate = dayjs(current);
 
-    // const startOfWeek = dayjs().startOf('week')
-    // const endOfWeek = dayjs().endOf('week')
+      // const startOfWeek = dayjs().startOf('week')
+      // const endOfWeek = dayjs().endOf('week')
 
-    // return currentDate.isBefore(startOfWeek) || currentDate.isAfter(endOfWeek);
+      // return currentDate.isBefore(startOfWeek) || currentDate.isAfter(endOfWeek);
 
-    return current && current < dayjs().endOf("day");
-  };
+      return current && current < dayjs().endOf("day");
+    };
 
   const headers = [
     {
