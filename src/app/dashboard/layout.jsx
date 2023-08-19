@@ -8,11 +8,11 @@ import { useSession, signOut } from "next-auth/react";
 
 const menu = ['schedule', 'employee', 'position', 'location', 'timesheet'];
 
-const DashboardLayout = async ({children}) => {
+const DashboardLayout = ({children}) => {
   const pathname = usePathname();
   const currentPath = pathname.split('/').pop()
 
-  const session = useSession();
+  const session = useSession()
 
   if (session.status === "loading") {
     return <p>Loading...</p>;

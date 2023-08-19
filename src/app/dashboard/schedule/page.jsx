@@ -38,7 +38,6 @@ const fetcher = ([url, token]) =>
 
 const Scheduler = () => {
   const session = useSession();
-
   const { data: shifts, mutate: mutateShifts } = useSWR(
     [`/api/shifts`, session.data.user.accessToken],
     fetcher

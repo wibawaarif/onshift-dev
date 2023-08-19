@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken'
 
 // signing jwt
-export function signJwtToken(payload, options = {}) {
+export function signJwtToken(payload) {
     const secret = process.env.JWT_SECRET;
-    const token = jwt.sign(payload, secret, options);
+    const token = jwt.sign(payload, secret, { expiresIn: 6 * 24 * 60 * 60, });
     return token;
 }
 

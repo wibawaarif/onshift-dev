@@ -30,7 +30,7 @@ const handler = NextAuth({
         } else {
           const { ...currentUser } = user._doc;
 
-          const accessToken = signJwtToken(currentUser, { expiresIn: 6 * 24 * 60 * 60, });
+          const accessToken = signJwtToken(currentUser);
 
           return {
             ...currentUser,
@@ -77,6 +77,22 @@ const handler = NextAuth({
       }
 
       return true
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.accessToken = user.accessToken;
+        token._id = user._id;
+      }
+
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user._id = token._id;
+        session.user.accessToken = token.accessToken;
+      }
+
+      return session;
     },
   },
   secret: process.env.JWT_SECRET,
