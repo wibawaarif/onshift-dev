@@ -47,7 +47,7 @@ const Location = () => {
 
   useEffect(() => {
     const filteredList = _.cloneDeep(locations)?.filter((x) => {
-      return x.name.toLocaleLowerCase().includes(searchLocationsInput.toLocaleLowerCase()) || x.address.toLocaleLowerCase().includes(searchLocationsInput.toLocaleLowerCase())
+      return x.name.toLocaleLowerCase()?.includes(searchLocationsInput?.toLocaleLowerCase()) || x.address.toLocaleLowerCase()?.includes(searchLocationsInput?.toLocaleLowerCase())
     });
 
     if (searchLocationsInput) {

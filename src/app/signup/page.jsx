@@ -114,6 +114,7 @@ const SignUpPage = () => {
               }}
             >
               <button
+                        onClick={() => createAccount()}
                 className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
               >
                 {spin ? <Spin /> : "Continue"}
