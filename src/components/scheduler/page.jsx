@@ -232,10 +232,7 @@ const SchedulerComponent = ({
                     <div key={dataIndex}>
                       <Droppable droppableId={`${dataItem}`}>
                         {(provided) =>
-                          dayjs(dataItem).add(1, "day") <
-                          dayjs().endOf("day") ? (
-                            <div className="col-span-1 bg-stone-200 bg-opacity-75 border border-[1px] border-[#E5E5E3] h-full w-full" />
-                          ) : (
+                          (
                             <div
                               {...provided.droppableProps}
                               ref={provided.innerRef}

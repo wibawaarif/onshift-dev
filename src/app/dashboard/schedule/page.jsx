@@ -671,6 +671,7 @@ const Scheduler = () => {
                               return { ...prev, startTime: e };
                             })
                           }
+                          format="HH:mm"
                           className="w-full rounded-none border-t-0 border-l-0 border-r-0"
                         />
                       </div>
@@ -685,6 +686,7 @@ const Scheduler = () => {
                               return { ...prev, endTime: e };
                             })
                           }
+                          format="HH:mm"
                           className="w-full rounded-none border-t-0 border-l-0 border-r-0"
                         />
                       </div>
