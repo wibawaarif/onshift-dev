@@ -5,7 +5,6 @@ const locationSchema = new Schema({
       type: String,
       trim: true,
       required: true,
-      unique: true,
     },
     address: {
       type: String,

@@ -110,6 +110,7 @@ const Employee = () => {
           Papa.parse(contents, {
             complete: (parsedData) => {
               // Process the parsed data here
+              console.log(parsedData.data);
               setUploadedEmployees(parsedData.data)
             },
             header: true,

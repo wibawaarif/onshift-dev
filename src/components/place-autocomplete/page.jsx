@@ -29,6 +29,7 @@ const PlaceComponent = ({style, address, setAddress, setLatitude, setLongitude }
           type="text"
           className={`form-control ${style}`}
           value={address}
+          onChange={(e) => setAddress(e.target.value)}
         />
       </StandaloneSearchBox>
     </LoadScript>

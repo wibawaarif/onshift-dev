@@ -311,7 +311,6 @@ const Location = () => {
                 placeholder="Enter radius..."
               />
               </div>
-
             <div className="mt-2 px-1 py-1 border-[1px] border-[#E5E5E3]">
               <GoogleMaps radius={form.radius} latitude={latitude} longitude={longitude} setLatitude={setLatitude} setLongitude={setLongitude} />
             </div>
