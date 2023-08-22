@@ -139,7 +139,7 @@ const SignIn = () => {
               </ConfigProvider>
               <div className="text-center mt-4">
                 <Link href="/signup">
-                  Don't have an account yet?{" "}
+                  Don&apos;t have an account yet?{" "}
                   <span className="hover:underline text-blue-500">
                     Create one.
                   </span>

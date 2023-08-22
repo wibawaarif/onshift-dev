@@ -83,7 +83,7 @@ const SignUpPage = () => {
 
         <div className="w-1/2 h-full flex justify-center items-center">
           <div className="w-[531px] h-[520px] shadow-lg px-6 py-6">
-            <p className="text-3xl font-bold text-left mt-2">Let's Get Started 🚀</p>
+            <p className="text-3xl font-bold text-left mt-2">Let&apos;s Get Started 🚀</p>
             <p className="mt-2">Create your account</p>
 
             <div className="mt-6">
@@ -129,7 +129,7 @@ const SignUpPage = () => {
             </ConfigProvider>
             <div className="text-center mt-4">
               <Link href="/signin">
-                Already have an account yet?{" "}
+                Already have an account?{" "}
                 <span className="hover:underline text-blue-500">
                   Sign In
                 </span>
