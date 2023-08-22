@@ -65,7 +65,7 @@ const Scheduler = () => {
   const [weeklyDateValue, setWeeklyDateValue] = useState(dayjs());
   const [actionType, setActionType] = useState(null);
   const [Id, setId] = useState(null);
-  const [uploadedEmployees, setUploadedEmployees] = useState(null);
+  const [uploadedShifts, setUploadedShifts] = useState(null);
   const [isFormInvalid, setIsFormInvalid] = useState(true);
   const [form, setForm] = useState({
     date: "",
@@ -151,7 +151,7 @@ const Scheduler = () => {
           Papa.parse(contents, {
             complete: (parsedData) => {
               // Process the parsed data here
-              setUploadedEmployees(parsedData.data)
+              setUploadedShifts(parsedData.data)
             },
             header: true,
           });
@@ -180,31 +180,27 @@ const Scheduler = () => {
 
   const headers = [
     {
-      label: "Date",
-      key: "dame"
+      label: "date",
+      key: "date"
     },
     {
-      label: "Start Time",
+      label: "startTime",
       key: "startTime"
     },
     {
-      label: "End Time",
+      label: "endTime",
       key: "endTime"
     },
     {
-      label: "Break",
+      label: "break",
       key: "break"
     },
     {
-      label: "Notes",
+      label: "notes",
       key: "notes"
     },
     {
-      label: "Notes",
-      key: "notes"
-    },
-    {
-      label: "Employees",
+      label: "employees",
       key: "employees"
     },
     {
@@ -385,6 +381,31 @@ const Scheduler = () => {
     message.success("Shift deleted");
   };
 
+  const addUploadedShifts = async () => {
+    setShiftModal(false);
+
+    for (let i = 0; i < uploadedShifts.length; i++) {
+      if (uploadedShifts[i].date && uploadedShifts[i].startTime && uploadedShifts[i].endTime && uploadedShifts[i].employees  ) {
+
+        const res = await fetch(`/api/shifts`, {
+          method: "POST",
+          body: JSON.stringify(uploadedShifts[i].isRepeated ? {...uploadedShifts[i], employees: [uploadedShifts[i].employees], reapeatedShift: {startRepeatedWeek: uploadedShifts[i].startRepeatedWeek, repeatedDays: uploadedShifts[i].repeatedDays, endDate: uploadedShifts[i].endDate} } : {...uploadedShifts[i],  employees: [uploadedShifts[i].employees]}),
+          headers: {
+            authorization: "Bearer " + session.data.user.accessToken,
+          },
+        });
+        const respMessage = await res.json();
+  
+        if (respMessage.info === "email existed") {
+          message.error(`${respMessage.error}`);
+          continue;
+        }
+  
+        message.success("Shift created");
+        mutateEmployees([...employees]);
+      }
+    }
+  }
   const clearFields = () => {
     setForm({
       date: "",
@@ -560,7 +581,7 @@ const Scheduler = () => {
             </button>,
              actionType === "exportImport" ? 
              <button
-               onClick={() => addUploadedEmployees()}
+               onClick={() => addUploadedShifts()}
                className="bg-black text-white rounded-sm border-[1px] border-black px-4 py-1 hover:opacity-80"
                key="submit"
              >
