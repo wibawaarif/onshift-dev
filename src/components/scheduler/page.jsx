@@ -328,6 +328,31 @@ const SchedulerComponent = ({
                                             : `${z?.position?.name}`}
                                         </span>
                                       </div>
+                                      <div className="relative">
+                                              <Image
+                                                onClick={() =>
+                                                  editShiftModal(z)
+                                                }
+                                                onMouseEnter={() =>
+                                                  setRowIndex(index)
+                                                }
+                                                width={16}
+                                                height={16}
+                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 right-3"
+                                                alt="trash"
+                                                src={"/static/svg/edit.svg"}
+                                              />
+                                              <Image
+                                                onClick={() =>
+                                                  deleteShiftModal(z._id)
+                                                }
+                                                width={16}
+                                                height={16}
+                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 -right-1"
+                                                alt="trash"
+                                                src={"/static/svg/trash.svg"}
+                                              />
+                                            </div>
                                     </div>
                                   ) : (
                                     dayjs(z.date).format("YYYY-MM-DD") ===

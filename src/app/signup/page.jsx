@@ -122,9 +122,7 @@ const SignUpPage = () => {
               <p className="text-center mt-4">Or sign up with</p>
               <button
                onClick={() => {
-                            signIn("google", {
-                              callbackUrl: `/dashboard/schedule`,
-                            });
+                            signIn("google", {callbackUrl: '/dashboard/schedule' });
                           }}
               prefix={<GoogleOutlined />}
                 className="mt-3 w-full h-[50px] bg-[#DB4437] text-white rounded-[8px]"

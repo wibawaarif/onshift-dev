@@ -95,10 +95,11 @@ const Location = () => {
   };
 
   const editLocation = async () => {
+    console.log(form.address);
     setLocationModal(false);
     const data = await fetch(`/api/locations/${id}`, {
       method: "PUT",
-      body: JSON.stringify(form),
+      body: JSON.stringify({...form, address, longitude, latitude}),
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,
       },

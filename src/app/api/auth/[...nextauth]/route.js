@@ -34,7 +34,7 @@ const handler = NextAuth({
 
           return {
             ...currentUser,
-            accessToken
+            accessToken,
           };
         }
       },
@@ -58,25 +58,26 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account.provider === "google") {
-          const response = await fetch(`/api/register`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: profile.email,
-              username: profile.name,
-              type: 'google',
-            }),
-          });
-          
-          if (response.status === 500) {
-            return '/signin?message=Email already exist'
-          }
+        console.log('test');
+        const response = await fetch(`/api/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: profile.email,
+            username: profile.name,
+            type: "google",
+          }),
+        });
+        console.log(response);
+        if (response.status === 500) {
+          return "/signin?message=Email already exist";
+        }
         return true;
       }
 
-      return true
+      return true;
     },
     async jwt({ token, user }) {
       if (user) {

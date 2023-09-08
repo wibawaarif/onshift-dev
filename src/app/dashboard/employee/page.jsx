@@ -214,6 +214,9 @@ const Employee = () => {
           <Popover
             content={
               <div className="flex flex-col items-start">
+                <button onClick={() => handleAction("detail", record)}>
+                  Details
+                </button>
                 <button onClick={() => handleAction("edit", record)}>
                   Edit
                 </button>
@@ -399,6 +402,18 @@ const Employee = () => {
       setForm(newForm);
     }
 
+    if (type === 'detail') {
+      const newForm = {
+        name: data.name,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        platform: data.platform,
+        wageOptions: data.wageOptions,
+        positions: data.positions,
+      };
+      setForm(newForm);
+    }
+
     if (type === "delete") {
       setId(data);
     }
@@ -535,7 +550,7 @@ const Employee = () => {
               //   </div>
               // </button>
               <button
-                className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
+                className={`mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm ${actionType === 'detail' ? 'invisible hidden' : ''}`}
                 key="back"
                 onClick={() => setEmployeeModal(false)}
               >
@@ -561,7 +576,7 @@ const Employee = () => {
                     ? bulkDeleteEmployee
                     : deleteEmployee
                 }
-                className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
+                className={`bg-black text-white rounded-sm px-4 py-1 hover:opacity-80 ${actionType === 'detail' ? 'invisible hidden' : ''}`}
                 key="submit"
               >
                 {actionType === "add"
@@ -579,7 +594,7 @@ const Employee = () => {
               ? "Edit Employee"
               : actionType === "exportImport"
               ? "Export / Import"
-              : "Delete Employee"
+              : actionType === 'detail' ? 'Employee Detail' : "Delete Employee"
           }`}
           open={employeeModal}
           onCancel={() => setEmployeeModal(false)}
@@ -600,6 +615,48 @@ const Employee = () => {
               </Dragger>
             </div>
           )}
+
+          {
+            actionType === 'detail' && (
+              <div className="w-full">
+                <div className="flex w-full h-max">
+
+                    {/* <div className="w-1/2 h-full border-r-2 border-slate-200">
+                    <div className="w-full flex justify-between">
+                  <span className="font-medium">Employee Name</span>
+                  <span>: {form.name}</span>
+                </div>
+                <div className="w-full flex justify-between">
+                  <span className="font-medium">Employee Email</span>
+                  <span>: {form.email}</span>
+                </div>
+                    </div>
+                    <div className="w-1/2 h-full">
+
+</div> */}
+
+
+                </div>
+                <div className="w-1/2 flex justify-between">
+                  <div className="font-medium w-1/2">Employee Name</div>
+                  <span>: {form.name}</span>
+                </div>
+                <div className="w-1/2 flex justify-between">
+                  <span className="font-medium">Employee Email</span>
+                  <span>: {form.email}</span>
+                </div>
+                                <div className="w-1/2 flex justify-between">
+                  <span className="font-medium">Phone Number :</span>
+                  <span>: {form.phoneNumber}</span>
+                </div>
+
+                <div className="w-1/2 flex justify-between">
+                  <span className="font-medium">Phone Number :</span>
+                  <span>: {form.platform}</span>
+                </div>
+              </div>
+            )
+          }
 
           {actionType === "bulkDelete" && (
             <p>Are you sure want to delete selected employees?</p>
