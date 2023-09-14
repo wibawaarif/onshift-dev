@@ -38,6 +38,7 @@ const fetcher = ([url, token]) =>
 
 const Scheduler = () => {
   const session = useSession();
+  console.log(session);
   const { data: shifts, mutate: mutateShifts } = useSWR(
     [`/api/shifts`, session.data.user.accessToken],
     fetcher
@@ -224,7 +225,7 @@ const Scheduler = () => {
   const filterOptions = [
     {
       name: "LOCATIONS / (DESELECT ALL)",
-      options: locations?.map((location) => location?.name),
+      options:  locations?.map((location) => location?.name),
     },
     {
       name: "POSITIONS / (DESELECT ALL)",

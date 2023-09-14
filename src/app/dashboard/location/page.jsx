@@ -184,7 +184,7 @@ const Location = () => {
             </p>
 
             <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
-            {clonedLocations &&
+            {clonedLocations?.length > 0 ? 
               clonedLocations.map((x, index) => (
                 <div key={index} className="h-full w-full mt-6">
                   <div className="h-[250px] border-[1px] border-[#E5E5E3]">
@@ -233,7 +233,11 @@ const Location = () => {
                     </div>
                   </div>
                 </div>
-              ))}
+              )) : <div className="col-span-full flex justify-center items-center">
+                
+                <span className="text-2xl text-slate-500">There is no any location yet! Create <span onClick={() => setLocationModal(true) & setActionType("add") & clearFields()} className="text-blue-400 underline cursor-pointer hover:text-blue-600">one</span></span>
+                </div>
+            }
               </div>
           </div>
         </div>

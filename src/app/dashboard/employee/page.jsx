@@ -618,8 +618,7 @@ const Employee = () => {
 
           {
             actionType === 'detail' && (
-              <div className="w-full">
-                <div className="flex w-full h-max">
+              <div className="w-full flex">
 
                     {/* <div className="w-1/2 h-full border-r-2 border-slate-200">
                     <div className="w-full flex justify-between">
@@ -634,18 +633,30 @@ const Employee = () => {
                     <div className="w-1/2 h-full">
 
 </div> */}
+              <div className="w-1/2 mr-2 flex flex-col">
+              <div className="flex flex-col">
+                  <span>Employee Name</span>
+                  <div className="font-medium w-full h-10 rounded-xl bg-stone-100 px-4 flex items-center">{ form.name }</div>
+                </div>
+                <div className="flex flex-col mt-4">
+                  <span>Employee Email</span>
+                  <div className="font-medium w-full h-10 rounded-xl bg-stone-100 px-4 flex items-center">{ form.email }</div>
+                </div>
+              </div>
 
+              <div className="w-1/2 ml-2 flex flex-col">
+              <div className="flex flex-col">
+                  <span>Phone Number</span>
+                  <div className="font-medium w-full h-10 rounded-xl bg-stone-100 px-4 flex items-center">{ form.phoneNumber }</div>
+                </div>
+                <div className="flex flex-col mt-4">
+                  <span>Platform</span>
+                  <div className="font-medium w-full h-10 rounded-xl bg-stone-100 px-4 flex items-center">{ form.platform }</div>
+                </div>
+              </div>
 
-                </div>
-                <div className="w-1/2 flex justify-between">
-                  <div className="font-medium w-1/2">Employee Name</div>
-                  <span>: {form.name}</span>
-                </div>
-                <div className="w-1/2 flex justify-between">
-                  <span className="font-medium">Employee Email</span>
-                  <span>: {form.email}</span>
-                </div>
-                                <div className="w-1/2 flex justify-between">
+               
+                                {/* <div className="w-1/2 flex justify-between">
                   <span className="font-medium">Phone Number :</span>
                   <span>: {form.phoneNumber}</span>
                 </div>
@@ -653,7 +664,7 @@ const Employee = () => {
                 <div className="w-1/2 flex justify-between">
                   <span className="font-medium">Phone Number :</span>
                   <span>: {form.platform}</span>
-                </div>
+                </div> */}
               </div>
             )
           }

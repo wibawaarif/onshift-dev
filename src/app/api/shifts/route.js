@@ -9,8 +9,9 @@ import { verifyJwtToken } from '@/lib/jwt'
 export const GET = async (request) => {
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
-
+  console.log(accessToken);
   const decodedToken = verifyJwtToken(token)  
+  console.log(decodedToken);
 
   if (!accessToken || !decodedToken) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })

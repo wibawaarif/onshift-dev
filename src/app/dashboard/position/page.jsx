@@ -227,7 +227,7 @@ const Position = () => {
             </p>
 
             <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
-              {clonedPositions &&
+              {clonedPositions?.length > 0 ?
                 clonedPositions?.map((x, index) => {
                   return (
                     <div
@@ -284,7 +284,11 @@ const Position = () => {
                       </div>
                     </div>
                   );
-                })}
+                }) : <div className="col-span-full flex justify-center items-center">
+                
+                <span className="text-2xl text-slate-500">There is no any position yet! Create <span onClick={() => setPositionModal(true) & setActionType("add") & clearFields()} className="text-blue-400 underline cursor-pointer hover:text-blue-600">one</span></span>
+                </div>
+              }
             </div>
           </div>
         </div>

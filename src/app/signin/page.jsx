@@ -8,6 +8,7 @@ import Image from "next/image";
 import { message, Input, Checkbox, ConfigProvider, Spin } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import Link from "next/link";
+import LoadingPage from "@/components/LoadingPage/page";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -26,7 +27,7 @@ const SignIn = () => {
   }, [searchParams]);
 
   if (session.status === "loading") {
-    return <p>Loading...</p>;
+    return <LoadingPage />
   }
 
   if (session.status === "authenticated") {

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import Link from "next/link";
 import { Popover } from "antd";
 import { useSession, signOut } from "next-auth/react";
+import LoadingPage from "@/components/LoadingPage/page";
 
 const menu = ['schedule', 'employee', 'position', 'location', 'timesheet'];
 
@@ -13,9 +14,9 @@ const DashboardLayout = ({children}) => {
   const currentPath = pathname.split('/').pop()
 
   const session = useSession()
-
+console.log(session);
   if (session.status === "loading") {
-    return <p>Loading...</p>;
+    return <LoadingPage />
   }
 
   if (session.status === "unauthenticated") {
@@ -27,7 +28,7 @@ const DashboardLayout = ({children}) => {
     <div className="h-screen w-screen bg-white flex">
       <div className="flex flex-col justify-between items-center py-4 w-[70px] h-full border-r-[1px] border-[#E5E5E3]">
         <div>
-          <span className="text-sm">Onshift</span>
+        <Image width={50} height={50} alt="brand-logo" src={'/static/img/brand.png'} />
         </div>
 
         <div className="flex flex-col justify-between items-center h-52">

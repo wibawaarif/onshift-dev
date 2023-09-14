@@ -51,6 +51,7 @@ const handler = NextAuth({
   session: {
     jwt: true,
     maxAge: 6 * 24 * 60 * 60,
+    strategy: 'jwt',
   },
   pages: {
     signIn: "/signin",
@@ -59,7 +60,7 @@ const handler = NextAuth({
     async signIn({ user, account, profile }) {
       if (account.provider === "google") {
         console.log('test');
-        const response = await fetch(`/api/register`, {
+        const response = await fetch(`http://localhost:3000/api/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -79,20 +80,39 @@ const handler = NextAuth({
 
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile }) {
+      console.log(token);
+      console.log(user);
+      console.log(account);
+      console.log(profile)
       if (user) {
-        token.accessToken = user.accessToken;
-        token._id = user._id;
+        token.user = {
+          _id: user._id,
+          email: user.email,
+          name: user.username,
+          accessToken: user.accessToken,
+        };
       }
 
+      if (account) {
+        const accessToken = signJwtToken(user);
+        token.user = {
+          _id: user.id,
+          email: user.email,
+          name: user.name,
+          accessToken: accessToken
+        };
+        
+      }
+  
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token, user }) {
       if (token) {
-        session.user._id = token._id;
-        session.user.accessToken = token.accessToken;
+        session.user._id = token.user._id;
+        session.user.name = token.user.name
+        session.user.accessToken = token.user.accessToken;
       }
-
       return session;
     },
   },

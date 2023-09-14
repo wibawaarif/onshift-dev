@@ -40,7 +40,7 @@ const FilterComponent = ({allFilterList, checkedFilter, selectedFilter}) => {
       </div>
 
       {
-        filterList?.map((x, index) => (
+        filterList?.length > 0 ? filterList?.map((x, index) => (
           <div key={index} className={`${index === 0 ? 'mt-[20px]' : 'mt-[28px]'} px-4 w-full`}>
             <p className="text-[10px] font-medium">{x.name}</p>
             {
@@ -51,7 +51,7 @@ const FilterComponent = ({allFilterList, checkedFilter, selectedFilter}) => {
               ))
             }
         </div>
-        ))
+        )) : <span className="text-slate-500 text-sm mt-4">There is no any data.</span>
       }
 
     </div>
