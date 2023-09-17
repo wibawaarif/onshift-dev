@@ -23,6 +23,7 @@ import { useSession } from "next-auth/react";
 import _ from "lodash";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
+import axios from "axios";
 
 const { Dragger } = Upload;
 
@@ -369,6 +370,21 @@ const Scheduler = () => {
     }
   };
 
+  const downloadTemplate = async () => {
+    const req = await axios({
+      method: "GET",
+      url: `/static/templates/Onshift_Shift_Template.xlsx`,
+      responseType: "blob",
+    });
+    var blob = new Blob([req.data], {
+      type: req.headers["content-type"],
+    });
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = `Onshift_Shift_Template.xlsx`;
+    link.click();
+}
+
   const deleteShift = async () => {
     setShiftModal(false);
     await fetch(`/api/shifts/${Id}`, {
@@ -602,11 +618,25 @@ const Scheduler = () => {
           title="Create New Shift"
           open={shiftModal}
           onCancel={() => setShiftModal(false) & clearFields()}
+          width={800}
         >
           {
             actionType === 'exportImport' &&  (
-              <div>
-                  <Dragger maxCount={1} {...props}>
+              <div className="flex gap-x-6">
+              <div onClick={downloadTemplate} className="rounded-lg border-dashed border-[1px] border-stone-300 cursor-pointer bg-stone-50 hover:bg-emerald-100 hover:border-black transition delay-100 w-[700px]">
+                <div className="flex flex-col px-4 py-4 items-center">
+                <p className="ant-upload-drag-icon">
+                <DownloadOutlined className="text-black text-5xl" />
+                </p>
+                <p className="text-lg mt-3">
+                  Onshift Employee Template 
+                </p>
+                <p className="text-stone-400 mt-1 text-center">
+                Download the template to import your data in here
+                </p>
+                </div>
+              </div>
+                  <Dragger className="hover:bg-amber-100" maxCount={1} {...props}>
                     <p className="ant-upload-drag-icon">
                       <InboxOutlined />
                     </p>

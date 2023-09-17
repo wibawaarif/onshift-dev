@@ -21,6 +21,8 @@ import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import Papa from "papaparse";
 import { CSVLink } from "react-csv";
+import axios from "axios";
+// import EmployeeTemplate from "@public/static/templates/Onshift_Employee_Template.xlsx"
 
 const fetcher = ([url, token]) =>
   fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
@@ -314,6 +316,21 @@ const Employee = () => {
     }
   };
 
+  const downloadTemplate = async () => {
+      const req = await axios({
+        method: "GET",
+        url: `/static/templates/Onshift_Employee_Template.xlsx`,
+        responseType: "blob",
+      });
+      var blob = new Blob([req.data], {
+        type: req.headers["content-type"],
+      });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `Onshift_Employee_Template.xlsx`;
+      link.click();
+  }
+
   const addEmployee = async () => {
     setEmployeeModal(false);
     const res = await fetch(`/api/employees`, {
@@ -521,6 +538,7 @@ const Employee = () => {
           </div>
         </div>
         <Modal
+        width={800}
           footer={[
             actionType === "exportImport" ? (
               <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm">
@@ -600,15 +618,28 @@ const Employee = () => {
           onCancel={() => setEmployeeModal(false)}
         >
           {actionType === "exportImport" && (
-            <div>
-              <Dragger maxCount={1} {...props}>
+            <div className="flex gap-x-6">
+              <div onClick={downloadTemplate} className="rounded-lg border-dashed border-[1px] border-stone-300 cursor-pointer bg-stone-50 hover:bg-emerald-100 hover:border-black transition delay-100 w-[700px]">
+                <div className="flex flex-col px-4 py-4 items-center">
+                <p className="ant-upload-drag-icon">
+                <DownloadOutlined className="text-black text-5xl" />
+                </p>
+                <p className="text-lg mt-3">
+                  Onshift Employee Template 
+                </p>
+                <p className="text-stone-400 mt-1 text-center">
+                Download the template to import your data in here
+                </p>
+                </div>
+              </div>
+              <Dragger className="hover:bg-amber-100" maxCount={1} {...props}>
                 <p className="ant-upload-drag-icon">
                   <InboxOutlined />
                 </p>
                 <p className="ant-upload-text">
                   Click or drag file to this area to upload
                 </p>
-                <p className="ant-upload-hint">
+                <p className="ant-upload-hint text-stone-600">
                   Support for a single or bulk upload. Strictly prohibited from
                   uploading company data or other banned files.
                 </p>
