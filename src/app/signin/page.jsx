@@ -14,7 +14,8 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
-    const [spin, setSpin] = useState(false);
+  const [spin, setSpin] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -52,9 +53,10 @@ const SignIn = () => {
         email,
         password,
         redirect: false,
-      });
+      }, {remember});
       setSpin(false);
       if (res?.error == null) {
+        console.log(res); // Acc
         router.push("/dashboard/schedule");
       } else {
         messageApi.open({
@@ -117,7 +119,7 @@ const SignIn = () => {
               </div>
 
               <div className="flex justify-between mt-5">
-                <Checkbox>Remember me</Checkbox>
+                <Checkbox value={remember} onChange={(e) => setRemember(e.target.checked)}>Remember me</Checkbox>
 
                 <span className="hover:underline hover:cursor-pointer">
                   Forgot password?
