@@ -18,6 +18,21 @@
   border: 1px solid #929292;
 }
 
+body > div:nth-child(17) > div > div > div > div > div.ant-picker-footer > ul > li.ant-picker-ok > button {
+  background-color: black;
+  color: white;
+}
+
+body > div:nth-child(19) > div > div > div > div > div.ant-picker-footer > ul > li.ant-picker-ok > button {
+  background-color: black;
+  color: white;
+}
+
+.ant-btn css-dev-only-do-not-override-dilhm8 ant-btn-primary ant-btn-sm {
+  background-color: black;
+  color: white;
+}
+
 body {
   margin: 0;
 }

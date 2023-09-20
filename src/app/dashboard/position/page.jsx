@@ -6,8 +6,7 @@ import {
   Avatar,
   Modal,
   Select,
-  Tabs,
-  Checkbox,
+  Pagination,
   message,
   Popover,
 } from "antd";
@@ -33,9 +32,8 @@ const Position = () => {
   const [wage, setWage] = useState("");
   const [wageAmount, setwageAmount] = useState("");
   const [selectedEmployees, setSelectedEmployees] = useState([]);
-  const [filterValue, setFilterValue] = useState("");
-
-  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(24);
 
   const [actionType, setActionType] = useState("");
   const [popover, setPopover] = useState(false);
@@ -61,6 +59,13 @@ const Position = () => {
     "#646466",
   ];
   const wageType = [{ value: "Hourly", label: "Hourly" }];
+
+  // Calculate the start and end index of items for the current page
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+
+  // Get the array of items for the current page
+  const itemsForCurrentPage = clonedPositions?.slice(startIndex, endIndex);
 
   const checklist = (
     <Image
@@ -162,6 +167,10 @@ const Position = () => {
     message.success("Position deleted");
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  }
+
   const checkedEmployee = (e) => {
     let newSelectedEmployees = [...selectedEmployees];
 
@@ -225,10 +234,9 @@ const Position = () => {
             <p className="text-2xl font-medium">
               Positions ({data && clonedPositions?.length})
             </p>
-
             <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
-              {clonedPositions?.length > 0 ?
-                clonedPositions?.map((x, index) => {
+              {itemsForCurrentPage?.length > 0 ?
+                itemsForCurrentPage?.map((x, index) => {
                   return (
                     <div
                       key={index}
@@ -289,6 +297,9 @@ const Position = () => {
                 <span className="text-2xl text-slate-500">There is no any position yet! Create <span onClick={() => setPositionModal(true) & setActionType("add") & clearFields()} className="text-blue-400 underline cursor-pointer hover:text-blue-600">one</span></span>
                 </div>
               }
+            </div>
+            <div className="flex justify-center mt-10">
+            <Pagination onChange={handlePageChange} total={clonedPositions?.length} defaultCurrent={currentPage} defaultPageSize={pageSize} />
             </div>
           </div>
         </div>

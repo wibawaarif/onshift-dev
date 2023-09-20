@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input, Modal, message, ConfigProvider, Popover } from "antd";
+import { Input, Modal, message, ConfigProvider, Popover, Pagination } from "antd";
 import Image from "next/image";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
@@ -31,6 +31,8 @@ const Location = () => {
   const [address, setAddress] = useState(null);
   const [latitude, setLatitude] = useState(24.432928);
   const [longitude, setLongitude] = useState(54.644539);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
 
   const session = useSession();
 
@@ -56,6 +58,13 @@ const Location = () => {
       setClonedLocations(_.cloneDeep(locations));
     }
   }, [searchLocationsInput]);
+
+  // Calculate the start and end index of items for the current page
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+
+  // Get the array of items for the current page
+  const itemsForCurrentPage = clonedLocations?.slice(startIndex, endIndex);
 
   const clearFields = () => {
     setForm({
@@ -155,6 +164,10 @@ const Location = () => {
     setPopover(false);
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  }
+
   return (
     <ConfigProvider
       theme={{
@@ -184,8 +197,8 @@ const Location = () => {
             </p>
 
             <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
-            {clonedLocations?.length > 0 ? 
-              clonedLocations.map((x, index) => (
+            {itemsForCurrentPage?.length > 0 ? 
+              itemsForCurrentPage.map((x, index) => (
                 <div key={index} className="h-full w-full mt-6">
                   <div className="h-[250px] border-[1px] border-[#E5E5E3]">
                     <div className="px-4 py-4 flex justify-between">
@@ -239,6 +252,9 @@ const Location = () => {
                 </div>
             }
               </div>
+              <div className="flex justify-center mt-10">
+            <Pagination onChange={handlePageChange} total={clonedLocations?.length} defaultCurrent={currentPage} defaultPageSize={pageSize} />
+            </div>
           </div>
         </div>
       </div>

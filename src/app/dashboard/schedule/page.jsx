@@ -4,7 +4,7 @@ import useSWR from "swr";
 import SchedulerComponent from "@/components/scheduler/page";
 import FilterComponent from "@/components/filter/page";
 import Image from "next/image";
-import { InboxOutlined,DownloadOutlined } from '@ant-design/icons';
+import { InboxOutlined, DownloadOutlined } from "@ant-design/icons";
 import Papa from "papaparse";
 import { CSVLink } from "react-csv";
 import {
@@ -16,7 +16,7 @@ import {
   Select,
   Input,
   message,
-  Upload
+  Upload,
 } from "antd";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -91,8 +91,13 @@ const Scheduler = () => {
   }, [employees]);
 
   useEffect(() => {
-
-    if (form.date !== "" && form.startTime !== "" && form.endTime !== "" && form.location !== null && form.employees.length > 0) {
+    if (
+      form.date !== "" &&
+      form.startTime !== "" &&
+      form.endTime !== "" &&
+      form.location !== null &&
+      form.employees.length > 0
+    ) {
       if (selectedRepeatedDays.length > 0) {
         if (form.repeatedShift.endDate === null) {
           setIsFormInvalid(true);
@@ -100,14 +105,13 @@ const Scheduler = () => {
           setIsFormInvalid(false);
         }
       } else {
-        setIsFormInvalid(false)
+        setIsFormInvalid(false);
       }
-      return
+      return;
     }
 
-    setIsFormInvalid(true)
-
-  }, [form, selectedRepeatedDays])
+    setIsFormInvalid(true);
+  }, [form, selectedRepeatedDays]);
 
   useEffect(() => {
     const filteredList = _.cloneDeep(employees)?.filter((x) => {
@@ -129,11 +133,11 @@ const Scheduler = () => {
 
   // upload action
   const props = {
-    name: 'file',
+    name: "file",
     multiple: false,
-    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+    action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
     beforeUpload: (file) => {
-      const isCSV = file.type === "text/csv"
+      const isCSV = file.type === "text/csv";
       if (!isCSV) {
         message.error(`${file.name} is not a csv file`);
       }
@@ -141,92 +145,92 @@ const Scheduler = () => {
     },
     onChange(info) {
       const { status } = info.file;
-      if (status !== 'uploading') {
+      if (status !== "uploading") {
         console.log(info.file, info.fileList);
       }
-      if (status === 'done') {
+      if (status === "done") {
         message.success(`${info.file.name} file uploaded successfully.`);
         const reader = new FileReader();
-    
+
         reader.onload = (e) => {
           const contents = e.target.result;
           Papa.parse(contents, {
             complete: (parsedData) => {
               // Process the parsed data here
-              setUploadedShifts(parsedData.data)
+              setUploadedShifts(parsedData.data);
             },
             header: true,
           });
         };
-  
-        reader.readAsText(info.fileList[0].originFileObj)
-      } else if (status === 'error') {
+
+        reader.readAsText(info.fileList[0].originFileObj);
+      } else if (status === "error") {
         message.error(`${info.file.name} file upload failed.`);
       }
     },
     onDrop(e) {
-      console.log('Dropped files', e.dataTransfer.files);
+      console.log("Dropped files", e.dataTransfer.files);
     },
   };
 
-    const disabledDate = (current) => {
-      // const currentDate = dayjs(current);
+  const disabledDate = (current) => {
+    // const currentDate = dayjs(current);
 
-      // const startOfWeek = dayjs().startOf('week')
-      // const endOfWeek = dayjs().endOf('week')
+    // const startOfWeek = dayjs().startOf('week')
+    // const endOfWeek = dayjs().endOf('week')
 
-      // return currentDate.isBefore(startOfWeek) || currentDate.isAfter(endOfWeek);
+    // return currentDate.isBefore(startOfWeek) || currentDate.isAfter(endOfWeek);
 
-      return current && current < dayjs().endOf("day");
-    };
+    return current && current < dayjs().endOf("day");
+  };
 
   const headers = [
     {
       label: "date",
-      key: "date"
+      key: "date",
     },
     {
       label: "startTime",
-      key: "startTime"
+      key: "startTime",
     },
     {
       label: "endTime",
-      key: "endTime"
+      key: "endTime",
     },
     {
       label: "break",
-      key: "break"
+      key: "break",
     },
     {
       label: "notes",
-      key: "notes"
+      key: "notes",
     },
     {
       label: "employees",
-      key: "employees"
+      key: "employees",
     },
     {
       label: "isRepeated",
-      key: "repeatedShift.isRepeated"
+      key: "repeatedShift.isRepeated",
     },
     {
       label: "startRepeatedWeek",
-      key: "repeatedShift.startRepeatedWeek"
+      key: "repeatedShift.startRepeatedWeek",
     },
     {
       label: "repeatedDays",
-      key: "repeatedShift.repeatedDays"
+      key: "repeatedShift.repeatedDays",
     },
     {
       label: "endDate",
-      key: "repeatedShift.endDate"
+      key: "repeatedShift.endDate",
     },
-  ]
+  ];
 
   const filterOptions = [
     {
       name: "LOCATIONS / (DESELECT ALL)",
-      options:  locations?.map((location) => location?.name),
+      options: locations?.map((location) => location?.name),
     },
     {
       name: "POSITIONS / (DESELECT ALL)",
@@ -253,7 +257,7 @@ const Scheduler = () => {
       setSelectedFilter(newSelectedFilter);
     }
   };
-  const checkRepeatedDays = index => {
+  const checkRepeatedDays = (index) => {
     setSelectedRepeatedDays((prev) => {
       const getDay = dayjs()
         .day(index + 1)
@@ -264,44 +268,77 @@ const Scheduler = () => {
         return [...prev, getDay];
       }
     });
-  }
+  };
 
-  const endRepeatedShift = date => {  
+  const endRepeatedShift = (date) => {
     setForm((prev) => {
       return {
         ...prev,
         repeatedShift: { ...prev.repeatedShift, endDate: date },
       };
     });
-  }
+  };
 
-  const editShiftModal = data => {
-    setId(data._id)
+  const editShiftModal = (data) => {
+    setId(data._id);
     if (data.repeatedShift.repeatedDays.length > 0) {
-      setSelectedRepeatedDays(data.repeatedShift.repeatedDays)
-      setForm(prev => { return { ...prev, ...data, location: data?.location?._id, position: data?.position?._id, startTime: dayjs(data.startTime), endTime: dayjs(data.endTime), date: dayjs(data.date), repeatedShift: {...prev.repeatedShift, startRepeatedWeek: dayjs(data.repeatedShift.startRepeatedWeek), endDate: dayjs(data.repeatedShift.endDate)} } })
+      setSelectedRepeatedDays(data.repeatedShift.repeatedDays);
+      setForm((prev) => {
+        return {
+          ...prev,
+          ...data,
+          location: data?.location?._id,
+          position: data?.position?._id,
+          startTime: dayjs(data.startTime),
+          endTime: dayjs(data.endTime),
+          date: dayjs(data.date),
+          repeatedShift: {
+            ...prev.repeatedShift,
+            startRepeatedWeek: dayjs(data.repeatedShift.startRepeatedWeek),
+            endDate: dayjs(data.repeatedShift.endDate),
+          },
+        };
+      });
     } else {
-      setForm(prev => { return { ...prev, ...data, location: data?.location?._id, position: data?.position?._id, startTime: dayjs(data.startTime), endTime: dayjs(data.endTime), date: dayjs(data.date) } })
+      setForm((prev) => {
+        return {
+          ...prev,
+          ...data,
+          location: data?.location?._id,
+          position: data?.position?._id,
+          startTime: dayjs(data.startTime),
+          endTime: dayjs(data.endTime),
+          date: dayjs(data.date),
+        };
+      });
     }
-    
-    setActionType('edit')
-    setShiftModal(true)
-  } 
 
-  const deleteShiftModal = id => {
-    setId(id)
-    setActionType('delete')
-    setShiftModal(true)
-  } 
+    setActionType("edit");
+    setShiftModal(true);
+  };
+
+  const deleteShiftModal = (id) => {
+    setId(id);
+    setActionType("delete");
+    setShiftModal(true);
+  };
 
   const addShiftFromTable = (date, id) => {
-    setSelectedRepeatedDays([])
-    setForm(prev => { return { ...prev, date, employees: [...prev.employees, id] } })
-    setActionType('add')
-    setShiftModal(true)
-  }
+    setSelectedRepeatedDays([]);
+    setForm((prev) => {
+      return { ...prev, date, employees: [...prev.employees, id] };
+    });
+    setActionType("add");
+    setShiftModal(true);
+  };
 
   const addShift = async () => {
+    const validateEndTime = isStartGreaterThanEnd();
+    if (validateEndTime) {
+      message.error('End time must be greater than start time')
+      return
+    }
+
     if (selectedRepeatedDays.length > 0) {
       let newForm = form;
       newForm.repeatedShift.isRepeated = true;
@@ -350,7 +387,7 @@ const Scheduler = () => {
 
     message.success("Shift updated");
     clearFields();
-  }
+  };
 
   const editShift = async (result) => {
     if (
@@ -383,7 +420,7 @@ const Scheduler = () => {
     link.href = window.URL.createObjectURL(blob);
     link.download = `Onshift_Shift_Template.xlsx`;
     link.click();
-}
+  };
 
   const deleteShift = async () => {
     setShiftModal(false);
@@ -402,27 +439,53 @@ const Scheduler = () => {
     setShiftModal(false);
 
     for (let i = 0; i < uploadedShifts.length; i++) {
-      if (uploadedShifts[i].date && uploadedShifts[i].startTime && uploadedShifts[i].endTime && uploadedShifts[i].employees  ) {
-
+      if (
+        uploadedShifts[i].date &&
+        uploadedShifts[i].startTime &&
+        uploadedShifts[i].endTime &&
+        uploadedShifts[i].employees
+      ) {
         const res = await fetch(`/api/shifts`, {
           method: "POST",
-          body: JSON.stringify(uploadedShifts[i].isRepeated ? {...uploadedShifts[i], employees: [uploadedShifts[i].employees], reapeatedShift: {startRepeatedWeek: uploadedShifts[i].startRepeatedWeek, repeatedDays: uploadedShifts[i].repeatedDays, endDate: uploadedShifts[i].endDate} } : {...uploadedShifts[i],  employees: [uploadedShifts[i].employees]}),
+          body: JSON.stringify(
+            uploadedShifts[i].isRepeated
+              ? {
+                  ...uploadedShifts[i],
+                  employees: [uploadedShifts[i].employees],
+                  reapeatedShift: {
+                    startRepeatedWeek: uploadedShifts[i].startRepeatedWeek,
+                    repeatedDays: uploadedShifts[i].repeatedDays,
+                    endDate: uploadedShifts[i].endDate,
+                  },
+                }
+              : {
+                  ...uploadedShifts[i],
+                  employees: [uploadedShifts[i].employees],
+                }
+          ),
           headers: {
             authorization: "Bearer " + session.data.user.accessToken,
           },
         });
         const respMessage = await res.json();
-  
+
         if (respMessage.info === "email existed") {
           message.error(`${respMessage.error}`);
           continue;
         }
-  
+
         message.success("Shift created");
         mutateEmployees([...employees]);
       }
     }
+  };
+
+  const isStartGreaterThanEnd = () => {
+    if (form.startTime && form.endTime) {
+      return dayjs(form.startTime).isAfter(dayjs(form.endTime));
+    }
   }
+
   const clearFields = () => {
     setForm({
       date: "",
@@ -542,7 +605,12 @@ const Scheduler = () => {
                 <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
                   Copy Shifts
                 </button>
-                <button onClick={() => setShiftModal(true) & setActionType("exportImport")} className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+                <button
+                  onClick={() =>
+                    setShiftModal(true) & setActionType("exportImport")
+                  }
+                  className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]"
+                >
                   Export / Print
                 </button>
                 <button className="hover:bg-[#E5E5E3] duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
@@ -578,352 +646,392 @@ const Scheduler = () => {
 
         {/* MODAL ADD NEW SHIFT / TIME OFF */}
         <Modal
-          footer={[ actionType === "exportImport" ? <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"><CSVLink
-          data={shifts}
-          headers={headers}
-          filename={"my-file.csv"}
-          key="back"
-          target="_blank"
-        >
-            <div className="flex justify-center items-center">
-          <DownloadOutlined className="mr-2 my-0 py-0 text-black" /> <span className="text-black">DOWNLOAD</span>
-          </div>
-        </CSVLink></div> :
-            <button
-              className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
-              key="back"
-              onClick={() => setShiftModal(false) & clearFields()}
-            >
-              CANCEL
-            </button>,
-             actionType === "exportImport" ? 
-             <button
-               onClick={() => addUploadedShifts()}
-               className="bg-black text-white rounded-sm border-[1px] border-black px-4 py-1 hover:opacity-80"
-               key="submit"
-             >
-               <div>
-               UPLOAD
-               </div>
-             </button> :
-            <button
-              disabled={isFormInvalid && actionType !== 'delete'}
-              onClick={actionType === 'add' ? () => addShift() : actionType === 'delete' ? () => deleteShift() : () => editDraggableShift()}
-              className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
-              key="submit"
-            >
-              {actionType === 'add' ? 'CREATE' : actionType === 'delete' ? 'CONFIRM' : 'EDIT'}
-            </button>,
+          footer={[
+            actionType === "exportImport" ? (
+              <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm">
+                <CSVLink
+                  data={shifts}
+                  headers={headers}
+                  filename={"my-file.csv"}
+                  key="back"
+                  target="_blank"
+                >
+                  <div className="flex justify-center items-center">
+                    <DownloadOutlined className="mr-2 my-0 py-0 text-black" />{" "}
+                    <span className="text-black">DOWNLOAD</span>
+                  </div>
+                </CSVLink>
+              </div>
+            ) : (
+              <button
+                className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
+                key="back"
+                onClick={() => setShiftModal(false) & clearFields()}
+              >
+                CANCEL
+              </button>
+            ),
+            actionType === "exportImport" ? (
+              <button
+                onClick={() => addUploadedShifts()}
+                className="bg-black text-white rounded-sm border-[1px] border-black px-4 py-1 hover:opacity-80"
+                key="submit"
+              >
+                <div>UPLOAD</div>
+              </button>
+            ) : (
+              <button
+                disabled={isFormInvalid && actionType !== "delete"}
+                onClick={
+                  actionType === "add"
+                    ? () => addShift()
+                    : actionType === "delete"
+                    ? () => deleteShift()
+                    : () => editDraggableShift()
+                }
+                className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
+                key="submit"
+              >
+                {actionType === "add"
+                  ? "CREATE"
+                  : actionType === "delete"
+                  ? "CONFIRM"
+                  : "EDIT"}
+              </button>
+            ),
           ]}
           title="Create New Shift"
           open={shiftModal}
           onCancel={() => setShiftModal(false) & clearFields()}
           width={800}
         >
-          {
-            actionType === 'exportImport' &&  (
-              <div className="flex gap-x-6">
-              <div onClick={downloadTemplate} className="rounded-lg border-dashed border-[1px] border-stone-300 cursor-pointer bg-stone-50 hover:bg-emerald-100 hover:border-black transition delay-100 w-[700px]">
+          {actionType === "exportImport" && (
+            <div className="flex gap-x-6">
+              <div
+                onClick={downloadTemplate}
+                className="rounded-lg border-dashed border-[1px] border-stone-300 cursor-pointer bg-stone-50 hover:bg-emerald-100 hover:border-black transition delay-100 w-[700px]"
+              >
                 <div className="flex flex-col px-4 py-4 items-center">
-                <p className="ant-upload-drag-icon">
-                <DownloadOutlined className="text-black text-5xl" />
-                </p>
-                <p className="text-lg mt-3">
-                  Onshift Employee Template 
-                </p>
-                <p className="text-stone-400 mt-1 text-center">
-                Download the template to import your data in here
-                </p>
+                  <p className="ant-upload-drag-icon">
+                    <DownloadOutlined className="text-black text-5xl" />
+                  </p>
+                  <p className="text-lg mt-3">Onshift Employee Template</p>
+                  <p className="text-stone-400 mt-1 text-center">
+                    Download the template to import your data in here
+                  </p>
                 </div>
               </div>
-                  <Dragger className="hover:bg-amber-100" maxCount={1} {...props}>
-                    <p className="ant-upload-drag-icon">
-                      <InboxOutlined />
-                    </p>
-                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                    <p className="ant-upload-hint">
-                      Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-                      banned files.
-                    </p>
-                  </Dragger>
-              </div>
-            )
-          }
+              <Dragger className="hover:bg-amber-100" maxCount={1} {...props}>
+                <p className="ant-upload-drag-icon">
+                  <InboxOutlined />
+                </p>
+                <p className="ant-upload-text">
+                  Click or drag file to this area to upload
+                </p>
+                <p className="ant-upload-hint">
+                  Support for a single or bulk upload. Strictly prohibited from
+                  uploading company data or other banned files.
+                </p>
+              </Dragger>
+            </div>
+          )}
 
-          {
-            actionType === 'delete' && <p>Are you sure want to delete this shift?</p>
-          }
-          {
-            (actionType === 'add' || actionType === 'edit') && 
+          {actionType === "delete" && (
+            <p>Are you sure want to delete this shift?</p>
+          )}
+          {(actionType === "add" || actionType === "edit") && (
             <Tabs
-            defaultActiveKey="1"
-            items={[
-              {
-                key: "1",
-                label: "CREATE SHIFT",
-                children: (
-                  <div>
-                    <div className="flex flex-col">
-                      <span className="text-xs font-semibold">DATE <span className="text-xs text-red-500">*</span></span>
-                      <DatePicker
-                        disabledDate={disabledDate}
-                        value={form?.date}
-                        onChange={date =>
-                          setForm((prev) => {
-                            return { ...prev, date: date };
-                          })
-                        }
-                        className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
-                      />
+              defaultActiveKey="1"
+              items={[
+                {
+                  key: "1",
+                  label: "CREATE SHIFT",
+                  children: (
+                    <div>
                       <div className="flex flex-col">
-                        <span className="text-xs font-semibold mt-4">
-                          REPEATED DAYS
+                        <span className="text-xs font-semibold">
+                          DATE <span className="text-xs text-red-500">*</span>
                         </span>
-                        <div className="flex mt-2">
-                          {Array.from(Array(7))?.map((x, index) => (
-                            <p
-                              onClick={() => checkRepeatedDays(index)}
-                              className={`px-4 py-1 border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${
-                                selectedRepeatedDays?.includes(
-                                  dayjs()
-                                    .day(index + 1)
-                                    .format("dddd")
-                                )
-                                  ? "bg-stone-300"
-                                  : "bg-white"
-                              }`}
-                              key={index}
-                            >
-                              {dayjs()
-                                .day(index + 1)
-                                .format("ddd")}
-                            </p>
-                          ))}
-                        </div>
-                        <span className="text-xs font-semibold mt-4">ENDS</span>
                         <DatePicker
-                          value={form?.repeatedShift?.endDate}
                           disabledDate={disabledDate}
-                          disabled={selectedRepeatedDays?.length === 0}
-                          onChange={endRepeatedShift}
+                          value={form?.date}
+                          onChange={(date) =>
+                            setForm((prev) => {
+                              return { ...prev, date: date };
+                            })
+                          }
                           className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
                         />
+                        <div className="flex flex-col">
+                          <span className="text-xs font-semibold mt-4">
+                            REPEATED DAYS
+                          </span>
+                          <div className="flex mt-2">
+                            {Array.from(Array(7))?.map((x, index) => (
+                              <p
+                                onClick={() => checkRepeatedDays(index)}
+                                className={`px-4 py-1 border-[1px] border-[#E5E5E3] hover:cursor-pointer mr-2 ${
+                                  selectedRepeatedDays?.includes(
+                                    dayjs()
+                                      .day(index + 1)
+                                      .format("dddd")
+                                  )
+                                    ? "bg-stone-300"
+                                    : "bg-white"
+                                }`}
+                                key={index}
+                              >
+                                {dayjs()
+                                  .day(index + 1)
+                                  .format("ddd")}
+                              </p>
+                            ))}
+                          </div>
+                          <span className="text-xs font-semibold mt-4">
+                            ENDS
+                          </span>
+                          <DatePicker
+                            value={form?.repeatedShift?.endDate}
+                            disabledDate={disabledDate}
+                            disabled={selectedRepeatedDays?.length === 0}
+                            onChange={endRepeatedShift}
+                            className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="flex mt-4 justify-between">
-                      <div className="w-[48%] ">
-                        <span className="text-xs font-semibold">
-                          START SHIFT  <span className="text-xs text-red-500">*</span>
-                        </span>
-                        <TimePicker
-                          value={form?.startTime}
-                          onChange={(e) =>
-                            setForm((prev) => {
-                              return { ...prev, startTime: e };
-                            })
-                          }
-                          format="HH:mm"
-                          className="w-full rounded-none border-t-0 border-l-0 border-r-0"
-                        />
-                      </div>
-                      <div className="w-[48%]">
-                        <span className="text-xs font-semibold">
-                          FINISH SHIFT  <span className="text-xs text-red-500">*</span>
-                        </span>
-                        <TimePicker
-                          value={form?.endTime}
-                          onChange={(e) =>
-                            setForm((prev) => {
-                              return { ...prev, endTime: e };
-                            })
-                          }
-                          format="HH:mm"
-                          className="w-full rounded-none border-t-0 border-l-0 border-r-0"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      {!showBreak && (
-                        <button
-                          onClick={() => setShowBreak(true)}
-                          className="transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
-                        >
-                          + ADD BREAK
-                        </button>
-                      )}
 
-                      {showBreak && (
-                        <div className="flex flex-col h-16 justify-center">
-                          <div className="mt-3">
-                            <button
-                              onClick={() =>
-                                setForm((prev) => {
-                                  return { ...prev, break: "15" };
-                                })
-                              }
-                              className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
-                                form.break === "15" ? "bg-[#F7F7F5]" : undefined
-                              }`}
-                            >
-                              15 min
-                            </button>
-                            <button
-                              onClick={() =>
-                                setForm((prev) => {
-                                  return { ...prev, break: "30" };
-                                })
-                              }
-                              className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
-                                form.break === "30" ? "bg-[#F7F7F5]" : undefined
-                              }`}
-                            >
-                              30 min
-                            </button>
-                            <button
-                              onClick={() =>
-                                setForm((prev) => {
-                                  return { ...prev, break: "45" };
-                                })
-                              }
-                              className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
-                                form.break === "45" ? "bg-[#F7F7F5]" : undefined
-                              }`}
-                            >
-                              45 min
-                            </button>
-                            <button
-                              onClick={() =>
-                                setForm((prev) => {
-                                  return { ...prev, break: "60" };
-                                })
-                              }
-                              className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
-                                form.break === "60" ? "bg-[#F7F7F5]" : undefined
-                              }`}
-                            >
-                              60 min
-                            </button>
-                            <div className="mt-2">
+                      <div className="flex mt-4 justify-between">
+                        <div className="w-[48%] ">
+                          <span className="text-xs font-semibold">
+                            START SHIFT{" "}
+                            <span className="text-xs text-red-500">*</span>
+                          </span>
+                          <TimePicker
+                            value={form?.startTime}
+                            onChange={(e) =>
+                              setForm((prev) => {
+                                return { ...prev, startTime: e };
+                              })
+                            }
+                            format="HH:mm"
+                            className="w-full rounded-none border-t-0 border-l-0 border-r-0"
+                          />
+                        </div>
+                        <div className="w-[48%]">
+                          <span className="text-xs font-semibold">
+                            FINISH SHIFT{" "}
+                            <span className="text-xs text-red-500">*</span>
+                          </span>
+                          <TimePicker
+                            value={form?.endTime}
+                            onChange={(e) =>
+                              setForm((prev) => {
+                                return { ...prev, endTime: e };
+                              })
+                            }
+                            format="HH:mm"
+                            className="w-full rounded-none border-t-0 border-l-0 border-r-0"
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        {!showBreak && (
+                          <button
+                            onClick={() => setShowBreak(true)}
+                            className="transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                          >
+                            + ADD BREAK
+                          </button>
+                        )}
+
+                        {showBreak && (
+                          <div className="flex flex-col h-16 justify-center">
+                            <div className="mt-3">
                               <button
                                 onClick={() =>
-                                  setShowBreak(false) &
                                   setForm((prev) => {
-                                    return { ...prev, break: null };
+                                    return { ...prev, break: "15" };
                                   })
                                 }
-                                className="transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                                className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
+                                  form.break === "15"
+                                    ? "bg-[#F7F7F5]"
+                                    : undefined
+                                }`}
                               >
-                                DELETE BREAK
+                                15 min
                               </button>
+                              <button
+                                onClick={() =>
+                                  setForm((prev) => {
+                                    return { ...prev, break: "30" };
+                                  })
+                                }
+                                className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
+                                  form.break === "30"
+                                    ? "bg-[#F7F7F5]"
+                                    : undefined
+                                }`}
+                              >
+                                30 min
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setForm((prev) => {
+                                    return { ...prev, break: "45" };
+                                  })
+                                }
+                                className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
+                                  form.break === "45"
+                                    ? "bg-[#F7F7F5]"
+                                    : undefined
+                                }`}
+                              >
+                                45 min
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setForm((prev) => {
+                                    return { ...prev, break: "60" };
+                                  })
+                                }
+                                className={`border-[1px] border-[#E5E5E3] px-2 mr-2 ${
+                                  form.break === "60"
+                                    ? "bg-[#F7F7F5]"
+                                    : undefined
+                                }`}
+                              >
+                                60 min
+                              </button>
+                              <div className="mt-2">
+                                <button
+                                  onClick={() =>
+                                    setShowBreak(false) &
+                                    setForm((prev) => {
+                                      return { ...prev, break: null };
+                                    })
+                                  }
+                                  className="transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                                >
+                                  DELETE BREAK
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </div>
 
-                    <div className="flex flex-col mt-4">
-                      <span className="text-xs font-semibold">EMPLOYEE  <span className="text-xs text-red-500">*</span></span>
-                      {/* <Image
+                      <div className="flex flex-col mt-4">
+                        <span className="text-xs font-semibold">
+                          EMPLOYEE{" "}
+                          <span className="text-xs text-red-500">*</span>
+                        </span>
+                        {/* <Image
                         className="absolute bottom-[29.5%] z-50"
                         width={20}
                         height={20}
                         alt="schedule-logo"
                         src={"/static/svg/employee.svg"}
                       /> */}
-                      <Select
-                        mode="multiple"
-                        allowClear
-                        placeholder="Select Employee"
-                        className="mt-1"
-                        value={form?.employees}
-                        options={employees?.map((x) => {
-                          return { label: x.name, value: x._id };
-                        })}
-                        onChange={(e) =>
-                          setForm((prev) => {
-                            return { ...prev, employees: e };
-                          })
-                        }
-                      />
-                    </div>
+                        <Select
+                          mode="multiple"
+                          allowClear
+                          placeholder="Select Employee"
+                          className="mt-1"
+                          value={form?.employees}
+                          options={employees?.map((x) => {
+                            return { label: x.name, value: x._id };
+                          })}
+                          onChange={(e) =>
+                            setForm((prev) => {
+                              return { ...prev, employees: e };
+                            })
+                          }
+                        />
+                      </div>
 
-                    <div className="flex mt-4 justify-between">
-                      <div className="w-[48%] flex flex-col">
-                        <span className="text-xs font-semibold">LOCATION  <span className="text-xs text-red-500">*</span></span>
-                        <Select
-                          value={form?.location}
-                          placeholder="Select Location"
-                          className="mt-1"
-                          options={locations?.map((x) => {
-                            return { label: x.name, value: x._id };
-                          })}
-                          onChange={(e) =>
-                            setForm((prev) => {
-                              return { ...prev, location: e };
-                            })
-                          }
-                        />
+                      <div className="flex mt-4 justify-between">
+                        <div className="w-[48%] flex flex-col">
+                          <span className="text-xs font-semibold">
+                            LOCATION{" "}
+                            <span className="text-xs text-red-500">*</span>
+                          </span>
+                          <Select
+                            value={form?.location}
+                            placeholder="Select Location"
+                            className="mt-1"
+                            options={locations?.map((x) => {
+                              return { label: x.name, value: x._id };
+                            })}
+                            onChange={(e) =>
+                              setForm((prev) => {
+                                return { ...prev, location: e };
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="w-[48%] flex flex-col">
+                          <span className="text-xs font-semibold">
+                            POSITION
+                          </span>
+                          <Select
+                            placeholder="Select Position"
+                            className="mt-1"
+                            value={form?.position}
+                            options={positions?.map((x) => {
+                              return { label: x.name, value: x._id };
+                            })}
+                            onChange={(e) =>
+                              setForm((prev) => {
+                                return { ...prev, position: e };
+                              })
+                            }
+                          />
+                        </div>
                       </div>
-                      <div className="w-[48%] flex flex-col">
-                        <span className="text-xs font-semibold">POSITION</span>
-                        <Select
-                          placeholder="Select Position"
-                          className="mt-1"
-                          value={form?.position}
-                          options={positions?.map((x) => {
-                            return { label: x.name, value: x._id };
-                          })}
-                          onChange={(e) =>
-                            setForm((prev) => {
-                              return { ...prev, position: e };
-                            })
-                          }
-                        />
-                      </div>
+                      {!showNotes && (
+                        <button
+                          onClick={() => setShowNotes(true)}
+                          className="mt-2 transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                        >
+                          + ADD NOTES
+                        </button>
+                      )}
+                      {showNotes && (
+                        <div className="mt-4">
+                          <span className="text-xs font-semibold">NOTES</span>
+                          <Input
+                            value={form?.notes}
+                            onChange={(e) =>
+                              setForm((prev) => {
+                                return { ...prev, notes: e.target.value };
+                              })
+                            }
+                            className="rounded-none border-t-0 border-l-0 border-r-0"
+                            placeholder="Basic usage"
+                          />
+                        </div>
+                      )}
                     </div>
-                    {!showNotes && (
-                      <button
-                        onClick={() => setShowNotes(true)}
-                        className="mt-2 transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
-                      >
-                        + ADD NOTES
-                      </button>
-                    )}
-                    {showNotes && (
-                      <div className="mt-4">
-                        <span className="text-xs font-semibold">NOTES</span>
-                        <Input
-                          value={form?.notes}
-                          onChange={(e) =>
-                            setForm((prev) => {
-                              return { ...prev, notes: e.target.value };
-                            })
-                          }
-                          className="rounded-none border-t-0 border-l-0 border-r-0"
-                          placeholder="Basic usage"
-                        />
-                      </div>
-                    )}
-                  </div>
-                ),
-              },
-              {
-                key: "2",
-                label: "CREATE TIME OFF",
-                children: (
-                  <div>
-                    <DatePicker />
-                  </div>
-                ),
-              },
-            ]}
-          />
-          }
+                  ),
+                },
+                {
+                  key: "2",
+                  label: "CREATE TIME OFF",
+                  children: (
+                    <div>
+                      <DatePicker />
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          )}
         </Modal>
 
         <button
-          onClick={() => setActionType('add') & setShiftModal(true)}
+          onClick={() => setActionType("add") & setShiftModal(true)}
           className="hover:opacity-80 transition duration-300 absolute bottom-10 right-10 w-[220px] h-[40px] bg-black text-white rounded-full text-[14px]"
         >
           + CREATE SHIFT / TIME OFF
