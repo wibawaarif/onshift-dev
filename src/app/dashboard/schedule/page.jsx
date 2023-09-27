@@ -17,6 +17,7 @@ import {
   Input,
   message,
   Upload,
+  AutoComplete
 } from "antd";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -85,6 +86,21 @@ const Scheduler = () => {
       endDate: null,
     },
   });
+  const [selectedTime, setSelectedTime] = useState('');
+  const options = [];
+
+var x = 1; //minutes interval
+var times = []; // time array
+var tt = 0; // start time
+var ap = ['AM', 'PM']; // AM-PM
+
+//loop to increment the time and push results in array
+for (var i=0;tt<24*60; i++) {
+  var hh = Math.floor(tt/60); // getting hours of day in 0-24 format
+  var mm = (tt%60); // getting minutes of the hour in 0-55 format
+  options[i] = {value: ("0" + (hh % 12)).slice(-2) + ':' + ("0" + mm).slice(-2) + ap[Math.floor(hh/12)], label: ("0" + (hh % 12)).slice(-2) + ':' + ("0" + mm).slice(-2) + ap[Math.floor(hh/12)]} // pushing data in array in [00:00 - 12:00 AM/PM format]
+  tt = tt + x;
+}
 
   useEffect(() => {
     setClonedEmployees(_.cloneDeep(employees));
@@ -334,6 +350,8 @@ const Scheduler = () => {
 
   const addShift = async () => {
     const validateEndTime = isStartGreaterThanEnd();
+    form.startTime = dayjs().hour(form.startTime.slice(5, 7) === 'PM' ? Number(form.startTime.slice(0, 2)) + 12 : Number(form.startTime.slice(0, 2))).minute(Number(form.startTime.slice(3, 5)))
+    form.endTime = dayjs().hour(form.endTime.slice(5, 7) === 'PM' ? Number(form.endTime.slice(0, 2)) + 12 : Number(form.endTime.slice(0, 2))).minute(Number(form.endTime.slice(3, 5)))
     if (validateEndTime) {
       message.error('End time must be greater than start time')
       return
@@ -807,7 +825,11 @@ const Scheduler = () => {
                             START SHIFT{" "}
                             <span className="text-xs text-red-500">*</span>
                           </span>
-                          <TimePicker
+                          <p className="text-black">{JSON.stringify({test: form.startTime})}</p>
+                          <AutoComplete className="w-full" value={form.startTime} onChange={(data, option) => setForm((prev) => { return { ...prev, startTime: data } })} onSelect={(data, option) => setForm((prev) => { return { ...prev, startTime: option.label} })}  placeholder="Select Start Time"   filterOption={(inputValue, option) =>
+      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+    } options={options} />
+                          {/* <TimePicker
                             value={form?.startTime}
                             onChange={(e) =>
                               setForm((prev) => {
@@ -816,14 +838,17 @@ const Scheduler = () => {
                             }
                             format="HH:mm"
                             className="w-full rounded-none border-t-0 border-l-0 border-r-0"
-                          />
+                          /> */}
                         </div>
                         <div className="w-[48%]">
                           <span className="text-xs font-semibold">
                             FINISH SHIFT{" "}
                             <span className="text-xs text-red-500">*</span>
                           </span>
-                          <TimePicker
+                          <AutoComplete className="w-full" value={form.endTime} onChange={(data, option) => setForm((prev) => { return { ...prev, endTime: data } })} onSelect={(data, option) => setForm((prev) => { return { ...prev, endTime: option.label} })} placeholder="Select End Time"   filterOption={(inputValue, option) =>
+      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+    } options={options} />
+                          {/* <TimePicker
                             value={form?.endTime}
                             onChange={(e) =>
                               setForm((prev) => {
@@ -832,7 +857,7 @@ const Scheduler = () => {
                             }
                             format="HH:mm"
                             className="w-full rounded-none border-t-0 border-l-0 border-r-0"
-                          />
+                          /> */}
                         </div>
                       </div>
                       <div className="mt-2">

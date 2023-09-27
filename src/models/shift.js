@@ -41,6 +41,10 @@ const shiftSchema = new Schema({
   },
   notes: {
     type: String,
+  },
+  platform: {
+    type: String,
+    default: 'Web App'
   }
 }, { timestamps: true })
 

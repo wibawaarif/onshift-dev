@@ -383,11 +383,31 @@ const SchedulerComponent = ({
                                               )}
                                               H
                                             </p>
+                                            {
+                                              z.platform === 'Mobile App' &&
+                                              <div
+                                              className={`flex justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
+                                            >
+                                              <span className="text-white text-[10px]">
+                                              Mobile App
+                                              </span>
+                                            </div>
+                                            }
+                                            {/* <div
+                                              className={`flex ${
+                                                z?.platform === 'Mobile App' &&
+                                                "invisible"
+                                              } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
+                                            >
+                                              <span className="text-white text-[10px]">
+                                              Mobile App
+                                              </span>
+                                            </div> */}
                                             <div
                                               className={`flex ${
                                                 !z?.position?.name &&
                                                 !z?.location?.name &&
-                                                "invisible"
+                                                "invisible hidden"
                                               } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
                                             >
                                               <span className="text-white text-[10px]">

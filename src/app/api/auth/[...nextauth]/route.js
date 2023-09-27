@@ -51,12 +51,6 @@ const handler = NextAuth({
     jwt: true,
     maxAge: 6 * 24 * 60 * 60,
     strategy: 'jwt',
-    async updateSession(session, token) {
-      if (token && token.rememberOption) {
-        session.maxAge = 30 * 24 * 60 * 60; // Set maxAge to 30 days if rememberOption is true
-      }
-      return session;
-    },
   },
   pages: {
     signIn: "/signin",
@@ -86,12 +80,14 @@ const handler = NextAuth({
       return true;
     },
     async jwt({ token, user, account, profile }) {
+      console.log(user);
       if (user) {
         token.user = {
           _id: user._id,
           email: user.email,
           name: user.username,
           accessToken: user.accessToken,
+          rememberOption: user.rememberOption,
         };
       }
 
@@ -108,10 +104,12 @@ const handler = NextAuth({
       return token;
     },
     async session({ session, token, user }) {
+      console.log(user);
       if (token) {
         session.user._id = token.user._id;
         session.user.name = token.user.name
         session.user.accessToken = token.user.accessToken;
+        session.user.rememberOption = token.user.rememberOption;
       }
       return session;
     },
