@@ -30,10 +30,10 @@ const FilterComponent = ({allFilterList, checkedFilter, selectedFilter}) => {
 
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center py-10">
       
       <div className="px-4">
-        <p onClick={() => setFilterValue("")} className="text-sm mt-[33px] hover:bg-[#E5E5E3] w-max px-2 py-1 rounded-sm transition duration-300 cursor-pointer">CLEAR FILTER</p>
+        <p onClick={() => setFilterValue("")} className="text-sm hover:bg-[#E5E5E3] w-max px-2 rounded-sm transition duration-300 cursor-pointer">CLEAR FILTER</p>
         <div className="mt-[29px]">
           <Input value={filterValue} onChange={(e) => e.preventDefault(setFilterValue(e.target.value))} placeholder="Search by keyword" className="rounded-sm" prefix={<Image width={20} height={20} src={"/static/svg/lup.svg"} />} />
         </div>

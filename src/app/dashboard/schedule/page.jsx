@@ -12,12 +12,11 @@ import {
   Tabs,
   ConfigProvider,
   DatePicker,
-  TimePicker,
   Select,
   Input,
   message,
   Upload,
-  AutoComplete
+  AutoComplete,
 } from "antd";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -25,6 +24,7 @@ import _ from "lodash";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
 import axios from "axios";
+import { shiftTemplates } from "@/utils/schedule";
 
 const { Dragger } = Upload;
 
@@ -86,21 +86,31 @@ const Scheduler = () => {
       endDate: null,
     },
   });
-  const [selectedTime, setSelectedTime] = useState('');
   const options = [];
+  const [shiftTemplate, setShiftTemplate] = useState('')
 
-var x = 1; //minutes interval
-var times = []; // time array
-var tt = 0; // start time
-var ap = ['AM', 'PM']; // AM-PM
+  var x = 1; //minutes interval
+  var times = []; // time array
+  var tt = 0; // start time
+  var ap = ["AM", "PM"]; // AM-PM
 
-//loop to increment the time and push results in array
-for (var i=0;tt<24*60; i++) {
-  var hh = Math.floor(tt/60); // getting hours of day in 0-24 format
-  var mm = (tt%60); // getting minutes of the hour in 0-55 format
-  options[i] = {value: ("0" + (hh % 12)).slice(-2) + ':' + ("0" + mm).slice(-2) + ap[Math.floor(hh/12)], label: ("0" + (hh % 12)).slice(-2) + ':' + ("0" + mm).slice(-2) + ap[Math.floor(hh/12)]} // pushing data in array in [00:00 - 12:00 AM/PM format]
-  tt = tt + x;
-}
+  for (var i = 0; tt < 24 * 60; i++) {
+    var hh = Math.floor(tt / 60); // getting hours of day in 0-24 format
+    var mm = tt % 60; // getting minutes of the hour in 0-55 format
+    options[i] = {
+      value:
+        ("0" + (hh % 12)).slice(-2) +
+        ":" +
+        ("0" + mm).slice(-2) +
+        ap[Math.floor(hh / 12)],
+      label:
+        ("0" + (hh % 12)).slice(-2) +
+        ":" +
+        ("0" + mm).slice(-2) +
+        ap[Math.floor(hh / 12)],
+    };
+    tt = tt + x;
+  }
 
   useEffect(() => {
     setClonedEmployees(_.cloneDeep(employees));
@@ -305,8 +315,8 @@ for (var i=0;tt<24*60; i++) {
           ...data,
           location: data?.location?._id,
           position: data?.position?._id,
-          startTime: dayjs(data.startTime),
-          endTime: dayjs(data.endTime),
+          startTime: dayjs(data.startTime).format('hh:mmA'),
+          endTime: dayjs(data.endTime).format('hh:mmA'),
           date: dayjs(data.date),
           repeatedShift: {
             ...prev.repeatedShift,
@@ -322,8 +332,8 @@ for (var i=0;tt<24*60; i++) {
           ...data,
           location: data?.location?._id,
           position: data?.position?._id,
-          startTime: dayjs(data.startTime),
-          endTime: dayjs(data.endTime),
+          startTime: dayjs(data.startTime).format('hh:mmA'),
+          endTime: dayjs(data.endTime).format('hh:mmA'),
           date: dayjs(data.date),
         };
       });
@@ -350,11 +360,23 @@ for (var i=0;tt<24*60; i++) {
 
   const addShift = async () => {
     const validateEndTime = isStartGreaterThanEnd();
-    form.startTime = dayjs().hour(form.startTime.slice(5, 7) === 'PM' ? Number(form.startTime.slice(0, 2)) + 12 : Number(form.startTime.slice(0, 2))).minute(Number(form.startTime.slice(3, 5)))
-    form.endTime = dayjs().hour(form.endTime.slice(5, 7) === 'PM' ? Number(form.endTime.slice(0, 2)) + 12 : Number(form.endTime.slice(0, 2))).minute(Number(form.endTime.slice(3, 5)))
+    form.startTime = dayjs()
+      .hour(
+        form.startTime.slice(5, 7) === "PM"
+          ? Number(form.startTime.slice(0, 2)) + 12
+          : Number(form.startTime.slice(0, 2))
+      )
+      .minute(Number(form.startTime.slice(3, 5)));
+    form.endTime = dayjs()
+      .hour(
+        form.endTime.slice(5, 7) === "PM"
+          ? Number(form.endTime.slice(0, 2)) + 12
+          : Number(form.endTime.slice(0, 2))
+      )
+      .minute(Number(form.endTime.slice(3, 5)));
     if (validateEndTime) {
-      message.error('End time must be greater than start time')
-      return
+      message.error("End time must be greater than start time");
+      return;
     }
 
     if (selectedRepeatedDays.length > 0) {
@@ -392,6 +414,20 @@ for (var i=0;tt<24*60; i++) {
       );
       setForm(newForm);
     }
+    form.startTime = dayjs()
+    .hour(
+      form.startTime.slice(5, 7) === "PM"
+        ? Number(form.startTime.slice(0, 2)) + 12
+        : Number(form.startTime.slice(0, 2))
+    )
+    .minute(Number(form.startTime.slice(3, 5)));
+  form.endTime = dayjs()
+    .hour(
+      form.endTime.slice(5, 7) === "PM"
+        ? Number(form.endTime.slice(0, 2)) + 12
+        : Number(form.endTime.slice(0, 2))
+    )
+    .minute(Number(form.endTime.slice(3, 5)));
 
     await fetch(`/api/shifts/${Id}`, {
       method: "PUT",
@@ -502,7 +538,7 @@ for (var i=0;tt<24*60; i++) {
     if (form.startTime && form.endTime) {
       return dayjs(form.startTime).isAfter(dayjs(form.endTime));
     }
-  }
+  };
 
   const clearFields = () => {
     setForm({
@@ -520,6 +556,7 @@ for (var i=0;tt<24*60; i++) {
         endDate: null,
       },
     });
+    setShiftTemplate('')
   };
 
   return (
@@ -639,8 +676,8 @@ for (var i=0;tt<24*60; i++) {
           </div>
         </div>
 
-        <div className="flex flex-1">
-          <div className="w-[202px] border-r-[1px] border-[#E5E5E3] overflow-y-auto h-[720px]">
+        <div className="flex flex-1 overflow-y-auto">
+          <div className="w-[202px] border-r-[1px] border-[#E5E5E3] overflow-y-auto h-full">
             <FilterComponent
               selectedFilter={selectedFilter}
               checkedFilter={checkedFilter}
@@ -818,17 +855,33 @@ for (var i=0;tt<24*60; i++) {
                         </div>
                       </div>
 
-
                       <div className="flex mt-4 justify-between">
                         <div className="w-[48%] ">
                           <span className="text-xs font-semibold">
                             START SHIFT{" "}
                             <span className="text-xs text-red-500">*</span>
                           </span>
-                          <p className="text-black">{JSON.stringify({test: form.startTime})}</p>
-                          <AutoComplete className="w-full" value={form.startTime} onChange={(data, option) => setForm((prev) => { return { ...prev, startTime: data } })} onSelect={(data, option) => setForm((prev) => { return { ...prev, startTime: option.label} })}  placeholder="Select Start Time"   filterOption={(inputValue, option) =>
-      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-    } options={options} />
+                          <AutoComplete
+                            className="w-full"
+                            value={form.startTime}
+                            onChange={(data, option) =>
+                              setForm((prev) => {
+                                return { ...prev, startTime: data };
+                              })
+                            }
+                            onSelect={(data, option) =>
+                              setForm((prev) => {
+                                return { ...prev, startTime: option.label };
+                              })
+                            }
+                            placeholder="Select Start Time"
+                            filterOption={(inputValue, option) =>
+                              option.value
+                                .toUpperCase()
+                                .indexOf(inputValue.toUpperCase()) !== -1
+                            }
+                            options={options}
+                          />
                           {/* <TimePicker
                             value={form?.startTime}
                             onChange={(e) =>
@@ -845,9 +898,27 @@ for (var i=0;tt<24*60; i++) {
                             FINISH SHIFT{" "}
                             <span className="text-xs text-red-500">*</span>
                           </span>
-                          <AutoComplete className="w-full" value={form.endTime} onChange={(data, option) => setForm((prev) => { return { ...prev, endTime: data } })} onSelect={(data, option) => setForm((prev) => { return { ...prev, endTime: option.label} })} placeholder="Select End Time"   filterOption={(inputValue, option) =>
-      option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-    } options={options} />
+                          <AutoComplete
+                            className="w-full"
+                            value={form.endTime}
+                            onChange={(data, option) =>
+                              setForm((prev) => {
+                                return { ...prev, endTime: data };
+                              })
+                            }
+                            onSelect={(data, option) =>
+                              setForm((prev) => {
+                                return { ...prev, endTime: option.label };
+                              })
+                            }
+                            placeholder="Select End Time"
+                            filterOption={(inputValue, option) =>
+                              option.value
+                                .toUpperCase()
+                                .indexOf(inputValue.toUpperCase()) !== -1
+                            }
+                            options={options}
+                          />
                           {/* <TimePicker
                             value={form?.endTime}
                             onChange={(e) =>
@@ -1038,6 +1109,38 @@ for (var i=0;tt<24*60; i++) {
                           />
                         </div>
                       )}
+                      <p className="text-xs font-semibold mt-3">
+                        OR, CHOOSE FROM A SHIFT TEMPLATES
+                      </p>
+                      <div className="w-full mt-2 grid-cols-2 gap-7 grid">
+                        {
+                          shiftTemplates.map((x) =>  <div onClick={() => setShiftTemplate(`${x.startTime} - ${x.endTime}`) & setForm((prev) => { return { ...prev, startTime: x.startTime, endTime: x.endTime } })} className={`h-10 ${x.color} px-5 justify-between flex items-center hover:opacity-80 cursor-pointer py-1 rounded-md`}>
+                          <p>{ `${x.startTime} - ${x.endTime}` }</p>
+                          {
+                            shiftTemplate === `${x.startTime} - ${x.endTime}` && <Image
+                            width={20}
+                            height={20}
+                            alt="checklist-icon"
+                            src={"/static/svg/checklist.svg"}
+                          />
+                          }
+                        </div>
+                          )
+                        }
+                        {/* <div className="h-10 bg-cyan-100 px-5 justify-between flex items-center hover:opacity-80 cursor-pointer py-1 rounded-md">
+                          <p>09:00 AM - 05:00 PM</p>
+                          <Image
+                            width={20}
+                            height={20}
+                            alt="checklist-icon"
+                            src={"/static/svg/checklist.svg"}
+                          />
+                        </div>
+
+                        <div className="h-10 bg-red-100 px-5 flex items-center hover:opacity-80 cursor-pointer  py-1 rounded-md">
+                          <p>01:00 PM - 06:00 PM</p>
+                        </div> */}
+                      </div>
                     </div>
                   ),
                 },

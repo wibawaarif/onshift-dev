@@ -22,6 +22,7 @@ import ApprovalsComponent from "@/components/approvals/page";
 import dayjs from "dayjs";
 import _ from "lodash";
 import updateLocale from "dayjs/plugin/updateLocale";
+import { CSVLink } from "react-csv";
 
 dayjs.extend(updateLocale);
 dayjs.updateLocale("en", {
@@ -113,6 +114,30 @@ const Timesheet = () => {
 
   };
 
+  const headers = [
+    {
+      label: "Name",
+      key: "name",
+    },
+    {
+      label: "Date",
+      key: "date"
+    },
+    {
+      label: "Start Time",
+      key: "startTime"
+    },
+    {
+      label: "End Time",
+      key: "endTime"
+    },
+    {
+      label: "Status",
+      key: "status"
+    }
+  ];
+
+
 
   return (
     <ConfigProvider
@@ -142,9 +167,31 @@ const Timesheet = () => {
 
 
           <div>
-            <button onClick={() => setEmployeeModal(true) & setActionType("exportImport")} className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+          <CSVLink
+                  data={clonedEmployees.reduce((acc, employee) => {
+                    const { name, timesheets } = employee;
+
+                    timesheets.forEach((timesheets) => {
+                      acc.push({
+                        name,
+                        ...timesheets,
+                      date: dayjs(timesheets.date).format("DD/MM/YYYY"),
+                      startTime: dayjs(timesheets.startTime).format("hh:mmA"),
+                      endTime: dayjs(timesheets.endTime).format("hh:mmA"),
+                      })
+                    })
+
+                    return acc
+                  }, [])}
+                  headers={headers}
+                  filename={"my-file.csv"}
+                  key="back"
+                  target="_blank"
+                >
+            <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
               Export Sheet
             </button>
+            </CSVLink>
           </div>
         </div>
 

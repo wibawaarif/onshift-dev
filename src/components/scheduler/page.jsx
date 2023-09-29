@@ -81,7 +81,7 @@ const SchedulerComponent = ({
               The data is displayed based on the specified filters
             </p>
           </div>
-          <div className="h-[43px] w-[393px] flex justify-between">
+          {/* <div className="h-[43px] w-[393px] flex justify-between">
             <div className="flex flex-col items-center">
               <span className="text-[20px]">{employees?.map(x => x?.shifts?.length).length}</span>
               <span className="text-[#7D7D80] text-[10px]">SHIFTS</span>
@@ -102,7 +102,7 @@ const SchedulerComponent = ({
               <span className="text-[20px]">40%</span>
               <span className="text-[#7D7D80] text-[10px]">LABOR %</span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       <div

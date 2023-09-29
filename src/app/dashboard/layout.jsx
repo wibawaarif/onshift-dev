@@ -26,12 +26,12 @@ console.log(session);
 
   return (
     <div className="h-screen w-screen bg-white flex">
-      <div className="flex flex-col justify-between items-center py-4 w-[70px] h-full border-r-[1px] border-[#E5E5E3]">
+      <div className="flex flex-col justify-between items-center py-4 w-[80px] h-full border-r-[1px] border-[#E5E5E3]">
         <div>
         <Image width={50} height={50} alt="brand-logo" src={'/static/img/brand.png'} />
         </div>
 
-        <div className="flex flex-col justify-between items-center h-52">
+        <div className="flex flex-col justify-between items-center h-72">
           {
             menu.map((x, index) => (
               <Link href={`/dashboard/${x}`} key={index}>
@@ -39,13 +39,14 @@ console.log(session);
               {
                 currentPath === x && (
                   <div className="absolute">
-                    <div className="w-[68px] h-[30px] border-l-4 border-black">
+                    <div className="w-[75px] h-[30px] border-l-4 border-black">
                     </div>
                 </div>
                 )
               }
                 <Image width={24} height={24} alt="schedule-logo" src={`/static/svg/${x}.svg`} />
               </div>
+              <p className="text-black text-center capitalize text-xs font-semibold">{x}</p>
               </Link>
             ))
           }

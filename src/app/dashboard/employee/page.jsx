@@ -463,8 +463,8 @@ const Employee = () => {
         },
       }}
     >
-      <div className="flex flex-1">
-        <div className="w-[202px] border-r-[1px] border-[#E5E5E3] overflow-y-auto h-[720px]">
+      <div className="flex flex-1 overflow-y-auto">
+        <div className="w-[202px] border-r-[1px] border-[#E5E5E3] overflow-y-auto h-full">
           <FilterComponent
             selectedFilter={selectedFilter}
             checkedFilter={checkedFilter}
