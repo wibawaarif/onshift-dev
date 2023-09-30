@@ -1114,7 +1114,7 @@ const Scheduler = () => {
                       </p>
                       <div className="w-full mt-2 grid-cols-2 gap-7 grid">
                         {
-                          shiftTemplates.map((x) =>  <div onClick={() => setShiftTemplate(`${x.startTime} - ${x.endTime}`) & setForm((prev) => { return { ...prev, startTime: x.startTime, endTime: x.endTime } })} className={`h-10 ${x.color} px-5 justify-between flex items-center hover:opacity-80 cursor-pointer py-1 rounded-md`}>
+                          shiftTemplates.map((x, index) =>  <div key={index} onClick={() => setShiftTemplate(`${x.startTime} - ${x.endTime}`) & setForm((prev) => { return { ...prev, startTime: x.startTime, endTime: x.endTime } })} className={`h-10 ${x.color} px-5 justify-between flex items-center hover:opacity-80 cursor-pointer py-1 rounded-md`}>
                           <p>{ `${x.startTime} - ${x.endTime}` }</p>
                           {
                             shiftTemplate === `${x.startTime} - ${x.endTime}` && <Image
