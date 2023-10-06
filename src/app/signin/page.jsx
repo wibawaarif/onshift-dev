@@ -16,6 +16,7 @@ const SignIn = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [spin, setSpin] = useState(false);
   const [remember, setRemember] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -28,12 +29,44 @@ const SignIn = () => {
   }, [searchParams]);
 
   if (session.status === "loading") {
-    return <LoadingPage />
+    return <LoadingPage />;
   }
 
   if (session.status === "authenticated") {
     router?.push("/dashboard/schedule");
     return;
+  }
+
+  const handleForgotPassword = async () => {
+    setSpin(true);
+
+    if (email === "") {
+      messageApi.open({
+        type: "error",
+        content: "Email cannot be empty",
+      });
+      return;
+    }
+    const response = await fetch("api/forgot-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+      }),
+    });
+
+    const data = await response.json();
+    setSpin(false);
+    if (data === "Email not found") {
+      message.error(data);
+      return;
+    } else {
+      message.success("Password Successfully Updated");
+      setIsForgotPassword(false);
+      clearFields();
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -49,11 +82,15 @@ const SignIn = () => {
     }
 
     try {
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      }, {remember});
+      const res = await signIn(
+        "credentials",
+        {
+          email,
+          password,
+          redirect: false,
+        },
+        { remember }
+      );
       setSpin(false);
       if (res?.error == null) {
         console.log(res); // Acc
@@ -68,6 +105,11 @@ const SignIn = () => {
       console.log(error);
     }
   };
+
+  const clearFields = () => {
+    setEmail("");
+    setPassword("");
+  }
 
   return (
     <ConfigProvider
@@ -95,59 +137,108 @@ const SignIn = () => {
           </div>
 
           <div className="w-1/2 h-full flex justify-center items-center">
-            <div className="w-[531px] h-[520px] shadow-lg px-6 py-6">
-              <p className="text-3xl font-bold text-center mt-2">Sign in</p>
+            <div className={`${isForgotPassword ? 'h-[350px]' : 'h-[520px]'} w-[531px] shadow-lg px-6 py-6`}>
+            <p className="text-3xl font-bold text-center mt-2">
+                  {isForgotPassword ? "Forgot Password" : "Sign In"}
+                </p>
+              {isForgotPassword ? (
+                <>
+                                <div className="mt-6">
+                  <span>Email</span>
+                  <Input
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    value={email}
+                    prefix={<MailOutlined />}
+                    className="py-2"
+                  />
+                </div>
+                <ConfigProvider
+                  theme={{
+                    token: {
+                      colorPrimary: "#1677ff",
+                    },
+                  }}
+                >
+                  <button
+                    onClick={handleForgotPassword}
+                    className="mt-5 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                  >
+                    {spin ? <Spin /> : "Reset Password"}
+                  </button>
+                </ConfigProvider>
 
-              <div className="mt-6">
-                <span>Email</span>
-                <Input
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  prefix={<MailOutlined />}
-                  className="py-2"
-                />
-              </div>
-
-              <div className="mt-5">
-                <span>Password</span>
-                <Input.Password
-                  onChange={(e) => setPassword(e.target.value)}
-                  prefix={<LockOutlined />}
-                  placeholder="Enter your password"
-                  className="py-2"
-                />
-              </div>
-
-              <div className="flex justify-between mt-5">
-                <Checkbox value={remember} onChange={(e) => setRemember(e.target.checked)}>Remember me</Checkbox>
-
-                <span className="hover:underline hover:cursor-pointer">
-                  Forgot password?
+                <div className="text-center mt-4">
+              <div>
+                Already have an account?{" "}
+                <span onClick={() => setIsForgotPassword(false) & clearFields()} className="hover:underline hover:cursor-pointer text-blue-500">
+                  Sign In
                 </span>
               </div>
+            </div>
+                </>
+              ) : (
+                <>
+                <div className="mt-6">
+                  <span>Email</span>
+                  <Input
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    value={email}
+                    className="py-2"
+                  />
+                </div>
 
-              <ConfigProvider
-                theme={{
-                  token: {
-                    colorPrimary: "#1677ff",
-                  },
-                }}
-              >
-                <button
-                  onClick={handleSubmit}
-                  className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
-                >
-                  {spin ? <Spin /> : "Sign in"}
-                </button>
-              </ConfigProvider>
-              <div className="text-center mt-4">
-                <Link href="/signup">
-                  Don&apos;t have an account yet?{" "}
-                  <span className="hover:underline text-blue-500">
-                    Create one.
+                <div className="mt-5">
+                  <span>Password</span>
+                  <Input.Password
+                    onChange={(e) => setPassword(e.target.value)}
+                    prefix={<LockOutlined />}
+                    placeholder="Enter your password"
+                    className="py-2"
+                  />
+                </div>
+
+                <div className="flex justify-between mt-5">
+                  <Checkbox
+                    value={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                  >
+                    Remember me
+                  </Checkbox>
+
+                  <span
+                    onClick={() => setIsForgotPassword(true) & clearFields()}
+                    className="hover:underline hover:cursor-pointer"
+                  >
+                    Forgot password?
                   </span>
-                </Link>
-              </div>
+                </div>
+
+                <ConfigProvider
+                  theme={{
+                    token: {
+                      colorPrimary: "#1677ff",
+                    },
+                  }}
+                >
+                  <button
+                    onClick={handleSubmit}
+                    className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                  >
+                    {spin ? <Spin /> : "Sign in"}
+                  </button>
+                </ConfigProvider>
+                <div className="text-center mt-4">
+                  <Link href="/signup">
+                    Don&apos;t have an account yet?{" "}
+                    <span className="hover:underline text-blue-500">
+                      Create one.
+                    </span>
+                  </Link>
+                </div>
+              </>
+              )}
             </div>
           </div>
         </div>

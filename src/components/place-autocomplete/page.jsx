@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { StandaloneSearchBox, LoadScript } from "@react-google-maps/api";
 
-const PlaceComponent = ({style, address, setAddress, setLatitude, setLongitude }) => {
+const PlaceComponent = ({children, style, address, setAddress, setLatitude, setLongitude }) => {
   const inputRef = useRef();
 
   const handlePlaceChanged = () => {
@@ -25,12 +25,16 @@ const PlaceComponent = ({style, address, setAddress, setLatitude, setLongitude }
         onLoad={(ref) => (inputRef.current = ref)}
         onPlacesChanged={handlePlaceChanged}
       >
+        <div className="relative">
         <input
           type="text"
           className={`form-control ${style}`}
           value={address}
+          placeholder="Enter location"
           onChange={(e) => setAddress(e.target.value)}
         />
+        {children}
+        </div>
       </StandaloneSearchBox>
     </LoadScript>
   );
