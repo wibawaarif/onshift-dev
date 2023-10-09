@@ -20,7 +20,10 @@ const positionSchema = new Schema({
   user: {
     type: String,
     required: true,
-  }
+  },
+  workspace: {
+    type: String
+  },
 }, { timestamps: true })
 
 export default mongoose?.models?.Position || mongoose.model("Position", positionSchema)

@@ -6,9 +6,9 @@ import { verifyJwtToken } from '@/lib/jwt'
 export const GET = async (request) => {
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
+  const workspace = accessToken?.split(' ')[2]
 
   const decodedToken = verifyJwtToken(token)  
-
   if (!accessToken || !decodedToken) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
@@ -20,7 +20,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const positions = await Position.find({user: decodedToken.email}).sort({ createdAt: -1 }).populate('employees');
+    const positions = await Position.find({user: decodedToken.email, workspace}).sort({ createdAt: -1 }).populate('employees');
 
     return new NextResponse(JSON.stringify(positions), { status: 200 });
   } catch (err) {

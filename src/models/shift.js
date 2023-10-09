@@ -45,7 +45,10 @@ const shiftSchema = new Schema({
   platform: {
     type: String,
     default: 'Web App'
-  }
+  },
+  workspace: {
+    type: String
+  },
 }, { timestamps: true })
 
 export default mongoose?.models?.Shift || mongoose.model("Shift", shiftSchema)

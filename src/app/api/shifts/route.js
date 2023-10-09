@@ -9,9 +9,10 @@ import { verifyJwtToken } from '@/lib/jwt'
 export const GET = async (request) => {
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
-  console.log(accessToken);
+  const workspace = accessToken?.split(' ')[2]
+
   const decodedToken = verifyJwtToken(token)  
-  console.log(decodedToken);
+
 
   if (!accessToken || !decodedToken) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
@@ -24,7 +25,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const shifts = await Shift.find({}).populate({ path: 'location', select: 'name', model: Location }).populate({ path: 'position', select: 'name', model: Position })
+    const shifts = await Shift.find({workspace}).populate({ path: 'location', select: 'name', model: Location }).populate({ path: 'position', select: 'name', model: Position })
 
     return new NextResponse(JSON.stringify(shifts), { status: 200 });
   } catch (err) {
@@ -35,7 +36,6 @@ export const GET = async (request) => {
 export const POST = async (request) => {
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
-
   const decodedToken = verifyJwtToken(token)  
 
   if (!accessToken || !decodedToken) {
@@ -61,8 +61,6 @@ export const POST = async (request) => {
         } else {
           newEmployees = [newShift._id]
         }
-  
-        console.log(newEmployees);
   
         findEmployee.set({
           ...findEmployee,

@@ -1,31 +1,28 @@
 import mongoose, { Schema } from 'mongoose';
 
-const locationSchema = new Schema({
+const workspaceSchema = new Schema({
     name: {
       type: String,
-      trim: true,
       required: true,
+      unique: true,
     },
     address: {
       type: String,
+      required: true,
     },
-    latitude: {
+    totalEmployees: {
       type: String,
+      required: true,
     },
-    longitude: {
+    industry: {
       type: String,
-    },
-    radius: {
-      type: Number,
+      required: true,
     },
     user: {
       type: String,
       required: true,
-    },
-    workspace: {
-      type: String
-    },
+    }
 }, { timestamps: true })
 
-export default mongoose?.models?.Location || mongoose.model("Location", locationSchema)
+export default mongoose?.models?.Workspace || mongoose.model("Workspace", workspaceSchema)
 

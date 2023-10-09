@@ -40,21 +40,20 @@ const fetcher = ([url, token]) =>
 
 const Scheduler = () => {
   const session = useSession();
-  console.log(session);
   const { data: shifts, mutate: mutateShifts } = useSWR(
-    [`/api/shifts`, session.data.user.accessToken],
+    [`/api/shifts`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
     fetcher
   );
   const { data: locations } = useSWR(
-    [`/api/locations`, session.data.user.accessToken],
+    [`/api/locations`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
     fetcher
   );
   const { data: positions } = useSWR(
-    [`/api/positions`, session.data.user.accessToken],
+    [`/api/positions`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
     fetcher
   );
   const { data: employees, mutate: mutateEmployees } = useSWR(
-    [`/api/employees`, session.data.user.accessToken],
+    [`/api/employees`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
     fetcher
   );
 
@@ -391,7 +390,7 @@ const Scheduler = () => {
     setShiftModal(false);
     await fetch(`/api/shifts`, {
       method: "POST",
-      body: JSON.stringify(form),
+      body: JSON.stringify({...form, workspace: session.data.user.workspace}),
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,
       },
@@ -511,10 +510,12 @@ const Scheduler = () => {
                     repeatedDays: uploadedShifts[i].repeatedDays,
                     endDate: uploadedShifts[i].endDate,
                   },
+                  workspace: session.data.user.workspace
                 }
               : {
                   ...uploadedShifts[i],
                   employees: [uploadedShifts[i].employees],
+                  workspace: session.data.user.workspace
                 }
           ),
           headers: {

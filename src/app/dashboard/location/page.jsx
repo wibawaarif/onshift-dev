@@ -10,7 +10,7 @@ import GoogleMaps from "@/components/google-maps/page";
 import _ from "lodash";
 
 const fetcher = ([url, token]) =>
-  fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
+  fetch(url, {headers: { authorization: "Bearer " + token }}).then((res) =>
     res.json()
   );
 
@@ -41,7 +41,7 @@ const Location = () => {
     error,
     isLoading,
     mutate,
-  } = useSWR([`/api/locations`, session.data.user.accessToken], fetcher);
+  } = useSWR([`/api/locations`, `${session.data.user.accessToken} ${session.data.user.workspace}`], fetcher);
 
   useEffect(() => {
     setClonedLocations(_.cloneDeep(locations));
@@ -84,7 +84,7 @@ const Location = () => {
     setLocationModal(false);
     const data = await fetch(`/api/locations`, {
       method: "POST",
-      body: JSON.stringify({...form, address, longitude, latitude}),
+      body: JSON.stringify({...form, address, longitude, latitude, workspace: session.data.user.workspace}),
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,
       },

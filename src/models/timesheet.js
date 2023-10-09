@@ -19,7 +19,10 @@ const timesheetSchema = new Schema({
     type: String,
     enum: ['Present', 'Absent', 'Late'],
     default: 'Present',
-  }
+  },
+  workspace: {
+    type: String
+  },
 }, { timestamps: true })
 
 export default mongoose?.models?.Timesheet || mongoose.model("Timesheet", timesheetSchema)

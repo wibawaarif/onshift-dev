@@ -22,6 +22,9 @@ const scheduleSchema = new Schema({
     endDate: {
       type: Date
     },
+    workspace: {
+      type: String
+    },
 }, { timestamps: true })
 
 export default mongoose?.models?.Schedule || mongoose.model("Schedule", scheduleSchema)

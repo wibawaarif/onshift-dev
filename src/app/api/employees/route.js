@@ -10,7 +10,7 @@ import { verifyJwtToken } from '@/lib/jwt';
 export const GET = async (request) => {
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
-
+  const workspace = accessToken?.split(' ')[2]
   const decodedToken = verifyJwtToken(token)  
 
   if (!accessToken || !decodedToken) {
@@ -24,7 +24,7 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const employees = await Employee.find({user: decodedToken.email}).sort({ createdAt: -1 })
+    const employees = await Employee.find({user: decodedToken.email, workspace}).sort({ createdAt: -1 })
     .populate({
       path: 'shifts',
       model: Shift,
@@ -49,7 +49,6 @@ export const GET = async (request) => {
 export const POST = async (request) => {
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
-
   const decodedToken = verifyJwtToken(token)  
 
   if (!accessToken || !decodedToken) {

@@ -43,7 +43,10 @@ const employeeSchema = new Schema({
       amount: {
         type: Number,
       }
-    }
+    },
+    workspace: {
+      type: String
+    },
 }, { timestamps: true })
 
 export default mongoose?.models?.Employee || mongoose?.model("Employee", employeeSchema)

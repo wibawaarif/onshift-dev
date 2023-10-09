@@ -35,11 +35,11 @@ const Employee = () => {
   const session = useSession();
 
   const { data: locations } = useSWR(
-    [`/api/locations`, session.data.user.accessToken],
+    [`/api/locations`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
     fetcher
   );
   const { data: positions } = useSWR(
-    [`/api/positions`, session.data.user.accessToken],
+    [`/api/positions`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
     fetcher
   );
   const {
@@ -47,7 +47,7 @@ const Employee = () => {
     error,
     isLoading,
     mutate,
-  } = useSWR([`/api/employees`, session.data.user.accessToken], fetcher);
+  } = useSWR([`/api/employees`, `${session.data.user.accessToken} ${session.data.user.workspace}`], fetcher);
 
   const [clonedEmployees, setClonedEmployees] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState([]);
@@ -101,7 +101,6 @@ const Employee = () => {
     onChange(info) {
       const { status } = info.file;
       if (status !== "uploading") {
-        console.log(info.file, info.fileList);
       }
       if (status === "done") {
         message.success(`${info.file.name} file uploaded successfully.`);
@@ -112,7 +111,6 @@ const Employee = () => {
           Papa.parse(contents, {
             complete: (parsedData) => {
               // Process the parsed data here
-              console.log(parsedData.data);
               setUploadedEmployees(parsedData.data);
             },
             header: true,
@@ -298,7 +296,7 @@ const Employee = () => {
       if (uploadedEmployees[i].email) {
         const res = await fetch(`/api/employees`, {
           method: "POST",
-          body: JSON.stringify(uploadedEmployees[i]),
+          body: JSON.stringify({...uploadedEmployees[i], workspace: session.data.user.workspace}),
           headers: {
             authorization: "Bearer " + session.data.user.accessToken,
           },
@@ -335,7 +333,7 @@ const Employee = () => {
     setEmployeeModal(false);
     const res = await fetch(`/api/employees`, {
       method: "POST",
-      body: JSON.stringify(form),
+      body: JSON.stringify({...form, workspace: session.data.user.workspace}),
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,
       },

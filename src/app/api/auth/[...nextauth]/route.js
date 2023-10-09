@@ -30,7 +30,7 @@ const handler = NextAuth({
           throw new Error("Invalid credentials");
         } else {
           const { ...currentUser } = user._doc;
-          console.log('test');
+
           const accessToken = signJwtToken(currentUser, req.query.remember);
 
           return {
@@ -58,7 +58,7 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account.provider === "google") {
-        console.log('test');
+
         const response = await fetch(`http://localhost:3000/api/register`, {
           method: "POST",
           headers: {
@@ -79,8 +79,8 @@ const handler = NextAuth({
 
       return true;
     },
-    async jwt({ token, user, account, profile }) {
-      console.log(user);
+    async jwt({ token, trigger, session, user, account, profile }) {
+
       if (user) {
         token.user = {
           _id: user._id,
@@ -99,17 +99,24 @@ const handler = NextAuth({
           name: user.name,
           accessToken: accessToken
         };
-        
       }  
+
+      if (trigger === 'update') {
+        if (session.workspace) {
+          token.user.workspace = session.workspace
+        }
+      }
+
       return token;
     },
     async session({ session, token, user }) {
-      console.log(user);
+
       if (token) {
         session.user._id = token.user._id;
         session.user.name = token.user.name
         session.user.accessToken = token.user.accessToken;
         session.user.rememberOption = token.user.rememberOption;
+        session.user.workspace = token.user.workspace
       }
       return session;
     },

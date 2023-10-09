@@ -41,12 +41,12 @@ const Position = () => {
   const session = useSession();
 
   let { data, error, isLoading, mutate } = useSWR(
-    [`/api/positions`, session.data.user.accessToken],
+    [`/api/positions`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
     fetcher
   );
   let { data: employees } = useSWR(
     positionModal
-      ? [`/api/employees`, session.data.user.accessToken]
+      ? [`/api/employees`, `${session.data.user.accessToken} ${session.data.user.workspace}`]
       : null,
     fetcher
   );
@@ -111,6 +111,7 @@ const Position = () => {
         wageType: wage,
         wageAmount,
         employees: selectedEmployees,
+        workspace: session.data.user.workspace
       }),
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,
