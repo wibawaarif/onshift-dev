@@ -40,7 +40,6 @@ export async function POST(req){
         }
 
         if (type !== 'google') {
-            console.log('mauksaajsf');
             const hashedPassword = await bcrypt.hash(pass, 10)
 
             const newUser = await User.create({username, email, password: hashedPassword, type})

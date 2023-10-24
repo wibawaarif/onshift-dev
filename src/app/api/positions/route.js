@@ -6,7 +6,7 @@ import { verifyJwtToken } from '@/lib/jwt'
 export const GET = async (request) => {
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
-  const workspace = accessToken?.split(' ')[2]
+  const workspace = accessToken?.split('#')[1]
 
   const decodedToken = verifyJwtToken(token)  
   if (!accessToken || !decodedToken) {

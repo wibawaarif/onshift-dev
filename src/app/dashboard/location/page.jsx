@@ -41,7 +41,7 @@ const Location = () => {
     error,
     isLoading,
     mutate,
-  } = useSWR([`/api/locations`, `${session.data.user.accessToken} ${session.data.user.workspace}`], fetcher);
+  } = useSWR([`/api/locations`, `${session.data.user.accessToken} #${session.data.user.workspace}`], fetcher);
 
   useEffect(() => {
     setClonedLocations(_.cloneDeep(locations));
@@ -59,12 +59,16 @@ const Location = () => {
     }
   }, [searchLocationsInput]);
 
-  // Calculate the start and end index of items for the current page
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
+  useEffect(() => {
 
-  // Get the array of items for the current page
-  const itemsForCurrentPage = clonedLocations?.slice(startIndex, endIndex);
+  }, [clonedLocations])
+
+    // Calculate the start and end index of items for the current page
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+
+    // Get the array of items for the current page
+    const itemsForCurrentPage = clonedLocations?.slice(startIndex, endIndex);
 
   const clearFields = () => {
     setForm({
@@ -104,7 +108,6 @@ const Location = () => {
   };
 
   const editLocation = async () => {
-    console.log(form.address);
     setLocationModal(false);
     const data = await fetch(`/api/locations/${id}`, {
       method: "PUT",
@@ -196,7 +199,7 @@ const Location = () => {
               Locations ({clonedLocations?.length})
             </p>
 
-            <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
+            <div className="h-full w-full mt-6 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
             {itemsForCurrentPage?.length > 0 ? 
               itemsForCurrentPage.map((x, index) => (
                 <div key={index} className="h-full w-full mt-6">

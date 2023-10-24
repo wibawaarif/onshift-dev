@@ -41,12 +41,12 @@ const Position = () => {
   const session = useSession();
 
   let { data, error, isLoading, mutate } = useSWR(
-    [`/api/positions`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
+    [`/api/positions`, `${session.data.user.accessToken} #${session.data.user.workspace}`],
     fetcher
   );
   let { data: employees } = useSWR(
     positionModal
-      ? [`/api/employees`, `${session.data.user.accessToken} ${session.data.user.workspace}`]
+      ? [`/api/employees`, `${session.data.user.accessToken} #${session.data.user.workspace}`]
       : null,
     fetcher
   );
@@ -235,7 +235,7 @@ const Position = () => {
             <p className="text-2xl font-medium">
               Positions ({data && clonedPositions?.length})
             </p>
-            <div className="h-full w-full mt-6 grid grid-cols-4 gap-6">
+            <div className="h-full w-full mt-6 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
               {itemsForCurrentPage?.length > 0 ?
                 itemsForCurrentPage?.map((x, index) => {
                   return (
@@ -295,7 +295,7 @@ const Position = () => {
                   );
                 }) : <div className="col-span-full flex justify-center items-center">
                 
-                <span className="text-2xl text-slate-500">There is no any position yet! Create <span onClick={() => setPositionModal(true) & setActionType("add") & clearFields()} className="text-blue-400 underline cursor-pointer hover:text-blue-600">one</span></span>
+                <span className="text-lg md:text-2xl lg:text-2xl text-slate-500">There is no any position yet! Create <span onClick={() => setPositionModal(true) & setActionType("add") & clearFields()} className="text-blue-400 underline cursor-pointer hover:text-blue-600">one</span></span>
                 </div>
               }
             </div>

@@ -10,7 +10,7 @@ import { verifyJwtToken } from '@/lib/jwt';
 export const GET = async (request) => {
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
-  const workspace = accessToken?.split(' ')[2]
+  const workspace = accessToken?.split('#')[1]
   const decodedToken = verifyJwtToken(token)  
 
   if (!accessToken || !decodedToken) {
@@ -28,7 +28,7 @@ export const GET = async (request) => {
     .populate({
       path: 'shifts',
       model: Shift,
-      select: 'date startTime endTime location position platform employees repeatedShift notes break',
+      select: 'date startTime endTime location position platform employees category repeatedShift notes break',
       populate: [{
         path: 'location',
         select: 'name address',

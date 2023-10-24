@@ -33,6 +33,10 @@ const SignIn = () => {
   }
 
   if (session.status === "authenticated") {
+    if (!session.data.user.workspace) {
+      router?.push("/accounts")
+      return
+    }
     router?.push("/dashboard/schedule");
     return;
   }
@@ -93,7 +97,6 @@ const SignIn = () => {
       );
       setSpin(false);
       if (res?.error == null) {
-        console.log(res); // Acc
         router.push("/dashboard/schedule");
       } else {
         messageApi.open({
@@ -122,11 +125,117 @@ const SignIn = () => {
       <div className="bg-[#FAFAFA] flex flex-col justify-center items-center h-screen w-screen">
         {contextHolder}
 
-        <div className="w-full h-12 px-28 flex items-center shadow-md">
+        <div className="w-full h-12 px-28 justify-center md:justify-normal lg:justify-normal flex items-center shadow-md">
           <p className="font-bold text-xl">onshift</p>
         </div>
 
-        <div className="flex flex-1 w-full">
+        <div className="w-[90%] md:hidden lg:hidden h-full flex justify-center items-center">
+            <div className={`${isForgotPassword ? 'h-[350px]' : 'h-[520px]'} w-[531px] shadow-lg px-6 py-6`}>
+            <p className="text-3xl font-bold text-center mt-2">
+                  {isForgotPassword ? "Forgot Password" : "Sign In"}
+                </p>
+              {isForgotPassword ? (
+                <>
+                                <div className="mt-6">
+                  <span>Email</span>
+                  <Input
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    value={email}
+                    prefix={<MailOutlined />}
+                    className="py-2"
+                  />
+                </div>
+                <ConfigProvider
+                  theme={{
+                    token: {
+                      colorPrimary: "#1677ff",
+                    },
+                  }}
+                >
+                  <button
+                    onClick={handleForgotPassword}
+                    className="mt-5 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                  >
+                    {spin ? <Spin /> : "Reset Password"}
+                  </button>
+                </ConfigProvider>
+
+                <div className="text-center mt-4">
+              <div>
+                Already have an account?{" "}
+                <span onClick={() => setIsForgotPassword(false) & clearFields()} className="hover:underline hover:cursor-pointer text-blue-500">
+                  Sign In
+                </span>
+              </div>
+            </div>
+                </>
+              ) : (
+                <>
+                <div className="mt-6">
+                  <span>Email</span>
+                  <Input
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    value={email}
+                    className="py-2"
+                  />
+                </div>
+
+                <div className="mt-5">
+                  <span>Password</span>
+                  <Input.Password
+                    onChange={(e) => setPassword(e.target.value)}
+                    prefix={<LockOutlined />}
+                    placeholder="Enter your password"
+                    className="py-2"
+                  />
+                </div>
+
+                <div className="flex justify-between mt-5">
+                  <Checkbox
+                    value={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                  >
+                    Remember me
+                  </Checkbox>
+
+                  <span
+                    onClick={() => setIsForgotPassword(true) & clearFields()}
+                    className="hover:underline hover:cursor-pointer"
+                  >
+                    Forgot password?
+                  </span>
+                </div>
+
+                <ConfigProvider
+                  theme={{
+                    token: {
+                      colorPrimary: "#1677ff",
+                    },
+                  }}
+                >
+                  <button
+                    onClick={handleSubmit}
+                    className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                  >
+                    {spin ? <Spin /> : "Sign in"}
+                  </button>
+                </ConfigProvider>
+                <div className="text-center mt-4">
+                  <Link href="/signup">
+                    Don&apos;t have an account yet?{" "}
+                    <span className="hover:underline text-blue-500">
+                      Create one.
+                    </span>
+                  </Link>
+                </div>
+              </>
+              )}
+            </div>
+          </div>
+
+        <div className="hidden md:flex lg:flex flex-1 w-full">
           <div className="bg-black w-1/2 h-full flex justify-center items-center">
             <Image
               height={404}

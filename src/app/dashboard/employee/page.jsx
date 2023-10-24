@@ -35,11 +35,11 @@ const Employee = () => {
   const session = useSession();
 
   const { data: locations } = useSWR(
-    [`/api/locations`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
+    [`/api/locations`, `${session.data.user.accessToken} #${session.data.user.workspace}`],
     fetcher
   );
   const { data: positions } = useSWR(
-    [`/api/positions`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
+    [`/api/positions`, `${session.data.user.accessToken} #${session.data.user.workspace}`],
     fetcher
   );
   const {
@@ -47,7 +47,7 @@ const Employee = () => {
     error,
     isLoading,
     mutate,
-  } = useSWR([`/api/employees`, `${session.data.user.accessToken} ${session.data.user.workspace}`], fetcher);
+  } = useSWR([`/api/employees`, `${session.data.user.accessToken} #${session.data.user.workspace}`], fetcher);
 
   const [clonedEmployees, setClonedEmployees] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState([]);

@@ -2,15 +2,6 @@
 const nextConfig = {
   basePath: '',
   reactStrictMode: false,
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/signin',
-        permanent: true
-      }
-    ]
-  }
 }
 
 module.exports = nextConfig

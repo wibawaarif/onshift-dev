@@ -6,9 +6,13 @@ import Link from "next/link";
 import { Input, Modal, Popover, message } from "antd";
 import { useSession, signOut } from "next-auth/react";
 import LoadingPage from "@/components/LoadingPage/page";
+import SidebarComponent from "@/components/sidebar/page"
 import { useEffect, useState } from "react";
 import { LockOutlined } from "@ant-design/icons";
 import useSWR from "swr";
+import {
+  Drawer
+} from "antd";
 const menu = ["schedule", "employee", "position", "location", "timesheet"];
 
 const fetcher = ([url, token]) =>
@@ -24,6 +28,7 @@ const DashboardLayout = ({ children }) => {
     newPassword: "",
     confirmNewPassword: "",
   });
+  const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const currentPath = pathname.split("/").pop();
 
@@ -83,8 +88,7 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <div className="h-screen w-screen bg-white flex">
-      <div className="flex flex-col justify-between items-center py-4 w-[80px] h-full border-r-[1px] border-[#E5E5E3]">
-        <Modal
+              <Modal
           footer={[
             <button
               className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
@@ -156,6 +160,7 @@ const DashboardLayout = ({ children }) => {
             />
           </div>
         </Modal>
+      {/* <div className="flex flex-col justify-between items-center py-4 w-[80px] h-full border-r-[1px] border-[#E5E5E3]">
         <div>
           <Image
             width={50}
@@ -234,7 +239,8 @@ const DashboardLayout = ({ children }) => {
             </div>
           </Popover>
         </div>
-      </div>
+      </div> */}
+      <SidebarComponent setChangePasswordModal={setChangePasswordModal} clicked={clicked} setClicked={setClicked} currentPath={currentPath} menu={menu} />
       {children}
     </div>
   );

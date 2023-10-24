@@ -23,6 +23,10 @@ const SignUpPage = () => {
   }
 
   if (session.status === "authenticated") {
+    if (!session.data.user.workspace) {
+      router?.push("/accounts")
+      return
+    }
     router?.push("/dashboard/schedule");
     return;
   }
@@ -67,11 +71,71 @@ const SignUpPage = () => {
     <div className="bg-[#FAFAFA] flex flex-col justify-center items-center h-screen w-screen">
       {contextHolder}
 
-      <div className="w-full h-12 px-28 flex items-center shadow-md">
+      <div className="w-full h-12 px-28 flex justify-center md:justify-normal lg:justify-normal items-center shadow-md">
         <p className="font-bold text-xl">onshift</p>
       </div>
 
-      <div className="flex flex-1 w-full">
+      <div className="w-[90%] md:hidden lg:hidden h-full flex justify-center items-center">
+          <div className="w-[531px] h-[520px] shadow-lg px-6 py-6">
+            <p className="text-3xl font-bold text-left mt-2">Let&apos;s Get Started 🚀</p>
+            <p className="mt-2">Create your account</p>
+
+            <div className="mt-6">
+              <span>Email</span>
+              <Input
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                prefix={<MailOutlined />}
+                className="py-2"
+              />
+            </div>
+
+            <div className="mt-5">
+              <span>Password</span>
+              <Input.Password
+                onChange={(e) => setPassword(e.target.value)}
+                prefix={<LockOutlined />}
+                placeholder="Enter your password"
+                className="py-2"
+              />
+            </div>
+
+            <ConfigProvider
+              theme={{
+                token: {
+                  colorPrimary: "#1677ff",
+                },
+              }}
+            >
+              <button
+                        onClick={() => createAccount()}
+                className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+              >
+                {spin ? <Spin /> : "Continue"}
+              </button>
+              <p className="text-center mt-4">Or sign up with</p>
+              <button
+               onClick={() => {
+                            signIn("google", {callbackUrl: '/dashboard/schedule' });
+                          }}
+              prefix={<GoogleOutlined />}
+                className="mt-3 w-full h-[50px] bg-[#DB4437] text-white rounded-[8px]"
+              >
+                Sign up with Google
+              </button>
+            </ConfigProvider>
+            <div className="text-center mt-4">
+              <Link href="/signin">
+                Already have an account?{" "}
+                <span className="hover:underline text-blue-500">
+                  Sign In
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+      <div className="hidden lg:flex md:flex-1 w-full">
         <div className="bg-black w-1/2 h-full flex justify-center items-center">
           <Image
             height={404}

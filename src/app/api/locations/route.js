@@ -7,18 +7,13 @@ export const GET = async (request) => {
   const accessToken = request.headers.get("authorization")
 
   const token = accessToken?.split(' ')[1]
-  const workspace = accessToken?.split(' ')[2]
+  const workspace = accessToken?.split('#')[1]
 
   const decodedToken = verifyJwtToken(token)  
 
   if (!accessToken || !decodedToken) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
-
-  // const url = new URL(request.url);
-
-  // const username = url.searchParams.get("username");
-  // console.log('tests', request);
 
   try {
     await connect();

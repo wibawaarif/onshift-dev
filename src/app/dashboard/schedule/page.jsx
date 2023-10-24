@@ -17,6 +17,7 @@ import {
   message,
   Upload,
   AutoComplete,
+  Checkbox
 } from "antd";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -41,19 +42,19 @@ const fetcher = ([url, token]) =>
 const Scheduler = () => {
   const session = useSession();
   const { data: shifts, mutate: mutateShifts } = useSWR(
-    [`/api/shifts`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
+    [`/api/shifts`, `${session.data.user.accessToken} #${session.data.user.workspace}`],
     fetcher
   );
   const { data: locations } = useSWR(
-    [`/api/locations`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
+    [`/api/locations`, `${session.data.user.accessToken} #${session.data.user.workspace}`],
     fetcher
   );
   const { data: positions } = useSWR(
-    [`/api/positions`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
+    [`/api/positions`, `${session.data.user.accessToken} #${session.data.user.workspace}`],
     fetcher
   );
   const { data: employees, mutate: mutateEmployees } = useSWR(
-    [`/api/employees`, `${session.data.user.accessToken} ${session.data.user.workspace}`],
+    [`/api/employees`, `${session.data.user.accessToken} #${session.data.user.workspace}`],
     fetcher
   );
 
@@ -69,6 +70,8 @@ const Scheduler = () => {
   const [Id, setId] = useState(null);
   const [uploadedShifts, setUploadedShifts] = useState(null);
   const [isFormInvalid, setIsFormInvalid] = useState(true);
+  const [currentTab, setCurrentTab] = useState("1");
+    const [allday, setAllday] = useState(false);
   const [form, setForm] = useState({
     date: "",
     startTime: "",
@@ -85,6 +88,14 @@ const Scheduler = () => {
       endDate: null,
     },
   });
+
+  const [timeoffForm, setTimeoffForm] = useState({
+    date: "",
+    employees: [],
+    startTime: "",
+    endTime: "",
+    category: "TimeOff"
+  })
   const options = [];
   const [shiftTemplate, setShiftTemplate] = useState('')
 
@@ -325,17 +336,29 @@ const Scheduler = () => {
         };
       });
     } else {
-      setForm((prev) => {
-        return {
-          ...prev,
-          ...data,
-          location: data?.location?._id,
-          position: data?.position?._id,
-          startTime: dayjs(data.startTime).format('hh:mmA'),
-          endTime: dayjs(data.endTime).format('hh:mmA'),
-          date: dayjs(data.date),
-        };
-      });
+      if (data?.category === "TimeOff") {
+        setCurrentTab("2")
+        setTimeoffForm((prev) => {
+          return {
+            ...prev,
+            ...data,
+            date: dayjs(data.date)
+          }
+        })
+      } else {
+        setCurrentTab("1")
+        setForm((prev) => {
+          return {
+            ...prev,
+            ...data,
+            location: data?.location?._id,
+            position: data?.position?._id,
+            startTime: dayjs(data.startTime).format('hh:mmA'),
+            endTime: dayjs(data.endTime).format('hh:mmA'),
+            date: dayjs(data.date),
+          };
+        });
+      }
     }
 
     setActionType("edit");
@@ -353,9 +376,44 @@ const Scheduler = () => {
     setForm((prev) => {
       return { ...prev, date, employees: [...prev.employees, id] };
     });
+    setTimeoffForm((prev) => {
+      return { ...prev, date, employees: [...prev.employees, id] }
+    })
     setActionType("add");
     setShiftModal(true);
   };
+
+  const addTimeoff = async () => {
+    setShiftModal(false);
+    await fetch(`/api/shifts`, {
+      method: "POST",
+      body: JSON.stringify({...timeoffForm, startTime: dayjs(timeoffForm.startTime), endTime: dayjs(timeoffForm.endTime), workspace: session.data.user.workspace, category: 'TimeOff'}),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    mutateEmployees([...employees]);
+    mutateEmployees([...shifts]);
+
+    message.success("Shift created");
+
+    clearFields();
+  }
+
+  const editTimeoff = async () => {
+    await fetch(`/api/shifts/${Id}`, {
+      method: "PUT",
+      body: JSON.stringify(timeoffForm),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    setShiftModal(false);
+    mutateEmployees([...employees]);
+
+    message.success("Timeoff updated");
+    clearFields();
+  }
 
   const addShift = async () => {
     const validateEndTime = isStartGreaterThanEnd();
@@ -390,7 +448,7 @@ const Scheduler = () => {
     setShiftModal(false);
     await fetch(`/api/shifts`, {
       method: "POST",
-      body: JSON.stringify({...form, workspace: session.data.user.workspace}),
+      body: JSON.stringify({...form, workspace: session.data.user.workspace, category: 'Shift'}),
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,
       },
@@ -557,6 +615,11 @@ const Scheduler = () => {
         endDate: null,
       },
     });
+    setTimeoffForm({
+      date: "",
+      employees: [],
+      category: "TimeOff"
+    })
     setShiftTemplate('')
   };
 
@@ -735,7 +798,7 @@ const Scheduler = () => {
               >
                 <div>UPLOAD</div>
               </button>
-            ) : (
+            ) : currentTab === "1" ? (
               <button
                 disabled={isFormInvalid && actionType !== "delete"}
                 onClick={
@@ -754,7 +817,8 @@ const Scheduler = () => {
                   ? "CONFIRM"
                   : "EDIT"}
               </button>
-            ),
+            ) : <button onClick={actionType === "delete" ? () => deleteShift() : actionType === "edit" ? () => editTimeoff() : () => addTimeoff()} disabled={actionType !== "delete" && (!timeoffForm.date || !timeoffForm.employees)} className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
+            key="submit">{actionType === "delete" ? "CONFIRM" : actionType === "edit" ? "EDIT" : "CREATE"}</button>,
           ]}
           title="Create New Shift"
           open={shiftModal}
@@ -797,7 +861,9 @@ const Scheduler = () => {
           )}
           {(actionType === "add" || actionType === "edit") && (
             <Tabs
+              onChange={(x) => setCurrentTab(x)}
               defaultActiveKey="1"
+              activeKey={currentTab}
               items={[
                 {
                   key: "1",
@@ -883,16 +949,7 @@ const Scheduler = () => {
                             }
                             options={options}
                           />
-                          {/* <TimePicker
-                            value={form?.startTime}
-                            onChange={(e) =>
-                              setForm((prev) => {
-                                return { ...prev, startTime: e };
-                              })
-                            }
-                            format="HH:mm"
-                            className="w-full rounded-none border-t-0 border-l-0 border-r-0"
-                          /> */}
+
                         </div>
                         <div className="w-[48%]">
                           <span className="text-xs font-semibold">
@@ -1150,7 +1207,127 @@ const Scheduler = () => {
                   label: "CREATE TIME OFF",
                   children: (
                     <div>
-                      <DatePicker />
+                       <span className="text-xs font-semibold">
+                          DATE <span className="text-xs text-red-500">*</span>
+                        </span>
+                        <DatePicker
+                          disabledDate={disabledDate}
+                          value={timeoffForm?.date}
+                          onChange={(date) =>
+                            setTimeoffForm((prev) => {
+                              return { ...prev, date: date };
+                            })
+                          }
+                          className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
+                        />
+
+                                              <div className="flex mt-4 justify-between">
+                        <div className="w-[48%] ">
+                          <p className="text-black">{JSON.stringify({test: dayjs("01:00 AM")})}</p>
+                          <span className="text-xs font-semibold">
+                            START SHIFT{" "}
+                            <span className="text-xs text-red-500">*</span>
+                          </span>
+                          <AutoComplete
+                            className="w-full"
+                            value={timeoffForm.startTime}
+                                                        disabled={allday}
+                            onChange={(data, option) =>
+                              setTimeoffForm((prev) => {
+                                return { ...prev, startTime: data };
+                              })
+                            }
+                            onSelect={(data, option) =>
+                              setTimeoffForm((prev) => {
+                                return { ...prev, startTime: option.label };
+                              })
+                            }
+                            placeholder="Select Start Time"
+                            filterOption={(inputValue, option) =>
+                              option.value
+                                .toUpperCase()
+                                .indexOf(inputValue.toUpperCase()) !== -1
+                            }
+                            options={options}
+                          />
+
+                        </div>
+                        <div className="w-[48%]">
+                          <span className="text-xs font-semibold">
+                            FINISH SHIFT{" "}
+                            <span className="text-xs text-red-500">*</span>
+                          </span>
+                          <AutoComplete
+                            className="w-full"
+                            disabled={allday}
+                            value={timeoffForm.endTime}
+                            onChange={(data, option) =>
+                              setTimeoffForm((prev) => {
+                                return { ...prev, endTime: data };
+                              })
+                            }
+                            onSelect={(data, option) =>
+                              setTimeoffForm((prev) => {
+                                return { ...prev, endTime: option.label };
+                              })
+                            }
+                            placeholder="Select End Time"
+                            filterOption={(inputValue, option) =>
+                              option.value
+                                .toUpperCase()
+                                .indexOf(inputValue.toUpperCase()) !== -1
+                            }
+                            options={options}
+                          />
+                          {/* <TimePicker
+                            value={form?.endTime}
+                            onChange={(e) =>
+                              setForm((prev) => {
+                                return { ...prev, endTime: e };
+                              })
+                            }
+                            format="HH:mm"
+                            className="w-full rounded-none border-t-0 border-l-0 border-r-0"
+                          /> */}
+                        </div>
+                      </div>
+
+                  <Checkbox
+                  className="mt-2"
+                    value={allday}
+                    onChange={(e) => setAllday(e.target.checked)}
+                  >
+                    All Day
+                  </Checkbox>
+
+<div className="flex flex-col mt-4">
+                        <span className="text-xs font-semibold">
+                          EMPLOYEE{" "}
+                          <span className="text-xs text-red-500">*</span>
+                        </span>
+                        {/* <Image
+                        className="absolute bottom-[29.5%] z-50"
+                        width={20}
+                        height={20}
+                        alt="schedule-logo"
+                        src={"/static/svg/employee.svg"}
+                      /> */}
+                        <Select
+                          mode="multiple"
+                          allowClear
+                          placeholder="Select Employee"
+                          className="mt-1"
+                          value={timeoffForm?.employees}
+                          options={employees?.map((x) => {
+                            return { label: x.name, value: x._id };
+                          })}
+                          onChange={(e) =>
+                            setTimeoffForm((prev) => {
+                              return { ...prev, employees: e };
+                            })
+                          }
+                        />
+                      </div>
                     </div>
                   ),
                 },

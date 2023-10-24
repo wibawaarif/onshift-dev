@@ -49,6 +49,10 @@ const shiftSchema = new Schema({
   workspace: {
     type: String
   },
+  category: {
+    type: String,
+    enum: ['Shift', 'TimeOff']
+  }
 }, { timestamps: true })
 
 export default mongoose?.models?.Shift || mongoose.model("Shift", shiftSchema)

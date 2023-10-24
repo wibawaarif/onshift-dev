@@ -64,10 +64,6 @@ const SchedulerComponent = ({
     "11PM",
   ];
 
-  const test = (data) => {
-    console.log(data);
-  };
-
   return (
     <div className="flex flex-col justify-center items-center">
       <div className="w-full h-[90px] bg-white border-b-[1px] border-[#E5E5E3]">
@@ -122,7 +118,7 @@ const SchedulerComponent = ({
             alt="sort"
             src={"/static/svg/sort.svg"}
           />
-          <span className="text-[#191407]">First Name A-Z</span>
+          <span className="text-[#191407] text-xs md:text-lg lg:text-lg">First Name A-Z</span>
           <Image
             width={24}
             height={24}
@@ -152,7 +148,7 @@ const SchedulerComponent = ({
                 className="bg-white flex justify-center items-center h-[40px] border-b-[1px] border-r-[1px] border-[#E5E5E3]"
                 key={x}
               >
-                <span className="text-slate-700">
+                <span className="text-slate-700 text-xs md:text-base lg:text-base">
                   {dayjs(x).format("ddd D")}
                 </span>
                 <Image
@@ -364,6 +360,7 @@ const SchedulerComponent = ({
                                         index={index}
                                       >
                                         {(provided) => (
+                                          z?.category !== 'TimeOff' ?
                                           <div
                                             {...provided.draggableProps}
                                             ref={provided.innerRef}
@@ -445,8 +442,42 @@ const SchedulerComponent = ({
                                               />
                                             </div>
                                             {provided.placeholder}
-                                          </div>
-                                        )}
+                                          </div> : <div
+                                            {...provided.draggableProps}
+                                            ref={provided.innerRef}
+                                            {...provided.dragHandleProps}
+                                            className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
+                                          >
+                                                <p className="text-[13px] font-semibold">ALL DAY</p>
+                                                <p className="text-[13px]">TIME OFF</p>
+                                                <div className="relative">
+                                              <Image
+                                                onClick={() =>
+                                                  editShiftModal(z)
+                                                }
+                                                onMouseEnter={() =>
+                                                  setRowIndex(index)
+                                                }
+                                                width={16}
+                                                height={16}
+                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 right-3"
+                                                alt="trash"
+                                                src={"/static/svg/edit.svg"}
+                                              />
+                                              <Image
+                                                onClick={() =>
+                                                  deleteShiftModal(z._id)
+                                                }
+                                                width={16}
+                                                height={16}
+                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 -right-1"
+                                                alt="trash"
+                                                src={"/static/svg/trash.svg"}
+                                              />
+                                            </div>
+                                            {provided.placeholder}
+                                          </div>                                        
+                                          )}
                                       </Draggable>
                                     )
                                   )

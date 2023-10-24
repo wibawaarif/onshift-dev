@@ -54,11 +54,15 @@ const Timesheet = () => {
     name: '010_REHMAN SAMA',
     timesheets: [{
       date: dayjs().date(6).subtract(1, 'month'),
+      shiftStartTime: dayjs().year(2023).month(7).date(13).hour(3),
+      shiftEndTime: dayjs().year(2023).month(7).date(13).hour(11),
       startTime: dayjs().date(6).add(4, 'hour').add(21, 'minute'),
       endTime: dayjs().date(6).add(10, 'hour'),
       status: 'Present',
     }, {
-      date:  dayjs().date(13) ,
+      date:  dayjs().date(13),
+      shiftStartTime: dayjs().year(2023).month(7).date(13).hour(5),
+      shiftEndTime: dayjs().year(2023).month(7).date(13).hour(10),
       startTime: dayjs().year(2023).month(7).date(13).hour(6),
       endTime: dayjs().year(2023).month(7).date(13).hour(9),
       status: 'Late',
@@ -73,6 +77,8 @@ const Timesheet = () => {
     name: '013_KAMRAN SAMA',
     timesheets: [{
       date: dayjs().date(2) ,
+      shiftStartTime: dayjs().year(2023).month(7).date(13).hour(1),
+      shiftEndTime: dayjs().year(2023).month(7).date(13).hour(4),
       startTime: dayjs().year(2023).month(7).date(13).hour(2),
       endTime: dayjs().year(2023).month(7).date(13).hour(3),
       status: 'Present',
@@ -81,6 +87,8 @@ const Timesheet = () => {
       status: 'Absent',
     }, {
       date:  dayjs().date(21) ,
+      shiftStartTime: dayjs().year(2023).month(7).date(13).hour(5),
+      shiftEndTime: dayjs().year(2023).month(7).date(13).hour(11),
       startTime: dayjs().year(2023).month(7).date(21).hour(6),
       endTime: dayjs().year(2023).month(7).date(21).hour(9),
       status: 'Present',
@@ -124,8 +132,16 @@ const Timesheet = () => {
       key: "date"
     },
     {
+      label: "Shift Start Time",
+      key: "shiftStartTime"
+    },
+    {
       label: "Start Time",
       key: "startTime"
+    },
+    {
+      label: "Shift End Time",
+      key: "shiftEndTime"
     },
     {
       label: "End Time",
@@ -176,8 +192,10 @@ const Timesheet = () => {
                         name,
                         ...timesheets,
                       date: dayjs(timesheets.date).format("DD/MM/YYYY"),
-                      startTime: dayjs(timesheets.startTime).format("hh:mmA"),
-                      endTime: dayjs(timesheets.endTime).format("hh:mmA"),
+                      shiftStartTime: timesheets.status === 'Absent'? '-' : dayjs(timesheets.shiftStartTime).format("hh:mmA"),
+                      shiftEndTime: timesheets.status === 'Absent'? '-' : dayjs(timesheets.shiftEndTime).format("hh:mmA"),
+                      startTime: timesheets.status === 'Absent'? '-' : dayjs(timesheets.startTime).format("hh:mmA"),
+                      endTime: timesheets.status === 'Absent'? '-' : dayjs(timesheets.endTime).format("hh:mmA"),
                       })
                     })
 
