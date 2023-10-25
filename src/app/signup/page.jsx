@@ -60,6 +60,10 @@ const SignUpPage = () => {
     }
   };
 
+  const redirectHome = () => {
+    router.push('/')
+  }
+
   return (
     <ConfigProvider
     theme={{
@@ -71,7 +75,7 @@ const SignUpPage = () => {
     <div className="bg-[#FAFAFA] flex flex-col justify-center items-center h-screen w-screen">
       {contextHolder}
 
-      <div onClick={() => useRouter().push('/')} className="w-full h-12 px-28 flex justify-center md:justify-normal lg:justify-normal items-center shadow-md">
+      <div onClick={() => redirectHome()} className="w-full h-12 px-28 cursor-pointer flex justify-center md:justify-normal lg:justify-normal items-center shadow-md">
         <p className="font-bold text-xl">onshift</p>
       </div>
 
