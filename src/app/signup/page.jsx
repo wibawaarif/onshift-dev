@@ -113,7 +113,7 @@ const SignUpPage = () => {
             >
               <button
                         onClick={() => createAccount()}
-                className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                className="mt-8 w-full h-[50px] text-white rounded-[8px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 {spin ? <Spin /> : "Continue"}
               </button>
@@ -183,7 +183,7 @@ const SignUpPage = () => {
             >
               <button
                         onClick={() => createAccount()}
-                className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                className="mt-8 w-full h-[50px] text-white rounded-[8px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 {spin ? <Spin /> : "Continue"}
               </button>

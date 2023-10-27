@@ -1338,7 +1338,7 @@ const Scheduler = () => {
 
         <button
           onClick={() => setActionType("add") & setShiftModal(true)}
-          className="hover:opacity-80 transition duration-300 absolute bottom-10 right-10 w-[220px] h-[40px] bg-black text-white rounded-full text-[14px]"
+          className="hover:opacity-80 transition duration-300 absolute bottom-10 right-10 w-[220px] h-[40px] rounded-full text-[14px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           + CREATE SHIFT / TIME OFF
         </button>

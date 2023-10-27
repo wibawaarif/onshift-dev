@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react'
-// import { Dialog } from '@headlessui/react'
+import Image from "next/image";
 import {
   ArrowPathIcon,
   Bars3Icon,
@@ -136,11 +136,12 @@ export default function Example() {
           <div className="flex lg:flex-1">
             <a href="#" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
-              <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                alt=""
-              />
+          <Image
+            height={50}
+            width={50}
+            alt="OnShift"
+            src={"/static/img/brand.png"}
+          />
             </a>
           </div>
           <div className="flex lg:hidden">
@@ -185,14 +186,11 @@ export default function Example() {
           </div>
           <div className="py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="mx-auto max-w-2xl text-center">
+              <div className="mx-auto max-w-4xl text-center">
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                  Deploy to the cloud with confidence
+                  Deploy Your Time With Ease
                 </h1>
-                <p className="mt-6 text-lg leading-8 text-gray-600">
-                  Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt
-                  amet fugiat veniam occaecat fugiat aliqua.
-                </p>
+                <p className="mt-8 text-lg text-slate-700">Onshift is the perfect tool to streamline scheduling and eliminate the need for<br/> back-and-forth emails to find the right time. Plus, it offers so much more!</p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
                   <a
                     href="#"
@@ -287,7 +285,7 @@ export default function Example() {
         {/* Feature section */}
         <div className="mx-auto mt-32 max-w-7xl px-6 sm:mt-56 lg:px-8">
           <div className="mx-auto max-w-2xl lg:text-center">
-            <h2 className="text-base font-semibold leading-7 text-indigo-600">Deploy faster</h2>
+            <h2 className="text-base font-semibold leading-7 text-indigo-600">Schedule faster</h2>
             <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Everything you need to deploy your app
             </p>

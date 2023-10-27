@@ -466,7 +466,7 @@ const SignIn = () => {
                       ? () => setCurrentStep(3)
                       : () => handleSubmit()
                   }
-                  className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                  className="mt-8 w-full ] bg-[#000000FF] text-white rounded-[8px]"
                 >
                   {spin ? <Spin /> : "Start Scheduling"}
                 </button>

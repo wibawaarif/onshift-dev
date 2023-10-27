@@ -86,6 +86,7 @@ const SignIn = () => {
         type: "error",
         content: "Email or password cannot be empty",
       });
+      setSpin(false)
       return;
     }
 
@@ -119,13 +120,6 @@ const SignIn = () => {
   }
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#191407",
-        },
-      }}
-    >
       <div className="bg-[#FAFAFA] flex flex-col justify-center items-center h-screen w-screen">
         {contextHolder}
 
@@ -212,20 +206,12 @@ const SignIn = () => {
                   </span>
                 </div>
 
-                <ConfigProvider
-                  theme={{
-                    token: {
-                      colorPrimary: "#1677ff",
-                    },
-                  }}
-                >
                   <button
                     onClick={handleSubmit}
-                    className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                    className="mt-8 w-full h-[50px] rounded-[8px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     {spin ? <Spin /> : "Sign in"}
                   </button>
-                </ConfigProvider>
                 <div className="text-center mt-4">
                   <Link href="/signup">
                     Don&apos;t have an account yet?{" "}
@@ -328,20 +314,12 @@ const SignIn = () => {
                   </span>
                 </div>
 
-                <ConfigProvider
-                  theme={{
-                    token: {
-                      colorPrimary: "#1677ff",
-                    },
-                  }}
-                >
                   <button
                     onClick={handleSubmit}
-                    className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                    className="mt-8 w-full h-[50px] rounded-[8px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     {spin ? <Spin /> : "Sign in"}
                   </button>
-                </ConfigProvider>
                 <div className="text-center mt-4">
                   <Link href="/signup">
                     Don&apos;t have an account yet?{" "}
@@ -356,7 +334,6 @@ const SignIn = () => {
           </div>
         </div>
       </div>
-    </ConfigProvider>
   );
 };
 
