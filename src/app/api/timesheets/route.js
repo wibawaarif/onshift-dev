@@ -29,6 +29,7 @@ export const GET = async (request) => {
 };
 
 export const POST = async (request) => {
+  console.log('test')
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
 
@@ -46,6 +47,29 @@ export const POST = async (request) => {
     await connect();
 
     await newTimesheet.save();
+
+    console.log(body);
+    if (body.employees.length > 0) {
+      console.log(body);
+      for (let i=0; i < body.employees.length; i++) {
+        const findEmployee = await Employee.findOne({user: decodedToken.email, _id: body.employees[i]})
+        let newEmployees;
+  
+        if (findEmployee.timesheets) {
+          newEmployees = [...findEmployee.timesheets, newTimesheet._id]
+        } else {
+          newEmployees = [newTimesheet._id]
+        }
+  
+        findEmployee.set({
+          ...findEmployee,
+          timesheets: newEmployees,
+        })
+  
+        await findEmployee.save();
+      }
+    }
+
 
     return new NextResponse(JSON.stringify(newTimesheet), { status: 201 });
   } catch (err) {

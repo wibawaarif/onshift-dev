@@ -24,6 +24,12 @@ const employeeSchema = new Schema({
         ref: 'Shift',
       }
     ],
+    timesheets: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Timesheet',
+      }
+    ],
     platform: {
       type: String,
       enum: ['Mobile App', 'Web Portal']

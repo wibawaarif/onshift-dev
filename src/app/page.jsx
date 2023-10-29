@@ -8,9 +8,8 @@ import {
   CloudArrowUpIcon,
   FingerPrintIcon,
   LockClosedIcon,
-  XMarkIcon,
 } from '@heroicons/react/24/outline'
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { CheckIcon, XMarkIcon } from '@heroicons/react/20/solid'
 
 const navigation = [
   { name: 'Product', href: '#' },
@@ -130,8 +129,21 @@ export default function Example() {
 
   return (
     <div className="bg-white">
+
+<div className="flex items-center gap-x-6 bg-gray-900 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
+      <p className="text-sm leading-6 font-semibold tracking-wider text-white">
+      We stand with Palestine 🇵🇸. Stop the genocide
+      </p>
+      <div className="flex flex-1 justify-end">
+        {/* <button type="button" className="-m-3 p-3 focus-visible:outline-offset-[-4px]">
+          <span className="sr-only">Dismiss</span>
+          <XMarkIcon className="h-5 w-5 text-white cursor-text" aria-hidden="true" />
+        </button> */}
+      </div>
+    </div>
+        
       {/* Header */}
-      <header className="absolute inset-x-0 top-0 z-50">
+      <header className="inset-x-0 top-0 z-50">
         <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
           <div className="flex lg:flex-1">
             <a href="#" className="-m-1.5 p-1.5">

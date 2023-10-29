@@ -6,6 +6,7 @@ import Shift from "@/models/shift";
 import Position from "@/models/position";
 import bcrypt from 'bcrypt'
 import { verifyJwtToken } from '@/lib/jwt';
+import Timesheet from "@/models/timesheet";
 
 export const GET = async (request) => {
   const accessToken = request.headers.get("authorization")
@@ -38,7 +39,11 @@ export const GET = async (request) => {
         select: 'name',
         model: Position,
       }],
-    });
+    }).populate({
+      path: 'timesheets',
+      model: Timesheet,
+      select: 'date shiftStartTime shiftEndTime startTime endTime status action',
+    })
 
     return new NextResponse(JSON.stringify(employees), { status: 200 });
   } catch (err) {
