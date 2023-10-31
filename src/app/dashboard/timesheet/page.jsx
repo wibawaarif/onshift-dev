@@ -45,7 +45,7 @@ const Timesheet = () => {
   );
 
   const [monthlyDateValue, setMonthlyDateValue] = useState(dayjs());
-  const [clonedEmployees, setClonedEmployees] = useState([]);
+  const [clonedEmployees, setClonedEmployees] = useState([{}]);
   const [searchEmployeesInput, setSearchEmployeesInput] = useState('');
   const [section, setSection] = useState('Timesheet');
 
@@ -184,8 +184,7 @@ const Timesheet = () => {
 
 
           <div>
-          {/* <CSVLink
-                  data={clonedEmployees?.reduce((acc, employee) => {
+            {/* <p className="text-black">{JSON.stringify(clonedEmployees?.reduce((acc, employee) => {
                     const { name, timesheets } = employee;
 
                     timesheets.forEach((timesheets) => {
@@ -201,16 +200,39 @@ const Timesheet = () => {
                     })
 
                     return acc
-                  }, [])}
-                  headers={headers}
-                  filename={"my-file.csv"}
-                  key="back"
-                  target="_blank"
-                >
-            <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
-              Export Sheet
-            </button>
-            </CSVLink> */}
+                  }, []))}</p> */}
+                  {
+                    clonedEmployees && (
+                      <CSVLink
+                      data={clonedEmployees?.reduce((acc, employee) => {
+                        const { name, timesheets } = employee;
+    
+                        timesheets?.forEach((timesheets) => {
+                          acc.push({
+                            name,
+                            ...timesheets,
+                          date: dayjs(timesheets.date).format("DD/MM/YYYY"),
+                          shiftStartTime: timesheets.status === 'Absent'? 'Absent' : dayjs(timesheets.shiftStartTime).format("hh:mmA"),
+                          shiftEndTime: timesheets.status === 'Absent'? 'Absent' : dayjs(timesheets.shiftEndTime).format("hh:mmA"),
+                          startTime: timesheets.status === 'Absent'? 'Absent' : dayjs(timesheets.startTime).format("hh:mmA"),
+                          endTime: timesheets.status === 'Absent'? 'Absent' : dayjs(timesheets.endTime).format("hh:mmA"),
+                          })
+                        })
+    
+                        return acc
+                      }, [])}
+                      headers={headers}
+                      filename={"my-file.csv"}
+                      key="back"
+                      target="_blank"
+                    >
+                <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
+                  Export Sheet
+                </button>
+                </CSVLink>
+                    )
+                  }
+
           </div>
         </div>
 
