@@ -499,14 +499,14 @@ const Employee = () => {
                   />
                 </button>
               )}
-              <button
+              {/* <button
                 onClick={() =>
                   setEmployeeModal(true) & setActionType("exportImport")
                 }
                 className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]"
               >
                 Import / Export
-              </button>
+              </button> */}
               <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
                 Invite Users
               </button>
@@ -895,6 +895,15 @@ const Employee = () => {
             <p>Are you sure want to delete this employee?</p>
           )}
         </Modal>
+
+        <button
+          onClick={() =>
+            setEmployeeModal(true) & setActionType("exportImport")
+          }
+          className="hover:opacity-80 transition duration-300 absolute bottom-10 right-60 w-[180px] h-[40px] rounded-full text-[14px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+          IMPORT EMPLOYEE
+        </button>
 
         <button
           onClick={() =>

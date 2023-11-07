@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { message, Input, Checkbox, ConfigProvider, Spin } from "antd";
-import { MailOutlined, LockOutlined } from "@ant-design/icons";
+import { MailOutlined, LockOutlined, GoogleOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import LoadingPage from "@/components/LoadingPage/page";
 
@@ -34,16 +34,16 @@ const SignIn = () => {
 
   if (session.status === "authenticated") {
     if (!session.data.user.workspace) {
-      router?.push("/accounts")
-      return
+      router?.push("/accounts");
+      return;
     }
     router?.push("/dashboard/schedule");
     return;
   }
 
   const redirectHome = () => {
-    router.push('/')
-  }
+    router.push("/");
+  };
 
   const handleForgotPassword = async () => {
     setSpin(true);
@@ -75,7 +75,7 @@ const SignIn = () => {
       setIsForgotPassword(false);
       clearFields();
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,7 +86,7 @@ const SignIn = () => {
         type: "error",
         content: "Email or password cannot be empty",
       });
-      setSpin(false)
+      setSpin(false);
       return;
     }
 
@@ -117,24 +117,156 @@ const SignIn = () => {
   const clearFields = () => {
     setEmail("");
     setPassword("");
-  }
+  };
 
   return (
-      <div className="bg-[#FAFAFA] flex flex-col justify-center items-center h-screen w-screen">
-        {contextHolder}
+    <div className="bg-[#FAFAFA] flex flex-col justify-center items-center h-screen w-screen">
+      {contextHolder}
 
-        <div onClick={() => redirectHome()} className="w-full cursor-pointer h-12 px-28 justify-center md:justify-normal lg:justify-normal flex items-center shadow-md">
-          <p className="font-bold text-xl">onshift</p>
+      <div
+        onClick={() => redirectHome()}
+        className="w-full cursor-pointer h-12 px-28 justify-center md:justify-normal lg:justify-normal flex items-center shadow-md"
+      >
+        <p className="font-bold text-xl">onshift</p>
+      </div>
+
+      <div className="w-[90%] md:hidden lg:hidden h-full flex justify-center items-center">
+        <div
+          className={`${
+            isForgotPassword ? "h-[350px]" : "h-[520px]"
+          } w-[531px] shadow-lg px-6 py-6`}
+        >
+          <p className="text-3xl font-bold text-center mt-2">
+            {isForgotPassword ? "Forgot Password" : "Sign In"}
+          </p>
+          {isForgotPassword ? (
+            <>
+              <div className="mt-6">
+                <span>Email</span>
+                <Input
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  value={email}
+                  prefix={<MailOutlined />}
+                  className="py-2"
+                />
+              </div>
+              <ConfigProvider
+                theme={{
+                  token: {
+                    colorPrimary: "#1677ff",
+                  },
+                }}
+              >
+                <button
+                  onClick={handleForgotPassword}
+                  className="mt-5 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                >
+                  {spin ? <Spin /> : "Reset Password"}
+                </button>
+              </ConfigProvider>
+
+              <div className="text-center mt-4">
+                <div>
+                  Already have an account?{" "}
+                  <span
+                    onClick={() => setIsForgotPassword(false) & clearFields()}
+                    className="hover:underline hover:cursor-pointer text-blue-500"
+                  >
+                    Sign In
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mt-6">
+                <span>Email</span>
+                <Input
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  value={email}
+                  className="py-2"
+                />
+              </div>
+
+              <div className="mt-5">
+                <span>Password</span>
+                <Input.Password
+                  onChange={(e) => setPassword(e.target.value)}
+                  prefix={<LockOutlined />}
+                  placeholder="Enter your password"
+                  className="py-2"
+                />
+              </div>
+
+              <div className="flex justify-between mt-5">
+                <Checkbox
+                  value={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                >
+                  Remember me
+                </Checkbox>
+
+                <span
+                  onClick={() => setIsForgotPassword(true) & clearFields()}
+                  className="hover:underline hover:cursor-pointer"
+                >
+                  Forgot password?
+                </span>
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                className="mt-8 w-full h-[50px] rounded-[8px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                {spin ? <Spin /> : "Sign in"}
+              </button>
+              <p className="text-center mt-4">Or sign in with</p>
+              <button
+                onClick={() => {
+                  signIn("google", { callbackUrl: "/dashboard/schedule" });
+                }}
+                className="mt-3 w-full h-[50px] bg-[#DB4437] text-white rounded-[8px]"
+              >
+                <GoogleOutlined className="mr-2" />
+                Sign in with Google
+              </button>
+              <div className="text-center mt-4">
+                <Link href="/signup">
+                  Don&apos;t have an account yet?{" "}
+                  <span className="hover:underline text-blue-500">
+                    Create one.
+                  </span>
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="hidden md:flex lg:flex flex-1 w-full">
+        <div className="bg-black w-1/2 h-full flex justify-center items-center">
+          <Image
+            height={404}
+            width={559}
+            alt="OnShift"
+            src={"/static/img/onshift.png"}
+          />
         </div>
 
-        <div className="w-[90%] md:hidden lg:hidden h-full flex justify-center items-center">
-            <div className={`${isForgotPassword ? 'h-[350px]' : 'h-[520px]'} w-[531px] shadow-lg px-6 py-6`}>
+        <div className="w-1/2 h-full flex justify-center items-center">
+          <div
+            className={`${
+              isForgotPassword ? "h-[350px]" : "h-[520px]"
+            } w-[531px] shadow-lg px-6 py-6`}
+          >
             <p className="text-3xl font-bold text-center mt-2">
-                  {isForgotPassword ? "Forgot Password" : "Sign In"}
-                </p>
-              {isForgotPassword ? (
-                <>
-                                <div className="mt-6">
+              {isForgotPassword ? "Forgot Password" : "Sign In"}
+            </p>
+            {isForgotPassword ? (
+              <>
+                <div className="mt-6">
                   <span>Email</span>
                   <Input
                     onChange={(e) => setEmail(e.target.value)}
@@ -160,16 +292,19 @@ const SignIn = () => {
                 </ConfigProvider>
 
                 <div className="text-center mt-4">
-              <div>
-                Already have an account?{" "}
-                <span onClick={() => setIsForgotPassword(false) & clearFields()} className="hover:underline hover:cursor-pointer text-blue-500">
-                  Sign In
-                </span>
-              </div>
-            </div>
-                </>
-              ) : (
-                <>
+                  <div>
+                    Already have an account?{" "}
+                    <span
+                      onClick={() => setIsForgotPassword(false) & clearFields()}
+                      className="hover:underline hover:cursor-pointer text-blue-500"
+                    >
+                      Sign In
+                    </span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
                 <div className="mt-6">
                   <span>Email</span>
                   <Input
@@ -206,120 +341,22 @@ const SignIn = () => {
                   </span>
                 </div>
 
-                  <button
-                    onClick={handleSubmit}
-                    className="mt-8 w-full h-[50px] rounded-[8px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  >
-                    {spin ? <Spin /> : "Sign in"}
-                  </button>
-                <div className="text-center mt-4">
-                  <Link href="/signup">
-                    Don&apos;t have an account yet?{" "}
-                    <span className="hover:underline text-blue-500">
-                      Create one.
-                    </span>
-                  </Link>
-                </div>
-              </>
-              )}
-            </div>
-          </div>
-
-        <div className="hidden md:flex lg:flex flex-1 w-full">
-          <div className="bg-black w-1/2 h-full flex justify-center items-center">
-            <Image
-              height={404}
-              width={559}
-              alt="OnShift"
-              src={"/static/img/onshift.png"}
-            />
-          </div>
-
-          <div className="w-1/2 h-full flex justify-center items-center">
-            <div className={`${isForgotPassword ? 'h-[350px]' : 'h-[520px]'} w-[531px] shadow-lg px-6 py-6`}>
-            <p className="text-3xl font-bold text-center mt-2">
-                  {isForgotPassword ? "Forgot Password" : "Sign In"}
-                </p>
-              {isForgotPassword ? (
-                <>
-                                <div className="mt-6">
-                  <span>Email</span>
-                  <Input
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    value={email}
-                    prefix={<MailOutlined />}
-                    className="py-2"
-                  />
-                </div>
-                <ConfigProvider
-                  theme={{
-                    token: {
-                      colorPrimary: "#1677ff",
-                    },
-                  }}
+                <button
+                  onClick={handleSubmit}
+                  className="mt-8 w-full h-[50px] rounded-[8px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                  <button
-                    onClick={handleForgotPassword}
-                    className="mt-5 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
-                  >
-                    {spin ? <Spin /> : "Reset Password"}
-                  </button>
-                </ConfigProvider>
-
-                <div className="text-center mt-4">
-              <div>
-                Already have an account?{" "}
-                <span onClick={() => setIsForgotPassword(false) & clearFields()} className="hover:underline hover:cursor-pointer text-blue-500">
-                  Sign In
-                </span>
-              </div>
-            </div>
-                </>
-              ) : (
-                <>
-                <div className="mt-6">
-                  <span>Email</span>
-                  <Input
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    value={email}
-                    className="py-2"
-                  />
-                </div>
-
-                <div className="mt-5">
-                  <span>Password</span>
-                  <Input.Password
-                    onChange={(e) => setPassword(e.target.value)}
-                    prefix={<LockOutlined />}
-                    placeholder="Enter your password"
-                    className="py-2"
-                  />
-                </div>
-
-                <div className="flex justify-between mt-5">
-                  <Checkbox
-                    value={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                  >
-                    Remember me
-                  </Checkbox>
-
-                  <span
-                    onClick={() => setIsForgotPassword(true) & clearFields()}
-                    className="hover:underline hover:cursor-pointer"
-                  >
-                    Forgot password?
-                  </span>
-                </div>
-
-                  <button
-                    onClick={handleSubmit}
-                    className="mt-8 w-full h-[50px] rounded-[8px] bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  >
-                    {spin ? <Spin /> : "Sign in"}
-                  </button>
+                  {spin ? <Spin /> : "Sign in"}
+                </button>
+                <p className="text-center mt-4">Or sign in with</p>
+                <button
+                  onClick={() => {
+                    signIn("google", { callbackUrl: "/dashboard/schedule" });
+                  }}
+                  className="mt-3 w-full h-[50px] bg-[#DB4437] text-white rounded-[8px]"
+                >
+                  <GoogleOutlined className="mr-2" />
+                  Sign in with Google
+                </button>
                 <div className="text-center mt-4">
                   <Link href="/signup">
                     Don&apos;t have an account yet?{" "}
@@ -329,11 +366,11 @@ const SignIn = () => {
                   </Link>
                 </div>
               </>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
+    </div>
   );
 };
 
