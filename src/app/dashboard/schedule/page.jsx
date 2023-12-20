@@ -123,7 +123,9 @@ const Scheduler = () => {
   }
 
   useEffect(() => {
-    setClonedEmployees(_.cloneDeep(employees));
+    if (employees?.length !== 0) {
+      setClonedEmployees(_.cloneDeep(employees));
+    }
   }, [employees]);
 
   useEffect(() => {
@@ -453,7 +455,7 @@ const Scheduler = () => {
         authorization: "Bearer " + session.data.user.accessToken,
       },
     });
-    mutateEmployees([...employees]);
+    // mutateEmployees([...employees]);
     mutateEmployees([...shifts]);
 
     message.success("Shift created");
