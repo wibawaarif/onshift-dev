@@ -3,7 +3,7 @@ import { Popover } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 
-const SidebarComponent = ({ setChangePasswordModal, clicked, setClicked ,currentPath, menu}) => (
+const SidebarComponent = ({ setChangePasswordModal, clicked, setClicked ,currentPath, menu, ScheduleRef, EmployeeRef}) => (
   <div className="flex flex-col justify-between items-center py-4 w-[80px] h-full border-r-[1px] border-[#E5E5E3]">
   <div>
     <Image

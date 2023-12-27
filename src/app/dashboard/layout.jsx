@@ -6,13 +6,11 @@ import Link from "next/link";
 import { Input, Modal, Popover, message } from "antd";
 import { useSession, signOut } from "next-auth/react";
 import LoadingPage from "@/components/LoadingPage/page";
-import SidebarComponent from "@/components/sidebar/page"
-import { useEffect, useState } from "react";
+import SidebarComponent from "@/components/sidebar/page";
+import { useEffect, useRef, useState } from "react";
 import { LockOutlined } from "@ant-design/icons";
 import useSWR from "swr";
-import {
-  Drawer
-} from "antd";
+import { Tour } from "antd";
 const menu = ["schedule", "employee", "position", "location", "timesheet"];
 
 const fetcher = ([url, token]) =>
@@ -28,12 +26,37 @@ const DashboardLayout = ({ children }) => {
     newPassword: "",
     confirmNewPassword: "",
   });
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const pathname = usePathname();
   const currentPath = pathname.split("/").pop();
 
+  // const ScheduleRef = useRef(null);
+  // const EmployeeRef = useRef(null);
+  // const PositionRef = useRef(null);
+  // const LocationRef = useRef(null);
+  // const TimesheetRef = useRef(null);
+
   const session = useSession();
   const { push, refresh } = useRouter();
+
+  // const steps = [
+  //   {
+  //     title: 'Schedule',
+  //     description: 'Put your files here.',
+  //     cover: (
+  //       <img
+  //         alt="tour.png"
+  //         src="https://user-images.githubusercontent.com/5378891/197385811-55df8480-7ff4-44bd-9d43-a7dade598d70.png"
+  //       />
+  //     ),
+  //     target: () => ScheduleRef.current,
+  //   },
+  //   {
+  //     title: 'Timesheet',
+  //     description: 'Save your changes.',
+  //     target: () => EmployeeRef.current,
+  //   },
+  // ];
 
   let { data: workspaces } = useSWR(
     [`/api/workspaces`, session?.data?.user?.accessToken],
@@ -41,8 +64,8 @@ const DashboardLayout = ({ children }) => {
   );
 
   useEffect(() => {
-    refresh()
-  }, [workspaces])
+    refresh();
+  }, [workspaces]);
 
   if (session.status === "loading") {
     return <LoadingPage />;
@@ -88,78 +111,78 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <div className="h-screen w-screen bg-white flex">
-              <Modal
-          footer={[
-            <button
-              className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
-              key="back"
-              onClick={() => setChangePasswordModal(false) & clearFields()}
-            >
-              CANCEL
-            </button>,
-            <button
-              onClick={handleChangePassword}
-              disabled={
-                form.currentPassword === "" ||
-                form.newPassword === "" ||
-                form.confirmNewPassword === "" ||
-                form.newPassword !== form.confirmNewPassword
-              }
-              className="bg-black text-white disabled:opacity-60 rounded-sm px-4 py-1 hover:opacity-80"
-              key="submit"
-            >
-              CHANGE PASSWORD
-            </button>,
-          ]}
-          title="Change Password"
-          open={changePasswordModal}
-          onCancel={() => setChangePasswordModal(false) & clearFields()}
-        >
-          <div className="mt-5">
-            <span>Current Password</span>
-            <Input.Password
-              onChange={(e) =>
-                setForm((prev) => {
-                  return { ...prev, currentPassword: e.target.value };
-                })
-              }
-              prefix={<LockOutlined />}
-              value={form.currentPassword}
-              placeholder="Enter your current password"
-              className="py-2"
-            />
-          </div>
+      <Modal
+        footer={[
+          <button
+            className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
+            key="back"
+            onClick={() => setChangePasswordModal(false) & clearFields()}
+          >
+            CANCEL
+          </button>,
+          <button
+            onClick={handleChangePassword}
+            disabled={
+              form.currentPassword === "" ||
+              form.newPassword === "" ||
+              form.confirmNewPassword === "" ||
+              form.newPassword !== form.confirmNewPassword
+            }
+            className="bg-black text-white disabled:opacity-60 rounded-sm px-4 py-1 hover:opacity-80"
+            key="submit"
+          >
+            CHANGE PASSWORD
+          </button>,
+        ]}
+        title="Change Password"
+        open={changePasswordModal}
+        onCancel={() => setChangePasswordModal(false) & clearFields()}
+      >
+        <div className="mt-5">
+          <span>Current Password</span>
+          <Input.Password
+            onChange={(e) =>
+              setForm((prev) => {
+                return { ...prev, currentPassword: e.target.value };
+              })
+            }
+            prefix={<LockOutlined />}
+            value={form.currentPassword}
+            placeholder="Enter your current password"
+            className="py-2"
+          />
+        </div>
 
-          <div className="mt-2">
-            <span>New Password</span>
-            <Input.Password
-              onChange={(e) =>
-                setForm((prev) => {
-                  return { ...prev, newPassword: e.target.value };
-                })
-              }
-              prefix={<LockOutlined />}
-              value={form.newPassword}
-              placeholder="Enter your new password"
-              className="py-2"
-            />
-          </div>
+        <div className="mt-2">
+          <span>New Password</span>
+          <Input.Password
+            onChange={(e) =>
+              setForm((prev) => {
+                return { ...prev, newPassword: e.target.value };
+              })
+            }
+            prefix={<LockOutlined />}
+            value={form.newPassword}
+            placeholder="Enter your new password"
+            className="py-2"
+          />
+        </div>
 
-          <div className="mt-2 mb-5">
-            <span>Confirm New Password</span>
-            <Input.Password
-              onChange={(e) =>
-                setForm((prev) => {
-                  return { ...prev, confirmNewPassword: e.target.value };
-                })
-              }
-              prefix={<LockOutlined />}
-              value={form.confirmNewPassword}
-              placeholder="Enter your new password"
-              className="py-2"
-            />
-          </div>
-        </Modal>
+        <div className="mt-2 mb-5">
+          <span>Confirm New Password</span>
+          <Input.Password
+            onChange={(e) =>
+              setForm((prev) => {
+                return { ...prev, confirmNewPassword: e.target.value };
+              })
+            }
+            prefix={<LockOutlined />}
+            value={form.confirmNewPassword}
+            placeholder="Enter your new password"
+            className="py-2"
+          />
+        </div>
+      </Modal>
       {/* <div className="flex flex-col justify-between items-center py-4 w-[80px] h-full border-r-[1px] border-[#E5E5E3]">
         <div>
           <Image
@@ -240,7 +263,19 @@ const DashboardLayout = ({ children }) => {
           </Popover>
         </div>
       </div> */}
-      <SidebarComponent setChangePasswordModal={setChangePasswordModal} clicked={clicked} setClicked={setClicked} currentPath={currentPath} menu={menu} />
+      {/* <Tour open={open} onClose={() => setOpen(false)} steps={steps} /> */}
+      <SidebarComponent
+        setChangePasswordModal={setChangePasswordModal}
+        clicked={clicked}
+        setClicked={setClicked}
+        currentPath={currentPath}
+        menu={menu}
+        // ScheduleRef={ScheduleRef}
+        // EmployeeRef={EmployeeRef}
+        // PositionRef={PositionRef}
+        // LocationRef={LocationRef}
+        // TimesheetRef={TimesheetRef}
+      />
       {children}
     </div>
   );
