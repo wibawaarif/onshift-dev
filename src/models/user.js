@@ -37,6 +37,9 @@ const userSchema = new Schema({
   },
   contract: {
     type: Object,
+  },
+  onboarding: {
+    type: Boolean,
   }
 
 }, { timestamps: true })

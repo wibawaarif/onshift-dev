@@ -42,7 +42,7 @@ export async function POST(req){
         if (type !== 'google') {
             const hashedPassword = await bcrypt.hash(pass, 10)
 
-            const newUser = await User.create({username, email, password: hashedPassword, type})
+            const newUser = await User.create({username, email, password: hashedPassword, type, onboarding: true})
     
             const {password, ...user} = newUser._doc
     
@@ -50,7 +50,7 @@ export async function POST(req){
             return new NextResponse(JSON.stringify(user), {status: 201})
         }
 
-        const newUser = await User.create({username, email, type})
+        const newUser = await User.create({username, email, type, onboarding: true})
 
         const {...user} = newUser._doc
 
