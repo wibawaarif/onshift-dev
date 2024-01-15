@@ -10,8 +10,8 @@ import SidebarComponent from "@/components/sidebar/page";
 import { useEffect, useRef, useState } from "react";
 import { LockOutlined } from "@ant-design/icons";
 import useSWR from "swr";
-import { Tour } from "antd";
 const menu = ["schedule", "employee", "position", "location", "timesheet"];
+import MarkerComponent from "@/lib/MarkerComponent.client";
 
 const fetcher = ([url, token]) =>
   fetch(url, { headers: { authorization: "Bearer " + token } }).then((res) =>
@@ -66,6 +66,8 @@ const DashboardLayout = ({ children }) => {
   useEffect(() => {
     refresh();
   }, [workspaces]);
+
+
 
   if (session.status === "loading") {
     return <LoadingPage />;
@@ -264,6 +266,7 @@ const DashboardLayout = ({ children }) => {
         </div>
       </div> */}
       {/* <Tour open={open} onClose={() => setOpen(false)} steps={steps} /> */}
+      <MarkerComponent />
       <SidebarComponent
         setChangePasswordModal={setChangePasswordModal}
         clicked={clicked}

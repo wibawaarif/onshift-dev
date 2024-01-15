@@ -111,654 +111,655 @@ const SignIn = () => {
   };
 
   return (
-    <div className="bg-white">
-    {/* Background color split screen for large screens */}
-    <div className="fixed left-0 top-0 hidden h-full w-1/2 bg-white lg:block" aria-hidden="true" />
-    <div className="fixed right-0 top-0 hidden h-full w-1/3 bg-indigo-900 lg:block" aria-hidden="true" />
+  //   <div className="bg-white">
+  //   {/* Background color split screen for large screens */}
+  //   <div className="fixed left-0 top-0 hidden h-full w-1/2 bg-white lg:block" aria-hidden="true" />
+  //   <div className="fixed right-0 top-0 hidden h-full w-1/3 bg-indigo-900 lg:block" aria-hidden="true" />
 
-    <header className="relative mx-auto max-w-8xl bg-indigo-900 py-6 lg:grid lg:grid-cols-2 lg:gap-x-16 lg:bg-transparent lg:px-8 lg:pb-10 lg:pt-16">
-      <div className="mx-auto flex max-w-2xl px-10 lg:w-full lg:max-w-4xl lg:px-0">
-        <a href="#">
-          <span className="sr-only">Your Company</span>
-          <img
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
-            alt=""
-            className="h-8 w-auto lg:hidden"
-          />
-          <img
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt=""
-            className="hidden h-8 w-auto lg:block"
-          />
-        </a>
-      </div>
-    </header>
+  //   <header className="relative mx-auto max-w-8xl bg-indigo-900 py-6 lg:grid lg:grid-cols-2 lg:gap-x-16 lg:bg-transparent lg:px-8 lg:pb-10 lg:pt-16">
+  //     <div className="mx-auto flex max-w-2xl px-10 lg:w-full lg:max-w-4xl lg:px-0">
+  //       <a href="#">
+  //         <span className="sr-only">Your Company</span>
+  //         <img
+  //           src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
+  //           alt=""
+  //           className="h-8 w-auto lg:hidden"
+  //         />
+  //         <img
+  //           src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+  //           alt=""
+  //           className="hidden h-8 w-auto lg:block"
+  //         />
+  //       </a>
+  //     </div>
+  //   </header>
 
-    <main className="relative mx-auto grid max-w-8xl grid-cols-1 gap-x-16 lg:grid-cols-3 lg:px-16">
-      <h1 className="sr-only">Checkout</h1>
+  //   <main className="relative mx-auto grid max-w-8xl grid-cols-1 gap-x-16 lg:grid-cols-3 lg:px-16">
+  //     <h1 className="sr-only">Checkout</h1>
 
-      <section
-        aria-labelledby="summary-heading"
-        className="bg-indigo-900 pb-12 pt-6 text-indigo-300 md:px-10 lg:col-start-3 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:bg-transparent lg:px-0 lg:pb-24 lg:pt-0"
-      >
-        <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
-          <h2 id="summary-heading" className="sr-only">
-            Order summary
-          </h2>
+  //     <section
+  //       aria-labelledby="summary-heading"
+  //       className="bg-indigo-900 pb-12 pt-6 text-indigo-300 md:px-10 lg:col-start-3 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:bg-transparent lg:px-0 lg:pb-24 lg:pt-0"
+  //     >
+  //       <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
+  //         <h2 id="summary-heading" className="sr-only">
+  //           Order summary
+  //         </h2>
 
-          <dl>
-            <dt className="text-sm font-medium">Amount due</dt>
-            <dd className="mt-1 text-3xl font-bold tracking-tight text-white">$232.00</dd>
-          </dl>
+  //         <dl>
+  //           <dt className="text-sm font-medium">Amount due</dt>
+  //           <dd className="mt-1 text-3xl font-bold tracking-tight text-white">$232.00</dd>
+  //         </dl>
 
-          <ul role="list" className="divide-y divide-white divide-opacity-10 text-sm font-medium">
-            {products.map((product) => (
-              <li key={product.id} className="flex items-start space-x-4 py-6">
-                <img
-                  src={product.imageSrc}
-                  alt={product.imageAlt}
-                  className="h-20 w-20 flex-none rounded-md object-cover object-center"
-                />
-                <div className="flex-auto space-y-1">
-                  <h3 className="text-white">{product.name}</h3>
-                  <p>{product.color}</p>
-                  <p>{product.size}</p>
-                </div>
-                <p className="flex-none text-base font-medium text-white">{product.price}</p>
-              </li>
-            ))}
-          </ul>
+  //         <ul role="list" className="divide-y divide-white divide-opacity-10 text-sm font-medium">
+  //           {products.map((product) => (
+  //             <li key={product.id} className="flex items-start space-x-4 py-6">
+  //               <img
+  //                 src={product.imageSrc}
+  //                 alt={product.imageAlt}
+  //                 className="h-20 w-20 flex-none rounded-md object-cover object-center"
+  //               />
+  //               <div className="flex-auto space-y-1">
+  //                 <h3 className="text-white">{product.name}</h3>
+  //                 <p>{product.color}</p>
+  //                 <p>{product.size}</p>
+  //               </div>
+  //               <p className="flex-none text-base font-medium text-white">{product.price}</p>
+  //             </li>
+  //           ))}
+  //         </ul>
 
-          <dl className="space-y-6 border-t border-white border-opacity-10 pt-6 text-sm font-medium">
-            <div className="flex items-center justify-between">
-              <dt>Subtotal</dt>
-              <dd>$570.00</dd>
-            </div>
+  //         <dl className="space-y-6 border-t border-white border-opacity-10 pt-6 text-sm font-medium">
+  //           <div className="flex items-center justify-between">
+  //             <dt>Subtotal</dt>
+  //             <dd>$570.00</dd>
+  //           </div>
 
-            <div className="flex items-center justify-between">
-              <dt>Shipping</dt>
-              <dd>$25.00</dd>
-            </div>
+  //           <div className="flex items-center justify-between">
+  //             <dt>Shipping</dt>
+  //             <dd>$25.00</dd>
+  //           </div>
 
-            <div className="flex items-center justify-between">
-              <dt>Taxes</dt>
-              <dd>$47.60</dd>
-            </div>
+  //           <div className="flex items-center justify-between">
+  //             <dt>Taxes</dt>
+  //             <dd>$47.60</dd>
+  //           </div>
 
-            <div className="flex items-center justify-between border-t border-white border-opacity-10 pt-6 text-white">
-              <dt className="text-base">Total</dt>
-              <dd className="text-base">$642.60</dd>
-            </div>
-          </dl>
+  //           <div className="flex items-center justify-between border-t border-white border-opacity-10 pt-6 text-white">
+  //             <dt className="text-base">Total</dt>
+  //             <dd className="text-base">$642.60</dd>
+  //           </div>
+  //         </dl>
+  //       </div>
+  //     </section>
+
+  //     <section
+  //       aria-labelledby="payment-and-shipping-heading"
+  //       className="py-16 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:pb-24 lg:pt-0"
+  //     >
+  //       <h2 id="payment-and-shipping-heading" className="sr-only">
+  //         Payment and shipping details
+  //       </h2>
+
+  //       <form>
+  //         <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
+  //           <div>
+  //             <h3 id="contact-info-heading" className="text-lg font-medium text-gray-900">
+  //               Contact information
+  //             </h3>
+
+  //             <div className="mt-6">
+  //               <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
+  //                 Email address
+  //               </label>
+  //               <div className="mt-1">
+  //                 <input
+  //                   type="email"
+  //                   id="email-address"
+  //                   name="email-address"
+  //                   autoComplete="email"
+  //                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  //                 />
+  //               </div>
+  //             </div>
+  //           </div>
+
+  //           <div className="mt-10">
+  //             <h3 id="payment-heading" className="text-lg font-medium text-gray-900">
+  //               Payment details
+  //             </h3>
+
+  //             <div className="mt-6 grid grid-cols-3 gap-x-4 gap-y-6 sm:grid-cols-4">
+  //               <div className="col-span-3 sm:col-span-4">
+  //                 <label htmlFor="card-number" className="block text-sm font-medium text-gray-700">
+  //                   Card number
+  //                 </label>
+  //                 <div className="mt-1">
+  //                   <input
+  //                     type="text"
+  //                     id="card-number"
+  //                     name="card-number"
+  //                     autoComplete="cc-number"
+  //                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  //                   />
+  //                 </div>
+  //               </div>
+
+  //               <div className="col-span-2 sm:col-span-3">
+  //                 <label htmlFor="expiration-date" className="block text-sm font-medium text-gray-700">
+  //                   Expiration date (MM/YY)
+  //                 </label>
+  //                 <div className="mt-1">
+  //                   <input
+  //                     type="text"
+  //                     name="expiration-date"
+  //                     id="expiration-date"
+  //                     autoComplete="cc-exp"
+  //                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  //                   />
+  //                 </div>
+  //               </div>
+
+  //               <div>
+  //                 <label htmlFor="cvc" className="block text-sm font-medium text-gray-700">
+  //                   CVC
+  //                 </label>
+  //                 <div className="mt-1">
+  //                   <input
+  //                     type="text"
+  //                     name="cvc"
+  //                     id="cvc"
+  //                     autoComplete="csc"
+  //                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  //                   />
+  //                 </div>
+  //               </div>
+  //             </div>
+  //           </div>
+
+  //           <div className="mt-10">
+  //             <h3 id="shipping-heading" className="text-lg font-medium text-gray-900">
+  //               Shipping address
+  //             </h3>
+
+  //             <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
+  //               <div className="sm:col-span-3">
+  //                 <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+  //                   Address
+  //                 </label>
+  //                 <div className="mt-1">
+  //                   <input
+  //                     type="text"
+  //                     id="address"
+  //                     name="address"
+  //                     autoComplete="street-address"
+  //                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  //                   />
+  //                 </div>
+  //               </div>
+
+  //               <div>
+  //                 <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+  //                   City
+  //                 </label>
+  //                 <div className="mt-1">
+  //                   <input
+  //                     type="text"
+  //                     id="city"
+  //                     name="city"
+  //                     autoComplete="address-level2"
+  //                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  //                   />
+  //                 </div>
+  //               </div>
+
+  //               <div>
+  //                 <label htmlFor="region" className="block text-sm font-medium text-gray-700">
+  //                   State / Province
+  //                 </label>
+  //                 <div className="mt-1">
+  //                   <input
+  //                     type="text"
+  //                     id="region"
+  //                     name="region"
+  //                     autoComplete="address-level1"
+  //                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  //                   />
+  //                 </div>
+  //               </div>
+
+  //               <div>
+  //                 <label htmlFor="postal-code" className="block text-sm font-medium text-gray-700">
+  //                   Postal code
+  //                 </label>
+  //                 <div className="mt-1">
+  //                   <input
+  //                     type="text"
+  //                     id="postal-code"
+  //                     name="postal-code"
+  //                     autoComplete="postal-code"
+  //                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+  //                   />
+  //                 </div>
+  //               </div>
+  //             </div>
+  //           </div>
+
+  //           <div className="mt-10">
+  //             <h3 className="text-lg font-medium text-gray-900">Billing information</h3>
+
+  //             <div className="mt-6 flex items-center">
+  //               <input
+  //                 id="same-as-shipping"
+  //                 name="same-as-shipping"
+  //                 type="checkbox"
+  //                 defaultChecked
+  //                 className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+  //               />
+  //               <div className="ml-2">
+  //                 <label htmlFor="same-as-shipping" className="text-sm font-medium text-gray-900">
+  //                   Same as shipping information
+  //                 </label>
+  //               </div>
+  //             </div>
+  //           </div>
+
+  //           <div className="mt-10 flex justify-end border-t border-gray-200 pt-6">
+  //             <button
+  //               type="submit"
+  //               className="rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
+  //             >
+  //               Pay now
+  //             </button>
+  //           </div>
+  //         </div>
+  //       </form>
+  //     </section>
+  //   </main>
+  // </div>
+
+
+
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: "#191407",
+        },
+      }}
+    >
+      <div className="bg-[#FAFAFA] flex flex-col justify-center items-center h-screen w-screen">
+        {contextHolder}
+
+        <div className="w-full h-12 px-28 flex items-center shadow-md">
+          <p className="font-bold text-xl">onshift</p>
         </div>
-      </section>
 
-      <section
-        aria-labelledby="payment-and-shipping-heading"
-        className="py-16 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:pb-24 lg:pt-0"
-      >
-        <h2 id="payment-and-shipping-heading" className="sr-only">
-          Payment and shipping details
-        </h2>
-
-        <form>
-          <div className="mx-auto max-w-2xl px-4 lg:max-w-none lg:px-0">
-            <div>
-              <h3 id="contact-info-heading" className="text-lg font-medium text-gray-900">
-                Contact information
-              </h3>
-
-              <div className="mt-6">
-                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
-                  Email address
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="email"
-                    id="email-address"
-                    name="email-address"
-                    autoComplete="email"
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  />
+                  <div className="w-[90%] md:hidden lg:hidden h-full flex justify-center items-center">
+            <div className="h-[450px] w-[400px] flex items-center relative flex-col shadow-lg px-6 py-6">
+              {(currentStep === 2 || currentStep === 3) && (
+                <div
+                  onClick={currentStep === 2 ? () => setCurrentStep(1) : () => setCurrentStep(2)}
+                  className="absolute top-4 left-6 flex items-center h-8"
+                >
+                  <MdKeyboardBackspace />
+                  <span className="ml-1 text-sm hover:underline hover:cursor-pointer">
+                    Back
+                  </span>
                 </div>
-              </div>
-            </div>
+              )}
 
-            <div className="mt-10">
-              <h3 id="payment-heading" className="text-lg font-medium text-gray-900">
-                Payment details
-              </h3>
-
-              <div className="mt-6 grid grid-cols-3 gap-x-4 gap-y-6 sm:grid-cols-4">
-                <div className="col-span-3 sm:col-span-4">
-                  <label htmlFor="card-number" className="block text-sm font-medium text-gray-700">
-                    Card number
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="card-number"
-                      name="card-number"
-                      autoComplete="cc-number"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div className="col-span-2 sm:col-span-3">
-                  <label htmlFor="expiration-date" className="block text-sm font-medium text-gray-700">
-                    Expiration date (MM/YY)
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      name="expiration-date"
-                      id="expiration-date"
-                      autoComplete="cc-exp"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="cvc" className="block text-sm font-medium text-gray-700">
-                    CVC
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      name="cvc"
-                      id="cvc"
-                      autoComplete="csc"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <h3 id="shipping-heading" className="text-lg font-medium text-gray-900">
-                Shipping address
-              </h3>
-
-              <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
-                <div className="sm:col-span-3">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                    Address
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="address"
-                      name="address"
-                      autoComplete="street-address"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-                    City
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="city"
-                      name="city"
-                      autoComplete="address-level2"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="region" className="block text-sm font-medium text-gray-700">
-                    State / Province
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="region"
-                      name="region"
-                      autoComplete="address-level1"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="postal-code" className="block text-sm font-medium text-gray-700">
-                    Postal code
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="postal-code"
-                      name="postal-code"
-                      autoComplete="postal-code"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-10">
-              <h3 className="text-lg font-medium text-gray-900">Billing information</h3>
-
-              <div className="mt-6 flex items-center">
-                <input
-                  id="same-as-shipping"
-                  name="same-as-shipping"
-                  type="checkbox"
-                  defaultChecked
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <div className="ml-2">
-                  <label htmlFor="same-as-shipping" className="text-sm font-medium text-gray-900">
-                    Same as shipping information
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-10 flex justify-end border-t border-gray-200 pt-6">
-              <button
-                type="submit"
-                className="rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
+              <p
+                className={`text-3xl font-bold text-center ${
+                  currentStep === 1 ? "mt-2" : "mt-8"
+                }`}
               >
-                Pay now
-              </button>
+                {currentStep === 1
+                  ? "My Workspaces"
+                  : currentStep === 2
+                  ? "Create Workspace"
+                  : "Tell Us About Your Workspace"}
+              </p>
+              {currentStep !== 1 && (
+                <p className="text-center text-sm w-96 mt-8 text-[#535a61]">
+                  Creating a new workplace for your business is a piece of cake!
+                  Just fill in the info below and you&apos;re good to go.
+                </p>
+              )}
+              {currentStep === 1 ?
+               (
+                <div className="grid grid-cols-3 gap-4 w-full px-6 mt-6 h-[200px] overflow-y-auto">
+                  {
+                     workspaces?.length === 0 ? <div className="col-span-3 flex justify-center"><p className="text-stone-300">There is no any workspace yet!</p></div> : workspaces?.map((x, index) => 
+                      <div key={index} className="w-32 h-48 flex flex-col items-center">
+                      <Image
+                        onClick={() => addToSession(x.name)}
+                        className="cursor-pointer"
+                        height={404}
+                        width={559}
+                        alt="OnShift"
+                        src={"/static/img/workspace.png"}
+                      />
+                  <p className="text-black text-sm mt-2">{x?.name}</p>
+                    </div>
+                    )
+                  }
+                </div>
+              ) : currentStep === 2 ? (
+                <>
+                  <div className="mt-6 w-full">
+                    <span>Company Name</span>
+                    <Input
+                      onChange={(e) =>
+                        setForm((prev) => {
+                          return { ...prev, name: e.target.value };
+                        })
+                      }
+                      prefix={<BsBuilding />}
+                      placeholder="Enter your company name"
+                      className="py-2"
+                    />
+                  </div>
+
+                  <div className="mt-4 w-full">
+                    <span>Workspace Address</span>
+                    <PlaceComponent
+                      address={address}
+                      setAddress={setAddress}
+                      setLatitude={setLatitude}
+                      setLongitude={setLongitude}
+                      style="w-full px-7 py-1 border-[1px] h-10 text-sm placeholder-[#bec1ca] rounded-[6px] border-[#E5E5E3]"
+                    >
+                      <SlLocationPin className="absolute top-3 left-[10px]" />
+                    </PlaceComponent>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mt-6 w-full flex flex-col">
+                    <span>Number of Employees</span>
+                    <Select
+                      showSearch
+                      prefixCls="test"
+                      placeholder="Select number of employees"
+                      optionFilterProp="children"
+                      className="h-10"
+                      onChange={(value) =>
+                        setForm((prev) => {
+                          return { ...prev, totalEmployees: value };
+                        })
+                      }
+                      onSearch={onSearch}
+                      filterOption={filterOption}
+                      options={[
+                        {
+                          value: "10",
+                          label: "10",
+                        },
+                        {
+                          value: "100",
+                          label: "100",
+                        },
+                        {
+                          value: "1000",
+                          label: "1000",
+                        },
+                      ]}
+                    />
+                  </div>
+
+                  <div className="mt-4 w-full flex flex-col">
+                    <span>Industry</span>
+                    <Select
+                      showSearch
+                      placeholder="Select industry"
+                      optionFilterProp="children"
+                      className="h-10"
+                      onChange={(value) =>
+                        setForm((prev) => {
+                          return { ...prev, industry: value };
+                        })
+                      }
+                      onSearch={onSearch}
+                      filterOption={filterOption}
+                      options={[
+                        {
+                          value: "agriculture",
+                          label: "Agriculture",
+                        },
+                        {
+                          value: "mining",
+                          label: "Mining",
+                        },
+                        {
+                          value: "trade",
+                          label: "Trade",
+                        },
+                        {
+                          value: "transport",
+                          label: "Transport",
+                        },
+                        {
+                          value: "finance",
+                          label: "Finance",
+                        },
+                      ]}
+                    />
+                  </div>
+                </>
+              )}
+              {currentStep === 1 ? (
+                <button
+                  onClick={() => setCurrentStep(2)
+                  }
+                  className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                >
+                  Create a New Workspace
+                </button>
+              ) : (
+                <button
+                  onClick={
+                    currentStep === 2
+                      ? () => setCurrentStep(3)
+                      : () => handleSubmit()
+                  }
+                  className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                >
+                  {spin ? <Spin /> : "Start Scheduling"}
+                </button>
+              )}
             </div>
           </div>
-        </form>
-      </section>
-    </main>
-  </div>
-
-
-    // <ConfigProvider
-    //   theme={{
-    //     token: {
-    //       colorPrimary: "#191407",
-    //     },
-    //   }}
-    // >
-    //   <div className="bg-[#FAFAFA] flex flex-col justify-center items-center h-screen w-screen">
-    //     {contextHolder}
-
-    //     <div className="w-full h-12 px-28 flex items-center shadow-md">
-    //       <p className="font-bold text-xl">onshift</p>
-    //     </div>
-
-    //               <div className="w-[90%] md:hidden lg:hidden h-full flex justify-center items-center">
-    //         <div className="h-[450px] w-[400px] flex items-center relative flex-col shadow-lg px-6 py-6">
-    //           {(currentStep === 2 || currentStep === 3) && (
-    //             <div
-    //               onClick={currentStep === 2 ? () => setCurrentStep(1) : () => setCurrentStep(2)}
-    //               className="absolute top-4 left-6 flex items-center h-8"
-    //             >
-    //               <MdKeyboardBackspace />
-    //               <span className="ml-1 text-sm hover:underline hover:cursor-pointer">
-    //                 Back
-    //               </span>
-    //             </div>
-    //           )}
-
-    //           <p
-    //             className={`text-3xl font-bold text-center ${
-    //               currentStep === 1 ? "mt-2" : "mt-8"
-    //             }`}
-    //           >
-    //             {currentStep === 1
-    //               ? "My Workspaces"
-    //               : currentStep === 2
-    //               ? "Create Workspace"
-    //               : "Tell Us About Your Workspace"}
-    //           </p>
-    //           {currentStep !== 1 && (
-    //             <p className="text-center text-sm w-96 mt-8 text-[#535a61]">
-    //               Creating a new workplace for your business is a piece of cake!
-    //               Just fill in the info below and you&apos;re good to go.
-    //             </p>
-    //           )}
-    //           {currentStep === 1 ?
-    //            (
-    //             <div className="grid grid-cols-3 gap-4 w-full px-6 mt-6 h-[200px] overflow-y-auto">
-    //               {
-    //                  workspaces?.length === 0 ? <div className="col-span-3 flex justify-center"><p className="text-stone-300">There is no any workspace yet!</p></div> : workspaces?.map((x, index) => 
-    //                   <div key={index} className="w-32 h-48 flex flex-col items-center">
-    //                   <Image
-    //                     onClick={() => addToSession(x.name)}
-    //                     className="cursor-pointer"
-    //                     height={404}
-    //                     width={559}
-    //                     alt="OnShift"
-    //                     src={"/static/img/workspace.png"}
-    //                   />
-    //               <p className="text-black text-sm mt-2">{x?.name}</p>
-    //                 </div>
-    //                 )
-    //               }
-    //             </div>
-    //           ) : currentStep === 2 ? (
-    //             <>
-    //               <div className="mt-6 w-full">
-    //                 <span>Company Name</span>
-    //                 <Input
-    //                   onChange={(e) =>
-    //                     setForm((prev) => {
-    //                       return { ...prev, name: e.target.value };
-    //                     })
-    //                   }
-    //                   prefix={<BsBuilding />}
-    //                   placeholder="Enter your company name"
-    //                   className="py-2"
-    //                 />
-    //               </div>
-
-    //               <div className="mt-4 w-full">
-    //                 <span>Workspace Address</span>
-    //                 <PlaceComponent
-    //                   address={address}
-    //                   setAddress={setAddress}
-    //                   setLatitude={setLatitude}
-    //                   setLongitude={setLongitude}
-    //                   style="w-full px-7 py-1 border-[1px] h-10 text-sm placeholder-[#bec1ca] rounded-[6px] border-[#E5E5E3]"
-    //                 >
-    //                   <SlLocationPin className="absolute top-3 left-[10px]" />
-    //                 </PlaceComponent>
-    //               </div>
-    //             </>
-    //           ) : (
-    //             <>
-    //               <div className="mt-6 w-full flex flex-col">
-    //                 <span>Number of Employees</span>
-    //                 <Select
-    //                   showSearch
-    //                   prefixCls="test"
-    //                   placeholder="Select number of employees"
-    //                   optionFilterProp="children"
-    //                   className="h-10"
-    //                   onChange={(value) =>
-    //                     setForm((prev) => {
-    //                       return { ...prev, totalEmployees: value };
-    //                     })
-    //                   }
-    //                   onSearch={onSearch}
-    //                   filterOption={filterOption}
-    //                   options={[
-    //                     {
-    //                       value: "10",
-    //                       label: "10",
-    //                     },
-    //                     {
-    //                       value: "100",
-    //                       label: "100",
-    //                     },
-    //                     {
-    //                       value: "1000",
-    //                       label: "1000",
-    //                     },
-    //                   ]}
-    //                 />
-    //               </div>
-
-    //               <div className="mt-4 w-full flex flex-col">
-    //                 <span>Industry</span>
-    //                 <Select
-    //                   showSearch
-    //                   placeholder="Select industry"
-    //                   optionFilterProp="children"
-    //                   className="h-10"
-    //                   onChange={(value) =>
-    //                     setForm((prev) => {
-    //                       return { ...prev, industry: value };
-    //                     })
-    //                   }
-    //                   onSearch={onSearch}
-    //                   filterOption={filterOption}
-    //                   options={[
-    //                     {
-    //                       value: "agriculture",
-    //                       label: "Agriculture",
-    //                     },
-    //                     {
-    //                       value: "mining",
-    //                       label: "Mining",
-    //                     },
-    //                     {
-    //                       value: "trade",
-    //                       label: "Trade",
-    //                     },
-    //                     {
-    //                       value: "transport",
-    //                       label: "Transport",
-    //                     },
-    //                     {
-    //                       value: "finance",
-    //                       label: "Finance",
-    //                     },
-    //                   ]}
-    //                 />
-    //               </div>
-    //             </>
-    //           )}
-    //           {currentStep === 1 ? (
-    //             <button
-    //               onClick={() => setCurrentStep(2)
-    //               }
-    //               className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
-    //             >
-    //               Create a New Workspace
-    //             </button>
-    //           ) : (
-    //             <button
-    //               onClick={
-    //                 currentStep === 2
-    //                   ? () => setCurrentStep(3)
-    //                   : () => handleSubmit()
-    //               }
-    //               className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
-    //             >
-    //               {spin ? <Spin /> : "Start Scheduling"}
-    //             </button>
-    //           )}
-    //         </div>
-    //       </div>
 
         
 
-    //     <div className="hidden md:flex lg:flex flex-1 w-full">
-    //       <div className="bg-black w-1/2 h-full flex justify-center items-center">
-    //         <Image
-    //           height={404}
-    //           width={559}
-    //           alt="OnShift"
-    //           src={"/static/img/onshift.png"}
-    //         />
-    //       </div>
+        <div className="hidden md:flex lg:flex flex-1 w-full">
+          <div className="bg-black w-1/2 h-full flex justify-center items-center">
+            <Image
+              height={404}
+              width={559}
+              alt="OnShift"
+              src={"/static/img/onshift.png"}
+            />
+          </div>
 
-    //       <div className="w-1/2 h-full flex justify-center items-center">
-    //         <div className="h-[450px] w-[531px] flex items-center relative flex-col shadow-lg px-6 py-6">
-    //           {(currentStep === 2 || currentStep === 3) && (
-    //             <div
-    //               onClick={currentStep === 2 ? () => setCurrentStep(1) : () => setCurrentStep(2)}
-    //               className="absolute top-4 left-6 flex items-center h-8"
-    //             >
-    //               <MdKeyboardBackspace />
-    //               <span className="ml-1 text-sm hover:underline hover:cursor-pointer">
-    //                 Back
-    //               </span>
-    //             </div>
-    //           )}
+          <div className="w-1/2 h-full flex justify-center items-center">
+            <div className="h-[450px] w-[531px] flex items-center relative flex-col shadow-lg px-6 py-6">
+              {(currentStep === 2 || currentStep === 3) && (
+                <div
+                  onClick={currentStep === 2 ? () => setCurrentStep(1) : () => setCurrentStep(2)}
+                  className="absolute top-4 left-6 flex items-center h-8"
+                >
+                  <MdKeyboardBackspace />
+                  <span className="ml-1 text-sm hover:underline hover:cursor-pointer">
+                    Back
+                  </span>
+                </div>
+              )}
 
-    //           <p
-    //             className={`text-3xl font-bold text-center ${
-    //               currentStep === 1 ? "mt-2" : "mt-8"
-    //             }`}
-    //           >
-    //             {currentStep === 1
-    //               ? "My Workspaces"
-    //               : currentStep === 2
-    //               ? "Create Workspace"
-    //               : "Tell Us About Your Workspace"}
-    //           </p>
-    //           {currentStep !== 1 && (
-    //             <p className="text-center text-sm w-96 mt-8 text-[#535a61]">
-    //               Creating a new workplace for your business is a piece of cake!
-    //               Just fill in the info below and you&apos;re good to go.
-    //             </p>
-    //           )}
-    //           {currentStep === 1 ?
-    //            (
-    //             <div className="grid grid-cols-3 gap-4 w-full px-6 mt-6 h-[200px] overflow-y-auto">
-    //               {
-    //                  workspaces?.length === 0 ? <div className="col-span-3 flex justify-center"><p className="text-stone-300">There is no any workspace yet!</p></div> : workspaces?.map((x, index) => 
-    //                   <div key={index} className="w-32 h-48 flex flex-col items-center">
-    //                   <Image
-    //                     onClick={() => addToSession(x.name)}
-    //                     className="cursor-pointer"
-    //                     height={404}
-    //                     width={559}
-    //                     alt="OnShift"
-    //                     src={"/static/img/workspace.png"}
-    //                   />
-    //               <p className="text-black text-sm mt-2">{x?.name}</p>
-    //                 </div>
-    //                 )
-    //               }
-    //             </div>
-    //           ) : currentStep === 2 ? (
-    //             <>
-    //               <div className="mt-6 w-full">
-    //                 <span>Company Name</span>
-    //                 <Input
-    //                   onChange={(e) =>
-    //                     setForm((prev) => {
-    //                       return { ...prev, name: e.target.value };
-    //                     })
-    //                   }
-    //                   prefix={<BsBuilding />}
-    //                   placeholder="Enter your company name"
-    //                   className="py-2"
-    //                 />
-    //               </div>
+              <p
+                className={`text-3xl font-bold text-center ${
+                  currentStep === 1 ? "mt-2" : "mt-8"
+                }`}
+              >
+                {currentStep === 1
+                  ? "My Workspaces"
+                  : currentStep === 2
+                  ? "Create Workspace"
+                  : "Tell Us About Your Workspace"}
+              </p>
+              {currentStep !== 1 && (
+                <p className="text-center text-sm w-96 mt-8 text-[#535a61]">
+                  Creating a new workplace for your business is a piece of cake!
+                  Just fill in the info below and you&apos;re good to go.
+                </p>
+              )}
+              {currentStep === 1 ?
+               (
+                <div className="grid grid-cols-3 gap-4 w-full px-6 mt-6 h-[200px] overflow-y-auto">
+                  {
+                     workspaces?.length === 0 ? <div className="col-span-3 flex justify-center"><p className="text-stone-300">There is no any workspace yet!</p></div> : workspaces?.map((x, index) => 
+                      <div key={index} className="w-32 h-48 flex flex-col items-center">
+                      <Image
+                        onClick={() => addToSession(x.name)}
+                        className="cursor-pointer"
+                        height={404}
+                        width={559}
+                        alt="OnShift"
+                        src={"/static/img/workspace.png"}
+                      />
+                  <p className="text-black text-sm mt-2">{x?.name}</p>
+                    </div>
+                    )
+                  }
+                </div>
+              ) : currentStep === 2 ? (
+                <>
+                  <div className="mt-6 w-full">
+                    <span>Company Name</span>
+                    <Input
+                      onChange={(e) =>
+                        setForm((prev) => {
+                          return { ...prev, name: e.target.value };
+                        })
+                      }
+                      prefix={<BsBuilding />}
+                      placeholder="Enter your company name"
+                      className="py-2"
+                    />
+                  </div>
 
-    //               <div className="mt-4 w-full">
-    //                 <span>Workspace Address</span>
-    //                 <PlaceComponent
-    //                   address={address}
-    //                   setAddress={setAddress}
-    //                   setLatitude={setLatitude}
-    //                   setLongitude={setLongitude}
-    //                   style="w-full px-7 py-1 border-[1px] h-10 text-sm placeholder-[#bec1ca] rounded-[6px] border-[#E5E5E3]"
-    //                 >
-    //                   <SlLocationPin className="absolute top-3 left-[10px]" />
-    //                 </PlaceComponent>
-    //               </div>
-    //             </>
-    //           ) : (
-    //             <>
-    //               <div className="mt-6 w-full flex flex-col">
-    //                 <span>Number of Employees</span>
-    //                 <Select
-    //                   showSearch
-    //                   prefixCls="test"
-    //                   placeholder="Select number of employees"
-    //                   optionFilterProp="children"
-    //                   className="h-10"
-    //                   onChange={(value) =>
-    //                     setForm((prev) => {
-    //                       return { ...prev, totalEmployees: value };
-    //                     })
-    //                   }
-    //                   onSearch={onSearch}
-    //                   filterOption={filterOption}
-    //                   options={[
-    //                     {
-    //                       value: "10",
-    //                       label: "10",
-    //                     },
-    //                     {
-    //                       value: "100",
-    //                       label: "100",
-    //                     },
-    //                     {
-    //                       value: "1000",
-    //                       label: "1000",
-    //                     },
-    //                   ]}
-    //                 />
-    //               </div>
+                  <div className="mt-4 w-full">
+                    <span>Workspace Address</span>
+                    <PlaceComponent
+                      address={address}
+                      setAddress={setAddress}
+                      setLatitude={setLatitude}
+                      setLongitude={setLongitude}
+                      style="w-full px-7 py-1 border-[1px] h-10 text-sm placeholder-[#bec1ca] rounded-[6px] border-[#E5E5E3]"
+                    >
+                      <SlLocationPin className="absolute top-3 left-[10px]" />
+                    </PlaceComponent>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mt-6 w-full flex flex-col">
+                    <span>Number of Employees</span>
+                    <Select
+                      showSearch
+                      prefixCls="test"
+                      placeholder="Select number of employees"
+                      optionFilterProp="children"
+                      className="h-10"
+                      onChange={(value) =>
+                        setForm((prev) => {
+                          return { ...prev, totalEmployees: value };
+                        })
+                      }
+                      onSearch={onSearch}
+                      filterOption={filterOption}
+                      options={[
+                        {
+                          value: "10",
+                          label: "10",
+                        },
+                        {
+                          value: "100",
+                          label: "100",
+                        },
+                        {
+                          value: "1000",
+                          label: "1000",
+                        },
+                      ]}
+                    />
+                  </div>
 
-    //               <div className="mt-4 w-full flex flex-col">
-    //                 <span>Industry</span>
-    //                 <Select
-    //                   showSearch
-    //                   placeholder="Select industry"
-    //                   optionFilterProp="children"
-    //                   className="h-10"
-    //                   onChange={(value) =>
-    //                     setForm((prev) => {
-    //                       return { ...prev, industry: value };
-    //                     })
-    //                   }
-    //                   onSearch={onSearch}
-    //                   filterOption={filterOption}
-    //                   options={[
-    //                     {
-    //                       value: "agriculture",
-    //                       label: "Agriculture",
-    //                     },
-    //                     {
-    //                       value: "mining",
-    //                       label: "Mining",
-    //                     },
-    //                     {
-    //                       value: "trade",
-    //                       label: "Trade",
-    //                     },
-    //                     {
-    //                       value: "transport",
-    //                       label: "Transport",
-    //                     },
-    //                     {
-    //                       value: "finance",
-    //                       label: "Finance",
-    //                     },
-    //                   ]}
-    //                 />
-    //               </div>
-    //             </>
-    //           )}
-    //           {currentStep === 1 ? (
-    //             <button
-    //               onClick={() => setCurrentStep(2)
-    //               }
-    //               className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
-    //             >
-    //               Create a New Workspace
-    //             </button>
-    //           ) : (
-    //             <button
-    //               onClick={
-    //                 currentStep === 2
-    //                   ? () => setCurrentStep(3)
-    //                   : () => handleSubmit()
-    //               }
-    //               className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
-    //             >
-    //               {spin ? <Spin /> : "Start Scheduling"}
-    //             </button>
-    //           )}
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </ConfigProvider>
+                  <div className="mt-4 w-full flex flex-col">
+                    <span>Industry</span>
+                    <Select
+                      showSearch
+                      placeholder="Select industry"
+                      optionFilterProp="children"
+                      className="h-10"
+                      onChange={(value) =>
+                        setForm((prev) => {
+                          return { ...prev, industry: value };
+                        })
+                      }
+                      onSearch={onSearch}
+                      filterOption={filterOption}
+                      options={[
+                        {
+                          value: "agriculture",
+                          label: "Agriculture",
+                        },
+                        {
+                          value: "mining",
+                          label: "Mining",
+                        },
+                        {
+                          value: "trade",
+                          label: "Trade",
+                        },
+                        {
+                          value: "transport",
+                          label: "Transport",
+                        },
+                        {
+                          value: "finance",
+                          label: "Finance",
+                        },
+                      ]}
+                    />
+                  </div>
+                </>
+              )}
+              {currentStep === 1 ? (
+                <button
+                  onClick={() => setCurrentStep(2)
+                  }
+                  className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                >
+                  Create a New Workspace
+                </button>
+              ) : (
+                <button
+                  onClick={
+                    currentStep === 2
+                      ? () => setCurrentStep(3)
+                      : () => handleSubmit()
+                  }
+                  className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                >
+                  {spin ? <Spin /> : "Start Scheduling"}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </ConfigProvider>
   );
 };
 
