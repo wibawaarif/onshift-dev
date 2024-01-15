@@ -99,7 +99,7 @@ const Scheduler = () => {
   const options = [];
   const [shiftTemplate, setShiftTemplate] = useState('')
 
-  var x = 1; //minutes interval
+  var x = 30; //minutes interval
   var times = []; // time array
   var tt = 0; // start time
   var ap = ["AM", "PM"]; // AM-PM
