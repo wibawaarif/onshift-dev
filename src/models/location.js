@@ -33,8 +33,8 @@ const locationSchema = new Schema({
 // Middleware to generate locationId
 locationSchema.pre('save', async function (next) {
   try {
-    const maxEmployee = await this.constructor.findOne({}, {}, { sort: { locationId: -1 } });
-
+    const maxEmployee = await this.constructor.findOne({workspace: this.workspace}, {}, { sort: { locationId: -1 } });
+    console.log(maxEmployee, 'test')
     if (maxEmployee) {
       const maxlocationId = parseInt(maxEmployee.locationId);
 

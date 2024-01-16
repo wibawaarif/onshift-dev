@@ -10,7 +10,7 @@ import SidebarComponent from "@/components/sidebar/page";
 import { useEffect, useRef, useState } from "react";
 import { LockOutlined } from "@ant-design/icons";
 import useSWR from "swr";
-const menu = ["schedule", "employee", "position", "location", "timesheet"];
+const menu = ["schedule", "employee", "position", "location", "timesheet", "leave"];
 import MarkerComponent from "@/lib/MarkerComponent.client";
 
 const fetcher = ([url, token]) =>

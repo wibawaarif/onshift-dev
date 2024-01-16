@@ -66,8 +66,8 @@ const employeeSchema = new Schema({
 // Middleware to generate employeeId
 employeeSchema.pre('save', async function (next) {
   try {
-    const maxEmployee = await this.constructor.findOne({}, {}, { sort: { employeeId: -1 } });
-
+    const maxEmployee = await this.constructor.findOne({workspace: this.workspace}, {}, { sort: { employeeId: -1 } });
+    console.log(maxEmployee, 'test')
     if (maxEmployee) {
       const maxEmployeeId = parseInt(maxEmployee.employeeId);
 
