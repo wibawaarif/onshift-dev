@@ -280,7 +280,8 @@ const Location = () => {
                 ? addLocation
                 : deleteLocation
             }
-            className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
+            disabled={!address || !form.radius || !form.name}
+            className="bg-black text-white rounded-sm px-4 disabled:opacity-50 py-1 hover:opacity-80"
             key="submit"
           >
             {actionType === "edit"

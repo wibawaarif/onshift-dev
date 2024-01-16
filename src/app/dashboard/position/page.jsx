@@ -58,7 +58,7 @@ const Position = () => {
     "#7D7D80",
     "#646466",
   ];
-  const wageType = [{ value: "Hourly", label: "Hourly" }];
+  const wageType = [{ value: "Hourly", label: "Hourly"}, {value: "Monthly", label: "Monthly"}];
 
   // Calculate the start and end index of items for the current page
   const startIndex = (currentPage - 1) * pageSize;

@@ -61,6 +61,7 @@ export const POST = async (request) => {
   }
   
   const body = await request.json();
+  console.log(body)
 
   const findExistingEmployee = await Employee.findOne({email: body.email})
 

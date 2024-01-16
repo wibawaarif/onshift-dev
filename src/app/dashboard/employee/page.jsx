@@ -175,22 +175,15 @@ const Employee = () => {
 
   const columns = [
     {
+      title: "ID",
+      dataIndex: "employeeId",
+      render: (_, record) => (
+        <div>{record.employeeId}</div>
+      ),
+    },
+    {
       title: "Name",
       dataIndex: "name",
-    },
-    {
-      title: "Position",
-      dataIndex: "position",
-      render: (_, record) => (
-        <div>{record.position ? record.position : "-"}</div>
-      ),
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-      render: (_, record) => (
-        <div>{record.location ? record.location : "-"}</div>
-      ),
     },
     {
       title: "Email",

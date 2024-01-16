@@ -1,7 +1,14 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { StandaloneSearchBox, LoadScript } from "@react-google-maps/api";
 
-const PlaceComponent = ({children, style, address, setAddress, setLatitude, setLongitude }) => {
+const PlaceComponent = ({
+  children,
+  style,
+  address,
+  setAddress,
+  setLatitude,
+  setLongitude,
+}) => {
   const inputRef = useRef();
 
   const handlePlaceChanged = () => {
@@ -13,8 +20,7 @@ const PlaceComponent = ({children, style, address, setAddress, setLatitude, setL
     }
   };
 
-  const type = ["places"]
-
+  const type = ["places"];
 
   return (
     <LoadScript
@@ -26,14 +32,14 @@ const PlaceComponent = ({children, style, address, setAddress, setLatitude, setL
         onPlacesChanged={handlePlaceChanged}
       >
         <div className="relative">
-        <input
-          type="text"
-          className={`form-control ${style}`}
-          value={address}
-          placeholder="Enter location"
-          onChange={(e) => setAddress(e.target.value)}
-        />
-        {children}
+          <input
+            type="text"
+            className={`form-control ${style}`}
+            value={address}
+            placeholder="Enter location"
+            onChange={(e) => setAddress(e.target.value)}
+          />
+          {children}
         </div>
       </StandaloneSearchBox>
     </LoadScript>
