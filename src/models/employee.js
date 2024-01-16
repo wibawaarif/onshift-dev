@@ -56,6 +56,11 @@ const employeeSchema = new Schema({
     workspace: {
       type: String
     },
+    status: {
+      type: String,
+      default: 'Active',
+      enum: ['Active', 'Inactive']
+    },
 }, { timestamps: true })
 
 // Middleware to generate employeeId

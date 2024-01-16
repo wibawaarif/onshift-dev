@@ -75,7 +75,7 @@ const Employee = () => {
       filteredList = _.cloneDeep(employees)?.filter((x) =>
         x.name
           .toLocaleLowerCase()
-          .includes(searchEmployeesInput.toLocaleLowerCase())
+          .includes(searchEmployeesInput.toLocaleLowerCase()) || x.employeeId.includes(searchEmployeesInput)
       );
     }
 
@@ -213,6 +213,9 @@ const Employee = () => {
                 <button onClick={() => handleAction("edit", record)}>
                   Edit
                 </button>
+                <button onClick={() => handleAction("statusAction", record)}>
+                  { record.status === "Active" ? "Deactivate": "Activate" }
+                </button>
                 <button onClick={() => handleAction("delete", record._id)}>
                   Delete
                 </button>
@@ -257,6 +260,7 @@ const Employee = () => {
       amount: null,
     },
     positions: [],
+    status: "",
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [employeeModal, setEmployeeModal] = useState(false);
@@ -406,6 +410,21 @@ const Employee = () => {
         platform: data.platform,
         wageOptions: data.wageOptions,
         positions: data.positions,
+      };
+      setForm(newForm);
+    }
+
+    if (type === "statusAction") {
+      setId(data._id);
+
+      const newForm = {
+        name: data.name,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        platform: data.platform,
+        wageOptions: data.wageOptions,
+        positions: data.positions,
+        status: data.status === "Active" ? "Inactive" : "Active",
       };
       setForm(newForm);
     }
@@ -579,8 +598,8 @@ const Employee = () => {
                 onClick={
                   actionType === "add"
                     ? addEmployee
-                    : actionType === "edit"
-                    ? editEmployee
+                    : actionType === "edit" || actionType === "statusAction"
+                    ? editEmployee 
                     : actionType === "bulkDelete"
                     ? bulkDeleteEmployee
                     : deleteEmployee
@@ -603,7 +622,7 @@ const Employee = () => {
               ? "Edit Employee"
               : actionType === "exportImport"
               ? "Export / Import"
-              : actionType === 'detail' ? 'Employee Detail' : "Delete Employee"
+              : actionType === 'detail' ? 'Employee Detail' : actionType === 'statusAction' ? "Update Employee Status" : "Delete Employee"
           }`}
           open={employeeModal}
           onCancel={() => setEmployeeModal(false)}
@@ -884,9 +903,9 @@ const Employee = () => {
             </div>
           )}
 
-          {actionType === "delete" && (
+          {actionType === "delete" ? (
             <p>Are you sure want to delete this employee?</p>
-          )}
+          ) : ( <p>Are you sure want to update the status of this employee?</p>)}
         </Modal>
 
         <button

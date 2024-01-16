@@ -49,7 +49,7 @@ const Location = () => {
 
   useEffect(() => {
     const filteredList = _.cloneDeep(locations)?.filter((x) => {
-      return x.name.toLocaleLowerCase()?.includes(searchLocationsInput?.toLocaleLowerCase()) || x.address.toLocaleLowerCase()?.includes(searchLocationsInput?.toLocaleLowerCase())
+      return x.name.toLocaleLowerCase()?.includes(searchLocationsInput?.toLocaleLowerCase()) || x.address.toLocaleLowerCase()?.includes(searchLocationsInput?.toLocaleLowerCase()) || x.locationId.includes(searchLocationsInput)
     });
 
     if (searchLocationsInput) {
@@ -208,6 +208,7 @@ const Location = () => {
                       <div className="flex flex-col">
                         <p>{x.name}</p>
                         <p className="mt-2 text-xs font-light">{x.address}</p>
+                        <p className="mt-2 text-xs font-light">{x.locationId}</p>
                         {/* <p className="mt-5">+1 212 435 6466</p> */}
                       </div>
 
