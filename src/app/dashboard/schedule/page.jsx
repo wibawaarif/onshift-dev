@@ -91,10 +91,9 @@ const Scheduler = () => {
 
   const [timeoffForm, setTimeoffForm] = useState({
     date: "",
-    employees: [],
-    startTime: "",
-    endTime: "",
-    category: "TimeOff"
+    employee: [],
+    reason: "",
+    workspace: "",
   })
   const options = [];
   const [shiftTemplate, setShiftTemplate] = useState('')
@@ -387,9 +386,9 @@ const Scheduler = () => {
 
   const addTimeoff = async () => {
     setShiftModal(false);
-    await fetch(`/api/shifts`, {
+    await fetch(`/api/leave`, {
       method: "POST",
-      body: JSON.stringify({...timeoffForm, startTime: dayjs(timeoffForm.startTime), endTime: dayjs(timeoffForm.endTime), workspace: session.data.user.workspace, category: 'TimeOff'}),
+      body: JSON.stringify({...timeoffForm, workspace: session.data.user.workspace}),
       headers: {
         authorization: "Bearer " + session.data.user.accessToken,
       },
@@ -397,7 +396,7 @@ const Scheduler = () => {
     mutateEmployees([...employees]);
     mutateEmployees([...shifts]);
 
-    message.success("Shift created");
+    message.success("TimeOff created");
 
     clearFields();
   }
@@ -819,7 +818,7 @@ const Scheduler = () => {
                   ? "CONFIRM"
                   : "EDIT"}
               </button>
-            ) : <button onClick={actionType === "delete" ? () => deleteShift() : actionType === "edit" ? () => editTimeoff() : () => addTimeoff()} disabled={actionType !== "delete" && (!timeoffForm.date || !timeoffForm.employees)} className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
+            ) : <button onClick={actionType === "delete" ? () => deleteShift() : actionType === "edit" ? () => editTimeoff() : () => addTimeoff()} disabled={actionType !== "delete" && (!timeoffForm.date || !timeoffForm.employee)} className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
             key="submit">{actionType === "delete" ? "CONFIRM" : actionType === "edit" ? "EDIT" : "CREATE"}</button>,
           ]}
           title="Create New Shift"
@@ -1223,9 +1222,8 @@ const Scheduler = () => {
                           className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
                         />
 
-                                              <div className="flex mt-4 justify-between">
+                                              {/* <div className="flex mt-4 justify-between">
                         <div className="w-[48%] ">
-                          <p className="text-black">{JSON.stringify({test: dayjs("01:00 AM")})}</p>
                           <span className="text-xs font-semibold">
                             START SHIFT{" "}
                             <span className="text-xs text-red-500">*</span>
@@ -1281,26 +1279,16 @@ const Scheduler = () => {
                             }
                             options={options}
                           />
-                          {/* <TimePicker
-                            value={form?.endTime}
-                            onChange={(e) =>
-                              setForm((prev) => {
-                                return { ...prev, endTime: e };
-                              })
-                            }
-                            format="HH:mm"
-                            className="w-full rounded-none border-t-0 border-l-0 border-r-0"
-                          /> */}
                         </div>
-                      </div>
+                      </div> */}
 
-                  <Checkbox
+                  {/* <Checkbox
                   className="mt-2"
                     value={allday}
                     onChange={(e) => setAllday(e.target.checked)}
                   >
                     All Day
-                  </Checkbox>
+                  </Checkbox> */}
 
 <div className="flex flex-col mt-4">
                         <span className="text-xs font-semibold">
@@ -1319,17 +1307,31 @@ const Scheduler = () => {
                           allowClear
                           placeholder="Select Employee"
                           className="mt-1"
-                          value={timeoffForm?.employees}
+                          value={timeoffForm?.employee}
                           options={employees?.map((x) => {
                             return { label: x.name, value: x._id };
                           })}
                           onChange={(e) =>
                             setTimeoffForm((prev) => {
-                              return { ...prev, employees: e };
+                              return { ...prev, employee: e };
                             })
                           }
                         />
                       </div>
+                      <div className="mt-4">
+                          <span className="text-xs font-semibold">Reason{" "}
+                          <span className="text-xs text-red-500">*</span></span>
+                          <Input
+                            value={timeoffForm?.reason}
+                            onChange={(e) =>
+                              setTimeoffForm((prev) => {
+                                return { ...prev, reason: e.target.value };
+                              })
+                            }
+                            className="rounded-none border-t-0 border-l-0 border-r-0"
+                            placeholder="I Have to..."
+                          />
+                        </div>
                     </div>
                   ),
                 },

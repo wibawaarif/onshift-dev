@@ -14,7 +14,7 @@ const SidebarComponent = ({ setChangePasswordModal, clicked, setClicked ,current
     />
   </div>
 
-  <div className="flex flex-col justify-between items-center h-72">
+  <div className="flex flex-col justify-between items-center h-80">
     {menu.map((x, index) => (
       <Link href={`/dashboard/${x}`} key={index}>
         <div className="flex justify-center items-center transition duration-300 hover:bg-[#E5E5E3] w-[32x] h-[30px] cursor-pointer px-1 rounded-lg">

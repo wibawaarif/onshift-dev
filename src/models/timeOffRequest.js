@@ -1,10 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 const timeOffRequesttSchema = new Schema({
-  startDate: {
-    type: Date
-  },
-  endDate: {
+  date: {
     type: Date
   },
   employee: {
@@ -14,8 +11,16 @@ const timeOffRequesttSchema = new Schema({
   },
   status: {
     type: String,
+    default: 'Requested',
+    enum: ['Requested', 'Approved', 'Disapproved']
   },
   reason: {
+    type: String,
+  },
+  workspace: {
+    type: String
+  },
+  approvedAt: {
     type: String,
   }
 }, { timestamps: true })
