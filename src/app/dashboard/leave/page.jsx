@@ -200,7 +200,7 @@ const Location = () => {
       title: "Date",
       dataIndex: "date",
       render: (_, record) => (
-        <div>{dayjs(record.employee.date).format("D/MMMM/YYYY")}</div>
+        <div>{dayjs(record.employee.date).format("D MMMM YYYY")}</div>
       ),
     },
     {
