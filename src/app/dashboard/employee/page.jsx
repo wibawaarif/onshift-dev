@@ -22,6 +22,7 @@ import { useSession } from "next-auth/react";
 import Papa from "papaparse";
 import { CSVLink } from "react-csv";
 import axios from "axios";
+import { read, utils } from 'xlsx';
 // import EmployeeTemplate from "@public/static/templates/Onshift_Employee_Template.xlsx"
 
 const fetcher = ([url, token]) =>
@@ -92,35 +93,49 @@ const Employee = () => {
     multiple: false,
     action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
     beforeUpload: (file) => {
+      console.log(file.type)
       const isCSV = file.type === "text/csv";
-      if (!isCSV) {
-        message.error(`${file.name} is not a csv file`);
+      const isXls = filte.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      if (!isCSV || !isXls) {
+        message.error(`${file.name} is not a csv or xls file`);
       }
       return isCSV || Upload.LIST_IGNORE;
     },
     onChange(info) {
-      const { status } = info.file;
-      if (status !== "uploading") {
-      }
-      if (status === "done") {
+      console.log(info)
+      // const { status } = info.file;
+      // console.log(status)
+      // if (status !== "uploading") {
+      // }
+      // if (status === "done") {
         message.success(`${info.file.name} file uploaded successfully.`);
         const reader = new FileReader();
 
         reader.onload = (e) => {
-          const contents = e.target.result;
-          Papa.parse(contents, {
+          let data = e.target.result;
+
+          if (info.file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+          let workbook = read(data, {type: 'binary'});
+          const wsname = workbook.SheetNames[0];
+          const ws = workbook.Sheets[wsname];
+          const result = utils.sheet_to_json(ws, {header: ['#', 'name', 'email', 'password', 'phoneNumber', 'platform'], range: 3, blankrows: false});
+          setUploadedEmployees(result);
+
+          } else {
+
+          Papa.parse(data, {
             complete: (parsedData) => {
               // Process the parsed data here
+              console.log(parsedData.data)
               setUploadedEmployees(parsedData.data);
             },
             header: true,
           });
+          }
         };
+        reader.readAsBinaryString(info.file)
+        // reader.readAsText(info.fileList[0].originFileObj);
 
-        reader.readAsText(info.fileList[0].originFileObj);
-      } else if (status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
-      }
     },
     onDrop(e) {
       console.log("Dropped files", e.dataTransfer.files);
@@ -288,12 +303,26 @@ const Employee = () => {
 
   const addUploadedEmployees = async () => {
     setEmployeeModal(false);
-
+    if (uploadedEmployees?.length === 0) {
+      message.error('No data inserted');
+      return
+    }
+    console.log(uploadedEmployees)
+    // debugger
     for (let i = 0; i < uploadedEmployees.length; i++) {
-      if (uploadedEmployees[i].email) {
+      if (uploadedEmployees[i].email && uploadedEmployees[i].name && uploadedEmployees[i].password && uploadedEmployees[i].phoneNumber && uploadedEmployees[i].platform) {
+        const employeesToBeSend = {
+          name: uploadedEmployees[i].name,
+          email: uploadedEmployees[i].email,
+          password: uploadedEmployees[i].password + '',
+          phoneNumber: uploadedEmployees[i].phoneNumber,
+          platform: uploadedEmployees[i].platform,
+          workspace: session.data.user.workspace,
+          user: session.data.user.email
+        }
         const res = await fetch(`/api/employees`, {
           method: "POST",
-          body: JSON.stringify({...uploadedEmployees[i], workspace: session.data.user.workspace}),
+          body: JSON.stringify(employeesToBeSend),
           headers: {
             authorization: "Bearer " + session.data.user.accessToken,
           },
@@ -307,6 +336,9 @@ const Employee = () => {
   
         message.success("Employee created");
         mutate([...employees, form]);
+      } else {
+        message.error('All fields are required');
+        return
       }
     }
   };
@@ -550,24 +582,24 @@ const Employee = () => {
         <Modal
         width={800}
           footer={[
-            actionType === "exportImport" ? (
-              <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm">
-                <CSVLink
-                  data={clonedEmployees.map((x) => {
-                    return { ...x, shifts: x?.shifts?.map((z) => z.date) };
-                  })}
-                  headers={headers}
-                  filename={"my-file.csv"}
-                  key="back"
-                  target="_blank"
-                >
-                  <div className="flex justify-center items-center">
-                    <DownloadOutlined className="mr-2 my-0 py-0 text-black" />{" "}
-                    <span className="text-black">DOWNLOAD</span>
-                  </div>
-                </CSVLink>
-              </div>
-            ) : (
+            // actionType === "exportImport" ? (
+            //   <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm">
+            //     <CSVLink
+            //       data={clonedEmployees.map((x) => {
+            //         return { ...x, shifts: x?.shifts?.map((z) => z.date) };
+            //       })}
+            //       headers={headers}
+            //       filename={"my-file.csv"}
+            //       key="back"
+            //       target="_blank"
+            //     >
+            //       <div className="flex justify-center items-center">
+            //         <DownloadOutlined className="mr-2 my-0 py-0 text-black" />{" "}
+            //         <span className="text-black">DOWNLOAD</span>
+            //       </div>
+            //     </CSVLink>
+            //   </div>
+            // ) : (
               // <button
               //   className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
               //   key="back"
@@ -578,13 +610,13 @@ const Employee = () => {
               //   </div>
               // </button>
               <button
-                className={`mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm ${actionType === 'detail' ? 'invisible hidden' : ''}`}
+                className={`mr-3 hover:bg-[#E5E5E3] px-4 mt-10 py-1 border-[1px] border-[#E5E5E3] rounded-sm ${actionType === 'detail' ? 'invisible hidden' : ''}`}
                 key="back"
                 onClick={() => setEmployeeModal(false)}
               >
                 CANCEL
               </button>
-            ),
+            ,
             actionType === "exportImport" ? (
               <button
                 onClick={() => addUploadedEmployees()}
@@ -903,9 +935,12 @@ const Employee = () => {
             </div>
           )}
 
-          {actionType === "delete" ? (
+          {actionType === "delete" && (
             <p>Are you sure want to delete this employee?</p>
-          ) : ( <p>Are you sure want to update the status of this employee?</p>)}
+          )}
+          {
+            actionType === "statusAction" && <p>Are you sure want to update the status of this employee?</p>
+          }
         </Modal>
 
         <button
