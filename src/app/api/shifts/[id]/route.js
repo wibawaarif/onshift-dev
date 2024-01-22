@@ -51,11 +51,15 @@ export const DELETE = async (request, { params }) => {
 
     await Shift.findByIdAndDelete(id);
 
-    await Employee.updateOne({
+    // await Employee.findOneAndUpdate({userId: userId}, {$pull: {alerts: {_id: alertId}}}, function(err, data){
+    //   console.log(err, data);
+    // });
+    console.log(id)
+    await Employee.findOneAndUpdate({shifts: id},{
       $pull: {
         shifts: id
       }
-    })
+    }).exec()
 
     return new NextResponse("Shift has been deleted", { status: 200 });
   } catch (err) {

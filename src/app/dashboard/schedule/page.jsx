@@ -378,7 +378,7 @@ const Scheduler = () => {
       return { ...prev, date, employees: [...prev.employees, id] };
     });
     setTimeoffForm((prev) => {
-      return { ...prev, date, employees: [...prev.employees, id] }
+      return { ...prev, date, employee: [...prev.employee, id] }
     })
     setActionType("add");
     setShiftModal(true);
@@ -618,8 +618,9 @@ const Scheduler = () => {
     });
     setTimeoffForm({
       date: "",
-      employees: [],
-      category: "TimeOff"
+      employee: [],
+      reason: "",
+      workspace: "",
     })
     setShiftTemplate('')
   };

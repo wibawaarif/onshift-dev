@@ -9,6 +9,7 @@ import {
   Pagination,
   message,
   Popover,
+  Radio
 } from "antd";
 import { ConfigProvider } from "antd";
 import Image from "next/image";
@@ -31,6 +32,7 @@ const Position = () => {
   const [name, setName] = useState("");
   const [wage, setWage] = useState("");
   const [wageAmount, setwageAmount] = useState("");
+  const [platform, setPlatform] = useState("Mobile App");
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(24);
@@ -110,6 +112,7 @@ const Position = () => {
         color: avatarColor,
         wageType: wage,
         wageAmount,
+        platform,
         employees: selectedEmployees,
         workspace: session.data.user.workspace
       }),
@@ -123,6 +126,7 @@ const Position = () => {
         name,
         color: avatarColor,
         wageType: wage,
+        platform,
         wageAmount,
         employees: selectedEmployees,
       },
@@ -317,7 +321,8 @@ const Position = () => {
             CLOSE
           </button>,
           <button
-            className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80"
+            className="bg-black text-white rounded-sm px-4 py-1 hover:opacity-80 disabled:opacity-50"
+            disabled={actionType === "add" && !name || !platform || !wage || !wageAmount}
             key="submit"
             onClick={
               actionType === "edit"
@@ -377,6 +382,20 @@ const Position = () => {
                         ))}
                       </div>
                     </div>
+
+                    <div className="flex flex-col mt-3">
+                <span className="text-xs font-semibold">PLATFORM</span>
+                <Radio.Group
+                  className="mt-3"
+                  onChange={(e) =>
+                    setPlatform(e.target.value)
+                  }
+                  value={platform}
+                >
+                  <Radio value={"Mobile App"}>Mobile App</Radio>
+                  <Radio value={"Web Portal"}>Web Portal</Radio>
+                </Radio.Group>
+              </div>
 
                     <div className="flex mt-4 justify-between">
                       <div className="w-[48%] flex flex-col">

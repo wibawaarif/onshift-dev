@@ -118,7 +118,7 @@ const Employee = () => {
           let workbook = read(data, {type: 'binary'});
           const wsname = workbook.SheetNames[0];
           const ws = workbook.Sheets[wsname];
-          const result = utils.sheet_to_json(ws, {header: ['#', 'name', 'email', 'password', 'phoneNumber', 'platform'], range: 3, blankrows: false});
+          const result = utils.sheet_to_json(ws, {header: ['#', 'name', 'email', 'password', 'phoneNumber'], range: 3, blankrows: false});
           setUploadedEmployees(result);
 
           } else {
@@ -169,10 +169,6 @@ const Employee = () => {
     {
       label: "phoneNumber",
       key: "phoneNumber",
-    },
-    {
-      label: "Platform",
-      key: "platform",
     },
     {
       label: "positions",
@@ -268,7 +264,6 @@ const Employee = () => {
     email: "",
     password: "",
     phoneNumber: null,
-    platform: "Mobile App",
     wageOptions: {
       category: "Standard",
       type: null,
@@ -310,13 +305,12 @@ const Employee = () => {
     console.log(uploadedEmployees)
     // debugger
     for (let i = 0; i < uploadedEmployees.length; i++) {
-      if (uploadedEmployees[i].email && uploadedEmployees[i].name && uploadedEmployees[i].password && uploadedEmployees[i].phoneNumber && uploadedEmployees[i].platform) {
+      if (uploadedEmployees[i].email && uploadedEmployees[i].name && uploadedEmployees[i].password && uploadedEmployees[i].phoneNumber) {
         const employeesToBeSend = {
           name: uploadedEmployees[i].name,
           email: uploadedEmployees[i].email,
           password: uploadedEmployees[i].password + '',
           phoneNumber: uploadedEmployees[i].phoneNumber,
-          platform: uploadedEmployees[i].platform,
           workspace: session.data.user.workspace,
           user: session.data.user.email
         }
@@ -439,7 +433,6 @@ const Employee = () => {
         name: data.name,
         email: data.email,
         phoneNumber: data.phoneNumber,
-        platform: data.platform,
         wageOptions: data.wageOptions,
         positions: data.positions,
       };
@@ -453,7 +446,6 @@ const Employee = () => {
         name: data.name,
         email: data.email,
         phoneNumber: data.phoneNumber,
-        platform: data.platform,
         wageOptions: data.wageOptions,
         positions: data.positions,
         status: data.status === "Active" ? "Inactive" : "Active",
@@ -466,7 +458,6 @@ const Employee = () => {
         name: data.name,
         email: data.email,
         phoneNumber: data.phoneNumber,
-        platform: data.platform,
         wageOptions: data.wageOptions,
         positions: data.positions,
       };
@@ -487,7 +478,6 @@ const Employee = () => {
       email: "",
       password: "",
       phoneNumber: null,
-      platform: "Mobile App",
       wageOptions: {
         category: "Standard",
         type: null,
@@ -722,10 +712,6 @@ const Employee = () => {
                   <span>Phone Number</span>
                   <div className="font-medium w-full h-10 rounded-xl bg-stone-100 px-4 flex items-center">{ form.phoneNumber }</div>
                 </div>
-                <div className="flex flex-col mt-4">
-                  <span>Platform</span>
-                  <div className="font-medium w-full h-10 rounded-xl bg-stone-100 px-4 flex items-center">{ form.platform }</div>
-                </div>
               </div>
 
                
@@ -917,21 +903,7 @@ const Employee = () => {
                 </div>
               )}
 
-              <div className="flex flex-col mt-3">
-                <span className="text-xs font-semibold">PLATFORM</span>
-                <Radio.Group
-                  className="mt-3"
-                  onChange={(e) =>
-                    setForm((prev) => {
-                      return { ...prev, platform: e.target.value };
-                    })
-                  }
-                  value={form.platform}
-                >
-                  <Radio value={"Mobile App"}>Mobile App</Radio>
-                  <Radio value={"Web Portal"}>Web Portal</Radio>
-                </Radio.Group>
-              </div>
+            
             </div>
           )}
 

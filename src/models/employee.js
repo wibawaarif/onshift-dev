@@ -33,10 +33,6 @@ const employeeSchema = new Schema({
         ref: 'Timesheet',
       }
     ],
-    platform: {
-      type: String,
-      enum: ['Mobile App', 'Web Portal']
-    },
     positions: [{
       type: mongoose.Types.ObjectId,
       ref: 'Position',
