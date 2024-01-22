@@ -557,6 +557,7 @@ const SignIn = () => {
                 </button>
               ) : (
                 <button
+                disabled={!form.name || !form.address}
                   onClick={
                     currentStep === 2
                       ? () => setCurrentStep(3)
@@ -745,12 +746,13 @@ const SignIn = () => {
                 </button>
               ) : (
                 <button
+                  disabled={(currentStep === 2 && (!form.name || !address)) || (currentStep === 3 && (!form.industry || !form.totalEmployees))}
                   onClick={
                     currentStep === 2
                       ? () => setCurrentStep(3)
                       : () => handleSubmit()
                   }
-                  className="mt-8 w-full h-[50px] bg-[#000000FF] text-white rounded-[8px]"
+                  className="mt-8 w-full h-[50px] disabled:opacity-50 bg-[#000000FF] text-white rounded-[8px]"
                 >
                   {spin ? <Spin /> : "Start Scheduling"}
                 </button>
