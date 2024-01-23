@@ -3,6 +3,7 @@
 import FilterComponent from "@/components/filter/page";
 import { InboxOutlined, DownloadOutlined } from "@ant-design/icons";
 import {
+  Avatar,
   ConfigProvider,
   Input,
   Table,
@@ -56,6 +57,30 @@ const Employee = () => {
   const [actionType, setActionType] = useState("");
   const [popover, setPopover] = useState(false);
   const [uploadedEmployees, setUploadedEmployees] = useState(null);
+  const [avatarColor, setAvatarColor] = useState("#FFFFFF");
+  const [name, setName] = useState("");
+  const [platform, setPlatform] = useState("Mobile App");
+  const [wage, setWage] = useState("");
+  const [wageAmount, setwageAmount] = useState("");
+  const [showPosition, setShowPosition] = useState(false);
+
+  const avatarHexColor = [
+    "#FFFFFF",
+    "#E5E5E3",
+    "#A7A7A7",
+    "#7D7D80",
+    "#646466",
+  ];
+
+
+  const checklist = (
+    <Image
+      width={16}
+      height={16}
+      alt="checklist-icon"
+      src={"/static/svg/checklist.svg"}
+    />
+  );
 
   useEffect(() => {
     setClonedEmployees(_.cloneDeep(employees));
@@ -206,6 +231,10 @@ const Employee = () => {
       render: (_, record) => <div>{`+${record.phoneNumber}`}</div>,
     },
     {
+      title: "Position",
+      render: (_, record) => <div>{record?.positions[0].name}</div>,
+    },
+    {
       title: "Status",
       dataIndex: "status",
       render: (_, record) => <div>{record.status ? record.status : "-"}</div>,
@@ -226,6 +255,9 @@ const Employee = () => {
                 </button>
                 <button onClick={() => handleAction("statusAction", record)}>
                   { record.status === "Active" ? "Deactivate": "Activate" }
+                </button>
+                <button onClick={() => handleAction("resetPassword", record)}>
+                  Reset Password
                 </button>
                 <button onClick={() => handleAction("delete", record._id)}>
                   Delete
@@ -256,7 +288,7 @@ const Employee = () => {
     },
   ];
 
-  const wageType = [{ value: "Hourly", label: "Hourly" }];
+  const wageType = [{ value: "Hourly", label: "Hourly" }, { value: "Monthly", label: "Monthly" }];
 
   const [id, setId] = useState("");
   const [form, setForm] = useState({
@@ -272,6 +304,11 @@ const Employee = () => {
     positions: [],
     status: "",
   });
+
+  const [resetPassword, setResetPassword] = useState({
+    password: "",
+    confirmPassword: "",
+  })
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [employeeModal, setEmployeeModal] = useState(false);
 
@@ -353,25 +390,67 @@ const Employee = () => {
   }
 
   const addEmployee = async () => {
-    setEmployeeModal(false);
-    const res = await fetch(`/api/employees`, {
-      method: "POST",
-      body: JSON.stringify({...form, workspace: session.data.user.workspace}),
-      headers: {
-        authorization: "Bearer " + session.data.user.accessToken,
-      },
-    });
+    if (!showPosition) {
+      setEmployeeModal(false);
+      const res = await fetch(`/api/employees`, {
+        method: "POST",
+        body: JSON.stringify({...form, workspace: session.data.user.workspace}),
+        headers: {
+          authorization: "Bearer " + session.data.user.accessToken,
+        },
+      });
+  
+      const respMessage = await res.json();
+  
+      if (respMessage.info === "email existed") {
+        message.error(`${respMessage.error}`);
+        return;
+      }
+  
+      mutate([...employees, form]);
+  
+      message.success("Employee created");
+    } else {
+      const position = await fetch(`/api/positions`, {
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          color: avatarColor,
+          wageType: wage,
+          wageAmount,
+          platform,
+          workspace: session.data.user.workspace
+        }),
+        headers: {
+          authorization: "Bearer " + session.data.user.accessToken,
+        },
+      });
 
-    const respMessage = await res.json();
+      const toJson = await position.json()
 
-    if (respMessage.info === "email existed") {
-      message.error(`${respMessage.error}`);
-      return;
+      setEmployeeModal(false);
+      const res = await fetch(`/api/employees`, {
+        method: "POST",
+        body: JSON.stringify({...form, positions: [toJson._id]  ,workspace: session.data.user.workspace}),
+        headers: {
+          authorization: "Bearer " + session.data.user.accessToken,
+        },
+      });
+  
+      const respMessage = await res.json();
+  
+      if (respMessage.info === "email existed") {
+        message.error(`${respMessage.error}`);
+        return;
+      }
+  
+      mutate([...employees, form]);
+  
+      message.success("Employee created");
+      console.log(await res.json());
     }
+  
 
-    mutate([...employees, form]);
-
-    message.success("Employee created");
   };
 
   const editEmployee = async () => {
@@ -386,6 +465,23 @@ const Employee = () => {
     mutate([...employees]);
 
     message.success("Employee updated");
+
+    clearFields();
+  };
+
+  const handleResetPassword = async () => {
+    console.log('test di handle')
+    setEmployeeModal(false);
+    await fetch(`/api/employees/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({...form, password: resetPassword.password, method: "resetPassword"}),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    mutate([...employees]);
+
+    message.success("Successfully reset password");
 
     clearFields();
   };
@@ -464,6 +560,19 @@ const Employee = () => {
       setForm(newForm);
     }
 
+    if (type === 'resetPassword') {
+      setId(data._id);
+      const newForm = {
+        name: data.name,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        wageOptions: data.wageOptions,
+        positions: data.positions,
+        password: resetPassword.password
+      };
+      setForm(newForm);
+    }
+
     if (type === "delete") {
       setId(data);
     }
@@ -485,6 +594,10 @@ const Employee = () => {
       },
       positions: [],
     });
+    setResetPassword({
+      password: "",
+      confirmPassword: "",
+    })
   };
 
   return (
@@ -570,6 +683,7 @@ const Employee = () => {
           </div>
         </div>
         <Modal
+              maskClosable={false}
         width={800}
           footer={[
             // actionType === "exportImport" ? (
@@ -617,6 +731,7 @@ const Employee = () => {
               </button>
             ) : (
               <button
+                disabled={actionType === "resetPassword" ? !resetPassword.confirmPassword || !resetPassword.password  || resetPassword.password !== resetPassword.confirmPassword  : actionType === "statusAction" ? false : !form.name || !form.email || !form.password || !form.phoneNumber || (showPosition ? !name || !wage || !wageAmount : form.positions.length === 0)}
                 onClick={
                   actionType === "add"
                     ? addEmployee
@@ -624,9 +739,9 @@ const Employee = () => {
                     ? editEmployee 
                     : actionType === "bulkDelete"
                     ? bulkDeleteEmployee
-                    : deleteEmployee
+                    : actionType === "resetPassword" ? handleResetPassword : deleteEmployee
                 }
-                className={`bg-black text-white rounded-sm px-4 py-1 hover:opacity-80 ${actionType === 'detail' ? 'invisible hidden' : ''}`}
+                className={`bg-black text-white rounded-sm disabled:opacity-50 px-4 py-1 hover:opacity-80 ${actionType === 'detail' ? 'invisible hidden' : ''}`}
                 key="submit"
               >
                 {actionType === "add"
@@ -644,7 +759,7 @@ const Employee = () => {
               ? "Edit Employee"
               : actionType === "exportImport"
               ? "Export / Import"
-              : actionType === 'detail' ? 'Employee Detail' : actionType === 'statusAction' ? "Update Employee Status" : "Delete Employee"
+              : actionType === 'detail' ? 'Employee Detail' : actionType === 'statusAction' ? "Update Employee Status" : actionType === "resetPassword" ? "Reset Password" : "Delete Employee"
           }`}
           open={employeeModal}
           onCancel={() => setEmployeeModal(false)}
@@ -678,6 +793,41 @@ const Employee = () => {
               </Dragger>
             </div>
           )}
+
+          {
+            actionType === "resetPassword" && (
+              <>
+              <div className="mt-3">
+              <span className="text-xs font-semibold">PASSWORD</span>
+              <Input
+                value={resetPassword.password}
+                type="password"
+                onChange={(e) =>
+                  setResetPassword((prev) => {
+                    return { ...prev, password: e.target.value };
+                  })
+                }
+                className="rounded-none border-t-0 border-l-0 border-r-0"
+                placeholder="Enter password"
+              />
+            </div>
+                          <div className="mt-3">
+                          <span className="text-xs font-semibold">CONFIRM PASSWORD</span>
+                          <Input
+                            value={resetPassword.confirmPassword}
+                            type="password"
+                            onChange={(e) =>
+                              setResetPassword((prev) => {
+                                return { ...prev, confirmPassword: e.target.value };
+                              })
+                            }
+                            className="rounded-none border-t-0 border-l-0 border-r-0"
+                            placeholder="Enter password"
+                          />
+                        </div>
+                        </>
+            )
+          }
 
           {
             actionType === 'detail' && (
@@ -821,24 +971,133 @@ const Employee = () => {
                   placeholder="company@gmail.com"
                 />
               </div> */}
-              <div className="mt-3 flex flex-col">
-                <span className="text-xs font-semibold">POSITION</span>
-                <Select
-                  mode="multiple"
-                  allowClear
-                  placeholder="Select Position"
-                  className="mt-1"
-                  value={form?.positions}
-                  options={positions?.map((x) => {
-                    return { label: x.name, value: x._id };
-                  })}
-                  onChange={(e) =>
-                    setForm((prev) => {
-                      return { ...prev, positions: e };
-                    })
-                  }
-                />
-              </div>
+              {
+                !showPosition && (
+                  <div className="mt-3 flex flex-col">
+                  <span className="text-xs font-semibold">POSITION</span>
+                  <Select
+                    mode="multiple"
+                    allowClear
+                    placeholder="Select Position"
+                    className="mt-1"
+                    value={form?.positions}
+                    options={positions?.map((x) => {
+                      return { label: x.name, value: x._id };
+                    })}
+                    onChange={(e) =>
+                      setForm((prev) => {
+                        return { ...prev, positions: e };
+                      })
+                    }
+                  />
+                </div>
+                )
+              }
+           
+
+              {!showPosition && (
+                          <button
+                            onClick={() => setShowPosition(true)}
+                            className="transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                          >
+                            + ADD NEW POSITION
+                          </button>
+                        )}
+
+
+              {/* start */}
+
+              {
+                showPosition && (
+                  <div className="mt-4">
+
+                  <div className="mt-1">
+                    <span className="text-xs font-semibold">
+                      POSITION NAME
+                    </span>
+                    <Input
+                      onChange={(e) => setName(e.target.value)}
+                      value={name}
+                      className="rounded-none border-t-0 border-l-0 border-r-0"
+                      placeholder="e.g Phlebotomist"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <span className="text-xs font-semibold">COLOR</span>
+                    <div className="border-b-[1px] border-[#E5E5E3] flex py-2 mt-1">
+                      {avatarHexColor?.map((x, index) => (
+                        <Avatar
+                          key={index}
+                          onClick={() => setAvatarColor(x)}
+                          className={`flex mr-1 cursor-pointer justify-center items-center ${
+                            avatarColor === "#FFFFFF"
+                              ? "border-[1px] border-[#E5E5E3]"
+                              : undefined
+                          } bg-[${x}]`}
+                          size={24}
+                        >
+                          {avatarColor === x && checklist}
+                        </Avatar>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col mt-3">
+              <span className="text-xs font-semibold">PLATFORM</span>
+              <Radio.Group
+                className="mt-3"
+                onChange={(e) =>
+                  setPlatform(e.target.value)
+                }
+                value={platform}
+              >
+                <Radio value={"Mobile App"}>Mobile App</Radio>
+                <Radio value={"Web Portal"}>Web Portal</Radio>
+              </Radio.Group>
+            </div>
+
+                  <div className="flex mt-4 justify-between">
+                    <div className="w-[48%] flex flex-col">
+                      <span className="text-xs font-semibold">WAGE TYPE</span>
+                      <Select
+                        value={wage}
+                        onChange={(e) => setWage(e)}
+                        placeholder="Select wage type"
+                        className="mt-1"
+                        options={wageType}
+                      />
+                    </div>
+                    <div className="w-[48%] flex flex-col">
+                      <span className="text-xs font-semibold">
+                        WAGE AMOUNT
+                      </span>
+                      <Input
+                        onChange={(e) => setwageAmount(e.target.value)}
+                        value={wageAmount}
+                        className="rounded-none border-t-0 border-l-0 border-r-0"
+                        suffix="usd per hour"
+                      />
+                    </div>
+</div>
+<div className="mt-2">
+                                <button
+                                  onClick={() =>
+                                    setShowPosition(false) &
+                                    setForm((prev) => {
+                                      return { ...prev, break: null };
+                                    })
+                                  }
+                                  className="transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                                >
+                                  SELECT EXISTING EMPLOYEE
+                                </button>
+                              </div>
+</div>
+                )
+              }
+            
+              {/* end */}
 
               <div className="flex flex-col mt-3">
                 <span className="text-xs font-semibold">WAGE TYPE</span>

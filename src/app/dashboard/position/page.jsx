@@ -312,6 +312,7 @@ const Position = () => {
 
       {/* MODAL ADD NEW SHIFT / TIME OFF */}
       <Modal
+            maskClosable={false}
         footer={[
           <button
             className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"

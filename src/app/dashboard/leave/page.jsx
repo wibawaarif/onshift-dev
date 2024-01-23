@@ -552,6 +552,7 @@ const Location = () => {
           </div>
         </div>
         <Modal
+              maskClosable={false}
           width={800}
           footer={[
             actionType === "exportImport" ? (

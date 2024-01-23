@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Employee from "@/models/employee";
-import { verifyJwtToken } from '@/lib/jwt'
+import { verifyJwtToken } from '@/lib/jwt';
+import bcrypt from 'bcrypt'
 
 export const PUT = async (request, { params }) => {
+  console.log('test')
   const accessToken = request.headers.get("authorization")
   const token = accessToken?.split(' ')[1]
 
@@ -18,16 +20,32 @@ export const PUT = async (request, { params }) => {
 
   try {
     await connect();
+    console.log(body)
+    if (body?.method === "resetPassword") {
+      const hashedPassword = await bcrypt.hash(body.password, 10)
+      const employee = await Employee.findById(id)
 
-    const employee = await Employee.findById(id)
+      employee.set({
+        ...body,
+        password: hashedPassword
+      })
+      
+      await employee.save();
+      return new NextResponse(JSON.stringify(employee), { status: 200 });
+    } else {
+      console.log('masuk sni')
+      const employee = await Employee.findById(id)
 
-    employee.set({
-      ...body
-    })
+      employee.set({
+        ...body
+      })
+  
+      await employee.save();
+  
+      return new NextResponse(JSON.stringify(employee), { status: 200 });
+    }
 
-    await employee.save();
 
-    return new NextResponse(JSON.stringify(employee), { status: 200 });
   } catch (err) {
     return new NextResponse(err, { status: 500 });
   }

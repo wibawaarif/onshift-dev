@@ -265,6 +265,7 @@ const Location = () => {
 
       {/* MODAL ADD NEW SHIFT / TIME OFF */}
       <Modal
+      maskClosable={false}
         footer={[
           <button
             className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
@@ -281,7 +282,7 @@ const Location = () => {
                 ? addLocation
                 : deleteLocation
             }
-            disabled={!address || !form.radius || !form.name}
+            disabled={actionType === "add" && (!address || !form.radius || !form.name)}
             className="bg-black text-white rounded-sm px-4 disabled:opacity-50 py-1 hover:opacity-80"
             key="submit"
           >

@@ -767,6 +767,7 @@ const Scheduler = () => {
 
         {/* MODAL ADD NEW SHIFT / TIME OFF */}
         <Modal
+              maskClosable={false}
           footer={[
             actionType === "exportImport" ? (
               <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm">
@@ -1319,18 +1320,20 @@ const Scheduler = () => {
                           }
                         />
                       </div>
-                      <div className="mt-4">
-                          <span className="text-xs font-semibold">Reason{" "}
-                          <span className="text-xs text-red-500">*</span></span>
-                          <Input
+                      <div className="flex flex-col mt-4">
+                        <span className="text-xs font-semibold">
+                          Reason{" "}
+                          <span className="text-xs text-red-500">*</span>
+                        </span>
+                          <Select
                             value={timeoffForm?.reason}
+                            className="mt-1"
+                            options={[{label: "Week off", value: "Week off"}, {label: "Annual Leave", value: "Annual Leave"}, {label: "Sick Leave", value: "Sick Leave"}, {label: "Bereavement Leave", value: "Bereavement Leave"}, {label: "Unpaid Leave", value: "Unpaid Leave"}]}
                             onChange={(e) =>
                               setTimeoffForm((prev) => {
-                                return { ...prev, reason: e.target.value };
+                                return { ...prev, reason: e };
                               })
                             }
-                            className="rounded-none border-t-0 border-l-0 border-r-0"
-                            placeholder="I Have to..."
                           />
                         </div>
                     </div>

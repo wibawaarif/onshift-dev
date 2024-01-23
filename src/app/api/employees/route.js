@@ -30,19 +30,14 @@ export const GET = async (request) => {
       path: 'shifts',
       model: Shift,
       select: 'date startTime endTime location position platform employees category repeatedShift notes break',
-      populate: [{
-        path: 'location',
-        select: 'name address',
-        model: Location,
-      }, {
-        path: 'position',
-        select: 'name',
-        model: Position,
-      }],
     }).populate({
       path: 'timesheets',
       model: Timesheet,
       select: 'date shiftStartTime shiftEndTime startTime endTime status action',
+    }).populate({
+      path: 'positions',
+      model: Position,
+      select: 'name',
     })
 
     return new NextResponse(JSON.stringify(employees), { status: 200 });
