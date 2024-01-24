@@ -38,7 +38,7 @@ export const GET = async (request) => {
       path: 'positions',
       model: Position,
       select: 'name',
-    })
+    }).select("name email phoneNumber shifts timesheets wageOptions positions status employeeId")
 
     return new NextResponse(JSON.stringify(employees), { status: 200 });
   } catch (err) {

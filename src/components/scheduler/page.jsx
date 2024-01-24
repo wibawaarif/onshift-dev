@@ -277,80 +277,66 @@ const SchedulerComponent = ({
 
                               {row?.shifts?.length !== 0 && (
                                 row?.shifts?.map((z, index) =>
-                                  dayjs(dataItem).diff(
-                                    dayjs(z?.repeatedShift?.endTime),
-                                    "day"
-                                  ) >=
-                                    dayjs(
-                                      z?.repeatedShift?.startRepeatedWeek
-                                    ).diff(
-                                      dayjs(z?.repeatedShift?.endTime),
-                                      "day"
-                                    ) &&
-                                  dayjs(dataItem).diff(
-                                    dayjs(z?.repeatedShift?.endDate),
-                                    "day"
-                                  ) < 0 &&
-                                  z?.repeatedShift?.repeatedDays?.some(
-                                    (x) => x === dayjs(dataItem).format("dddd")
-                                  ) ? (
-                                    // repeated week
-                                    <div
-                                      key={index}
-                                      className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
-                                    >
-                                      <p className="text-[10px] font-bold">
-                                        {dayjs(z.startTime).format("h:mma")} -{" "}
-                                        {dayjs(z.endTime).format("h:mma")} ·{" "}
-                                        {dayjs(z.endTime).diff(
-                                          dayjs(z.startTime),
-                                          "hour"
-                                        )}
-                                        H
-                                      </p>
-                                      <div
-                                        className={`flex ${
-                                          !z?.position?.name &&
-                                          !z?.location?.name &&
-                                          "invisible"
-                                        } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
-                                      >
-                                        <span className="text-white text-[10px]">
-                                          {z?.location?.name &&
-                                          z?.position?.name
-                                            ? `${z?.location.name} • ${z?.position.name}`
-                                            : z?.location?.name
-                                            ? `${z?.location?.name}`
-                                            : `${z?.position?.name}`}
-                                        </span>
-                                      </div>
-                                      <div className="relative">
-                                              <Image
-                                                onClick={() =>
-                                                  editShiftModal(z)
-                                                }
-                                                onMouseEnter={() =>
-                                                  setRowIndex(index)
-                                                }
-                                                width={16}
-                                                height={16}
-                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 right-3"
-                                                alt="trash"
-                                                src={"/static/svg/edit.svg"}
-                                              />
-                                              <Image
-                                                onClick={() =>
-                                                  deleteShiftModal(z._id)
-                                                }
-                                                width={16}
-                                                height={16}
-                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 -right-1"
-                                                alt="trash"
-                                                src={"/static/svg/trash.svg"}
-                                              />
-                                            </div>
-                                    </div>
-                                  ) : (
+                                  
+                                  // (
+                                  //   // repeated week
+                                  //   <div
+                                  //     key={index}
+                                  //     className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
+                                  //   >
+                                  //     <p className="text-[10px] font-bold">
+                                  //       {dayjs(z.startTime).format("h:mma")} -{" "}
+                                  //       {dayjs(z.endTime).format("h:mma")} ·{" "}
+                                  //       {dayjs(z.endTime).diff(
+                                  //         dayjs(z.startTime),
+                                  //         "hour"
+                                  //       )}
+                                  //       H
+                                  //     </p>
+                                  //     <div
+                                  //       className={`flex ${
+                                  //         !z?.position?.name &&
+                                  //         !z?.location?.name &&
+                                  //         "invisible"
+                                  //       } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
+                                  //     >
+                                  //       <span className="text-white text-[10px]">
+                                  //         {z?.location?.name &&
+                                  //         z?.position?.name
+                                  //           ? `${z?.location.name} • ${z?.position.name}`
+                                  //           : z?.location?.name
+                                  //           ? `${z?.location?.name}`
+                                  //           : `${z?.position?.name}`}
+                                  //       </span>
+                                  //     </div>
+                                  //     <div className="relative">
+                                  //             <Image
+                                  //               onClick={() =>
+                                  //                 editShiftModal(z)
+                                  //               }
+                                  //               onMouseEnter={() =>
+                                  //                 setRowIndex(index)
+                                  //               }
+                                  //               width={16}
+                                  //               height={16}
+                                  //               className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 right-3"
+                                  //               alt="trash"
+                                  //               src={"/static/svg/edit.svg"}
+                                  //             />
+                                  //             <Image
+                                  //               onClick={() =>
+                                  //                 deleteShiftModal(z._id)
+                                  //               }
+                                  //               width={16}
+                                  //               height={16}
+                                  //               className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 -right-1"
+                                  //               alt="trash"
+                                  //               src={"/static/svg/trash.svg"}
+                                  //             />
+                                  //           </div>
+                                  //   </div>
+                                  // ) : (
+                                    (
                                     dayjs(z.date).format("YYYY-MM-DD") ===
                                       dataItem && (
                                       // non repeated week

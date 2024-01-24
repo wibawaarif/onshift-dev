@@ -530,7 +530,7 @@ const Employee = () => {
         email: data.email,
         phoneNumber: data.phoneNumber,
         wageOptions: data.wageOptions,
-        positions: data.positions,
+        positions: data.positions?.map(x => x._id),
       };
       setForm(newForm);
     }
@@ -669,6 +669,8 @@ const Employee = () => {
               }}
             >
               <Table
+                scroll={{y: 1000}}
+                pagination={false}
                 columns={columns}
                 rowKey={(record) => record._id}
                 dataSource={clonedEmployees}
