@@ -26,6 +26,8 @@ import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
 import axios from "axios";
 import { shiftTemplates } from "@/utils/schedule";
+import PlaceComponent from "@/components/place-autocomplete/page";
+import GoogleMaps from "@/components/google-maps/page";
 
 const { Dragger } = Upload;
 
@@ -45,7 +47,7 @@ const Scheduler = () => {
     [`/api/shifts`, `${session.data.user.accessToken} #${session.data.user.workspace}`],
     fetcher
   );
-  const { data: locations } = useSWR(
+  const { data: locations, mutate: mutateLocation } = useSWR(
     [`/api/locations`, `${session.data.user.accessToken} #${session.data.user.workspace}`],
     fetcher
   );
@@ -71,7 +73,7 @@ const Scheduler = () => {
   const [uploadedShifts, setUploadedShifts] = useState(null);
   const [isFormInvalid, setIsFormInvalid] = useState(true);
   const [currentTab, setCurrentTab] = useState("1");
-    const [allday, setAllday] = useState(false);
+  const [locationModal, setLocationModal] = useState(false);
   const [form, setForm] = useState({
     date: "",
     startTime: "",
@@ -88,6 +90,17 @@ const Scheduler = () => {
       endDate: null,
     },
   });
+
+  const [formLocation, setFormLocation] = useState({
+    name: "",
+    address: "",
+    latitude: null,
+    longitude: null,
+    radius: 500,
+  });
+  const [address, setAddress] = useState(null);
+  const [latitude, setLatitude] = useState(24.432928);
+  const [longitude, setLongitude] = useState(54.644539);
 
   const [timeoffForm, setTimeoffForm] = useState({
     date: "",
@@ -370,6 +383,29 @@ const Scheduler = () => {
     setId(id);
     setActionType("delete");
     setShiftModal(true);
+  };
+
+  const addLocation = async () => {
+    setLocationModal(false);
+    const data = await fetch(`/api/locations`, {
+      method: "POST",
+      body: JSON.stringify({...formLocation, address, longitude, latitude, workspace: session.data.user.workspace}),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+
+    const res = await data.json();
+
+    if (res.error === "Location already exists") {
+      message.error("Location already exists");
+      clearFields();
+      return;
+    }
+    mutateLocation([...locations, formLocation]);
+
+    message.success("Location created");
+    clearFields();
   };
 
   const addShiftFromTable = (date, id) => {
@@ -1147,6 +1183,14 @@ const Scheduler = () => {
                           />
                         </div>
                       </div>
+                      <div className="w-full">
+                      <button
+                          onClick={() => setLocationModal(true)}
+                          className="mt-2 transition duration-300 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                        >
+                          + ADD LOCATION
+                        </button>
+                        </div>
                       {!showNotes && (
                         <button
                           onClick={() => setShowNotes(true)}
@@ -1342,6 +1386,75 @@ const Scheduler = () => {
               ]}
             />
           )}
+
+<Modal
+      maskClosable={false}
+        footer={[
+          <button
+            className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
+            key="back"
+            onClick={() => setLocationModal(false) & setAddress(null) & setLatitude(24.432928) & setLongitude(54.644539)}
+          >
+            CANCEL
+          </button>,
+          <button
+            onClick={
+         addLocation
+            }
+            disabled={!address || !formLocation.radius || !formLocation.name}
+            className="bg-black text-white rounded-sm px-4 disabled:opacity-50 py-1 hover:opacity-80"
+            key="submit"
+          >
+            CREATE
+          </button>,
+        ]}
+        title={
+          "Create Location"
+        }
+        open={locationModal}
+        onCancel={() => setLocationModal(false) & setAddress(null) & setLatitude(24.432928) & setLongitude(54.644539)}
+      >
+
+            <div className="mt-4">
+              <span className="text-xs font-semibold">LOCATION NAME</span>
+              <Input
+                value={formLocation.name}
+                onChange={(e) =>
+                  setFormLocation((prev) => {
+                    return { ...prev, name: e.target.value };
+                  })
+                }
+                className="rounded-none border-t-0 border-l-0 border-r-0"
+                placeholder="e.g My Location"
+              />
+            </div>
+
+            <div className="mt-4">
+              <span className="text-xs font-semibold">ADDRESS</span>
+              <PlaceComponent address={address} setAddress={setAddress} setLatitude={setLatitude} setLongitude={setLongitude} style="w-full px-2 py-1 border-b-[1px] border-[#E5E5E3]" />
+            </div>
+
+            <div className="mt-4">
+              <span className="text-xs font-semibold">RADIUS</span>
+                          <Input
+                          type="number"
+                value={formLocation.radius}
+                onChange={(e) =>
+                  setFormLocation((prev) => {
+                    return { ...prev, radius: Number(e.target.value) };
+                  })
+                }
+                className="rounded-none border-t-0 border-l-0 border-r-0"
+                placeholder="Enter radius..."
+              />
+              </div>
+            <div className="mt-2 px-1 py-1 border-[1px] border-[#E5E5E3]">
+              <GoogleMaps radius={formLocation.radius} latitude={latitude} longitude={longitude} setLatitude={setLatitude} setLongitude={setLongitude} />
+            </div>
+
+
+      </Modal>
+
         </Modal>
 
         <button
