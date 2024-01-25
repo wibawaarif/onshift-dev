@@ -56,9 +56,6 @@ export const POST = async (request) => {
     let currentDate = dayjs(body.date);
     console.log('awal', body.repeatedShift.isRepeated)
     if (body.repeatedShift.isRepeated) {
-      console.log(currentDate)
-      console.log(dayjs(body.repeatedShift.endDate))
-      console.log(currentDate.isSameOrBefore(dayjs(body.repeatedShift.endDate)))
       assignNewShift.push({...body, user: decodedToken.email})
       while (currentDate.isSameOrBefore(dayjs(body.repeatedShift.endDate))) {
         console.log('masuk')  
@@ -105,18 +102,20 @@ export const POST = async (request) => {
         // } else {
         //   newEmployees = [newShift._id]
         // }
-        console.log(newEmployees, 'new employes')
-        findEmployee.set({
-          ...findEmployee,
-          shifts: newEmployees,
-        })
+        // console.log(newEmployees, 'new employes')
+        // findEmployee.set({
+        //   ...findEmployee,
+        //   shifts: newEmployees,
+        // })
   
-        await findEmployee.save();
+        // await findEmployee.save();
+
+        await Employee.updateOne({user: decodedToken.email, _id: body.employees[i]}, {$set: { "shifts": newEmployees }})
       }
     }
 
 
-    return new NextResponse(JSON.stringify(newShift), { status: 201 });
+    return new NextResponse(JSON.stringify({info: "Success"}), { status: 201 });
   } catch (err) {
     return new NextResponse(err, { status: 500 });
   }

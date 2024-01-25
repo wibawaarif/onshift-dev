@@ -1,6 +1,7 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema } from "mongoose";
 
-const employeeSchema = new Schema({
+const employeeSchema = new Schema(
+  {
     name: {
       type: String,
     },
@@ -24,60 +25,69 @@ const employeeSchema = new Schema({
     shifts: [
       {
         type: mongoose.Types.ObjectId,
-        ref: 'Shift',
-      }
+        ref: "Shift",
+      },
     ],
     timesheets: [
       {
         type: mongoose.Types.ObjectId,
-        ref: 'Timesheet',
-      }
+        ref: "Timesheet",
+      },
     ],
-    positions: [{
-      type: mongoose.Types.ObjectId,
-      ref: 'Position',
-    }],
+    positions: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Position",
+      },
+    ],
     wageOptions: {
       category: {
         type: String,
-        enum: ['Standard', 'Custom']
+        enum: ["Standard", "Custom"],
       },
       type: {
-        type: String
+        type: String,
       },
       amount: {
         type: Number,
-      }
+      },
     },
     workspace: {
-      type: String
+      type: String,
     },
     status: {
       type: String,
-      default: 'Active',
-      enum: ['Active', 'Inactive']
+      default: "Active",
+      enum: ["Active", "Inactive"],
     },
-}, { timestamps: true })
+  },
+  { timestamps: true }
+);
 
 // Middleware to generate employeeId
-employeeSchema.pre('save', async function (next) {
+employeeSchema.pre("save", async function (next) {
   try {
-    const maxEmployee = await this.constructor.findOne({workspace: this.workspace}, {}, { sort: { employeeId: -1 } });
-    console.log(maxEmployee, 'test')
+    const maxEmployee = await this.constructor.findOne(
+      { workspace: this.workspace },
+      {},
+      { sort: { employeeId: -1 } }
+    );
+    console.log(maxEmployee, "test");
+
     if (maxEmployee) {
       const maxEmployeeId = parseInt(maxEmployee.employeeId);
 
       if (maxEmployeeId === 9999) {
         // If the counter reaches 9999, add a sequence part
-        const currentSequence = maxEmployee.employeeId.split('-')[1] || 1;
+        const currentSequence = maxEmployee.employeeId.split("-")[1] || 1;
         const nextSequence = parseInt(currentSequence) + 1;
-        this.employeeId = `0001-${nextSequence}`.padStart(4, '0');
+        this.employeeId = `0001-${nextSequence}`.padStart(4, "0");
       } else {
-        this.employeeId = (maxEmployeeId + 1).toString().padStart(4, '0');
+        this.employeeId = (maxEmployeeId + 1).toString().padStart(4, "0");
       }
     } else {
       // If there are no employees yet, start from 0001
-      this.employeeId = '0001';
+      this.employeeId = "0001";
     }
 
     next();
@@ -86,5 +96,5 @@ employeeSchema.pre('save', async function (next) {
   }
 });
 
-export default mongoose?.models?.Employee || mongoose?.model("Employee", employeeSchema)
-
+export default mongoose?.models?.Employee ||
+  mongoose?.model("Employee", employeeSchema);

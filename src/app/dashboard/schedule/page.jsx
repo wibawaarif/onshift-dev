@@ -5,8 +5,7 @@ import SchedulerComponent from "@/components/scheduler/page";
 import FilterComponent from "@/components/filter/page";
 import Image from "next/image";
 import { InboxOutlined, DownloadOutlined } from "@ant-design/icons";
-import Papa from "papaparse";
-import { CSVLink } from "react-csv";
+import { read, utils } from 'xlsx';
 import {
   Modal,
   Tabs,
@@ -17,7 +16,6 @@ import {
   message,
   Upload,
   AutoComplete,
-  Checkbox
 } from "antd";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -185,38 +183,46 @@ const Scheduler = () => {
   const props = {
     name: "file",
     multiple: false,
-    action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
+    action:"https://www.mocky.io/v2/5cc8019d300000980a055e76",
     beforeUpload: (file) => {
+      console.log(file.type)
       const isCSV = file.type === "text/csv";
-      if (!isCSV) {
-        message.error(`${file.name} is not a csv file`);
+      const isXls = filte.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      if (!isCSV || !isXls) {
+        message.error(`${file.name} is not a csv or xls file`);
       }
       return isCSV || Upload.LIST_IGNORE;
     },
     onChange(info) {
-      const { status } = info.file;
-      if (status !== "uploading") {
-        console.log(info.file, info.fileList);
-      }
-      if (status === "done") {
-        message.success(`${info.file.name} file uploaded successfully.`);
-        const reader = new FileReader();
+      message.success(`${info.file.name} file uploaded successfully.`);
+      const reader = new FileReader();
 
-        reader.onload = (e) => {
-          const contents = e.target.result;
-          Papa.parse(contents, {
-            complete: (parsedData) => {
-              // Process the parsed data here
-              setUploadedShifts(parsedData.data);
-            },
-            header: true,
-          });
-        };
+      reader.onload = (e) => {
+        let data = e.target.result;
 
-        reader.readAsText(info.fileList[0].originFileObj);
-      } else if (status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
-      }
+        if (info.file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+        let workbook = read(data, {type: 'binary'});
+        const wsname = workbook.SheetNames[0];
+        const ws = workbook.Sheets[wsname];
+        const result = utils.sheet_to_json(ws, {header: ['#', 'date', 'startTime', 'endTime', 'break', 'employeeId', 'notes'], range: 3, blankrows: false});
+        console.log(result)
+         setUploadedShifts(result);
+
+        } else {
+
+        Papa.parse(data, {
+          complete: (parsedData) => {
+            // Process the parsed data here
+            console.log(parsedData.data)
+            setUploadedShifts(parsedData.data);
+          },
+          header: true,
+        });
+        }
+      };
+      reader.readAsBinaryString(info.file)
+
+
     },
     onDrop(e) {
       console.log("Dropped files", e.dataTransfer.files);
@@ -584,50 +590,49 @@ const Scheduler = () => {
   };
 
   const addUploadedShifts = async () => {
+    let allShifts = []
     setShiftModal(false);
-
+    if (uploadedShifts?.length === 0) {
+      message.error('No data inserted');
+      return
+    }
     for (let i = 0; i < uploadedShifts.length; i++) {
       if (
         uploadedShifts[i].date &&
         uploadedShifts[i].startTime &&
         uploadedShifts[i].endTime &&
-        uploadedShifts[i].employees
+        uploadedShifts[i].employeeId
       ) {
-        const res = await fetch(`/api/shifts`, {
-          method: "POST",
-          body: JSON.stringify(
-            uploadedShifts[i].isRepeated
-              ? {
-                  ...uploadedShifts[i],
-                  employees: [uploadedShifts[i].employees],
-                  reapeatedShift: {
-                    startRepeatedWeek: uploadedShifts[i].startRepeatedWeek,
-                    repeatedDays: uploadedShifts[i].repeatedDays,
-                    endDate: uploadedShifts[i].endDate,
-                  },
-                  workspace: session.data.user.workspace
-                }
-              : {
-                  ...uploadedShifts[i],
-                  employees: [uploadedShifts[i].employees],
-                  workspace: session.data.user.workspace
-                }
-          ),
-          headers: {
-            authorization: "Bearer " + session.data.user.accessToken,
-          },
-        });
-        const respMessage = await res.json();
-
-        if (respMessage.info === "email existed") {
-          message.error(`${respMessage.error}`);
-          continue;
+        const shiftToBeSend = {
+          date: dayjs(uploadedShifts[i].date),
+          startTime: dayjs(uploadedShifts[i].date).set('hour', dayjs(uploadedShifts[i].startTime, 'HH:mm').hour()).set('minute', dayjs(uploadedShifts[i].startTime, 'HH:mm').minute()),
+          endTime: dayjs(uploadedShifts[i].date).set('hour', dayjs(uploadedShifts[i].endTime, 'HH:mm').hour()).set('minute', dayjs(uploadedShifts[i].endTime, 'HH:mm').minute()),
+          employeeId: uploadedShifts[i].employeeId,
+          break: uploadedShifts[i].break + '',
+          notes: uploadedShifts[i].notes + '',
+          workspace: session.data.user.workspace,
         }
-
-        message.success("Shift created");
-        mutateEmployees([...employees]);
+        
+        allShifts.push(shiftToBeSend)
       }
     }
+
+    const res = await fetch(`/api/shifts-bulk`, {
+      method: "POST",
+      body: JSON.stringify(allShifts),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    const respMessage = await res.json();
+
+    if (respMessage.info === "email existed") {
+      message.error(`${respMessage.error}`);
+    }
+
+    message.success("Shift created");
+    mutateEmployees([...employees]);
+
   };
 
   const isStartGreaterThanEnd = () => {
@@ -805,22 +810,23 @@ const Scheduler = () => {
         <Modal
               maskClosable={false}
           footer={[
-            actionType === "exportImport" ? (
-              <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm">
-                <CSVLink
-                  data={shifts}
-                  headers={headers}
-                  filename={"my-file.csv"}
-                  key="back"
-                  target="_blank"
-                >
-                  <div className="flex justify-center items-center">
-                    <DownloadOutlined className="mr-2 my-0 py-0 text-black" />{" "}
-                    <span className="text-black">DOWNLOAD</span>
-                  </div>
-                </CSVLink>
-              </div>
-            ) : (
+            // actionType === "exportImport" ? (
+            //   <div className="mr-3 inline-block w-32 h-8 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm">
+            //     <CSVLink
+            //       data={shifts}
+            //       headers={headers}
+            //       filename={"my-file.csv"}
+            //       key="back"
+            //       target="_blank"
+            //     >
+            //       <div className="flex justify-center items-center">
+            //         <DownloadOutlined className="mr-2 my-0 py-0 text-black" />{" "}
+            //         <span className="text-black">DOWNLOAD</span>
+            //       </div>
+            //     </CSVLink>
+            //   </div>
+            // ) :
+             (
               <button
                 className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
                 key="back"
@@ -1016,16 +1022,6 @@ const Scheduler = () => {
                             }
                             options={options}
                           />
-                          {/* <TimePicker
-                            value={form?.endTime}
-                            onChange={(e) =>
-                              setForm((prev) => {
-                                return { ...prev, endTime: e };
-                              })
-                            }
-                            format="HH:mm"
-                            className="w-full rounded-none border-t-0 border-l-0 border-r-0"
-                          /> */}
                         </div>
                       </div>
                       <div className="mt-2">
@@ -1120,13 +1116,6 @@ const Scheduler = () => {
                           EMPLOYEE{" "}
                           <span className="text-xs text-red-500">*</span>
                         </span>
-                        {/* <Image
-                        className="absolute bottom-[29.5%] z-50"
-                        width={20}
-                        height={20}
-                        alt="schedule-logo"
-                        src={"/static/svg/employee.svg"}
-                      /> */}
                         <Select
                           mode="multiple"
                           allowClear

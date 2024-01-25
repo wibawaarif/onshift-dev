@@ -21,7 +21,6 @@ import "react-phone-input-2/lib/style.css";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
 import Papa from "papaparse";
-import { CSVLink } from "react-csv";
 import axios from "axios";
 import { read, utils } from 'xlsx';
 // import EmployeeTemplate from "@public/static/templates/Onshift_Employee_Template.xlsx"
@@ -127,12 +126,6 @@ const Employee = () => {
       return isCSV || Upload.LIST_IGNORE;
     },
     onChange(info) {
-      console.log(info)
-      // const { status } = info.file;
-      // console.log(status)
-      // if (status !== "uploading") {
-      // }
-      // if (status === "done") {
         message.success(`${info.file.name} file uploaded successfully.`);
         const reader = new FileReader();
 
