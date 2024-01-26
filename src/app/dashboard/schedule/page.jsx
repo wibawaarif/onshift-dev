@@ -240,6 +240,11 @@ const Scheduler = () => {
     return current && current < dayjs().endOf("day");
   };
 
+  const disableForMonth = (current) => {
+
+    return current && current < dayjs().endOf("day") || current > dayjs().add(30, 'day')
+  }
+
   const headers = [
     {
       label: "date",
@@ -959,7 +964,7 @@ const Scheduler = () => {
                           </span>
                           <DatePicker
                             value={form?.repeatedShift?.endDate}
-                            disabledDate={disabledDate}
+                            disabledDate={disableForMonth}
                             disabled={selectedRepeatedDays?.length === 0}
                             onChange={endRepeatedShift}
                             className="w-full mt-1 rounded-none border-t-0 border-l-0 border-r-0"
