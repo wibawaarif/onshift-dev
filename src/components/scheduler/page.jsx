@@ -65,7 +65,7 @@ const SchedulerComponent = ({
   ];
 
   return (
-    <div className="flex flex-col h-full justify-center items-center">
+    <div className="flex flex-col h-full justify-start items-center">
       <div className="w-full h-[90px] bg-white border-b-[1px] border-[#E5E5E3]">
         {/* header table */}
         <div className="p-6 flex h-full w-full justify-between items-center">
