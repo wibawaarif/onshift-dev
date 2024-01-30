@@ -390,11 +390,15 @@ const Scheduler = () => {
     setShiftModal(true);
   };
 
-  const deleteShiftModal = (id) => {
+  const deleteShiftModal = (id, type) => {
     setId(id);
-    setActionType("delete");
     setShiftModal(true);
-  };
+    if (type === "single") {
+      setActionType("delete");
+    } else {
+      setActionType("deleteMultiple");
+      }
+    }
 
   const addLocation = async () => {
     setLocationModal(false);
@@ -589,6 +593,22 @@ const Scheduler = () => {
         authorization: "Bearer " + session.data.user.accessToken,
       },
     });
+    mutateEmployees([...employees]);
+
+    message.success("Shift deleted");
+  };
+
+  const deleteBulk = async () => {
+    setShiftModal(false);
+    for (let i = 0; i < Id?.length; i++) {
+      await fetch(`/api/shifts/${Id[i]}`, {
+        method: "DELETE",
+        headers: {
+          authorization: "Bearer " + session.data.user.accessToken,
+        },
+      });
+    }
+
     mutateEmployees([...employees]);
 
     message.success("Shift deleted");
@@ -850,24 +870,24 @@ const Scheduler = () => {
               </button>
             ) : currentTab === "1" ? (
               <button
-                disabled={isFormInvalid && actionType !== "delete"}
+                disabled={isFormInvalid && actionType !== "delete" && actionType !== "deleteMultiple"}
                 onClick={
                   actionType === "add"
                     ? () => addShift()
                     : actionType === "delete"
                     ? () => deleteShift()
-                    : () => editDraggableShift()
+                    : actionType === "deleteMultiple" ? () => deleteBulk() : () => editDraggableShift()
                 }
                 className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
                 key="submit"
               >
                 {actionType === "add"
                   ? "CREATE"
-                  : actionType === "delete"
+                  : actionType === "delete" || actionType === "deleteMultiple"
                   ? "CONFIRM"
                   : "EDIT"}
               </button>
-            ) : <button onClick={actionType === "delete" ? () => deleteShift() : actionType === "edit" ? () => editTimeoff() : () => addTimeoff()} disabled={actionType !== "delete" && (!timeoffForm.date || !timeoffForm.employee)} className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
+            ) : <button onClick={actionType === "delete" ? () => deleteShift() : actionType === "deleteMultiple" ? () => deleteBulk()  : actionType === "edit" ? () => editTimeoff() : () => addTimeoff()} disabled={actionType !== "delete" && (!timeoffForm.date || !timeoffForm.employee)} className="bg-black text-white rounded-sm px-4 py-1 disabled:opacity-50 hover:opacity-80"
             key="submit">{actionType === "delete" ? "CONFIRM" : actionType === "edit" ? "EDIT" : "CREATE"}</button>,
           ]}
           title="Create New Shift"
@@ -909,6 +929,11 @@ const Scheduler = () => {
           {actionType === "delete" && (
             <p>Are you sure want to delete this shift?</p>
           )}
+
+          {
+           actionType === "deleteMultiple" && (
+            <p>Are you sure want to delete all selected shift?</p> 
+           )}
           {(actionType === "add" || actionType === "edit") && (
             <Tabs
               onChange={(x) => setCurrentTab(x)}

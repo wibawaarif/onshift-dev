@@ -25,6 +25,7 @@ const SchedulerComponent = ({
   // Get the current date
 
   // Get the start date of the current week (Sunday)
+  const [isMultipleDelete, setIsMultipleDelete] = useState(false);
   const startDate = weeklyDateValue.startOf("week");
 
   const weekSchedule = [];
@@ -36,6 +37,7 @@ const SchedulerComponent = ({
 
   // const [employees, setEmployees] = useState([]);
   const [rowIndex, setRowIndex] = useState(null);
+  const [selectedMultipleDelete, setSelectedMultipleDelete] = useState([]);
 
   const day = [
     "12AM",
@@ -63,6 +65,19 @@ const SchedulerComponent = ({
     "10PM",
     "11PM",
   ];
+
+  const configureMultipleSelected = id => {
+    if (selectedMultipleDelete?.includes(id)) {
+      const allSelected = [...selectedMultipleDelete]
+      const index = allSelected.indexOf(id)
+      if (index !== -1) {
+        allSelected.splice(index, 1)
+        setSelectedMultipleDelete(allSelected)
+      }
+    } else {
+      setSelectedMultipleDelete([...selectedMultipleDelete, id])
+    }
+  }
 
   return (
     <div className="flex flex-col h-full justify-start items-center">
@@ -99,6 +114,18 @@ const SchedulerComponent = ({
               <span className="text-[#7D7D80] text-[10px]">LABOR %</span>
             </div>
           </div> */}
+          <div>
+          {
+                  selectedMultipleDelete?.length > 0 && isMultipleDelete && (
+                    <button onClick={() => deleteShiftModal(selectedMultipleDelete, 'multiple')} className={`mr-3 bg-red-500 hover:bg-red-700 text-white duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}>
+                    Delete
+                  </button>
+                  )
+                }
+              <button onClick={() => setIsMultipleDelete(!isMultipleDelete)} className={`mr-3 ${isMultipleDelete ? 'bg-[#E5E5E3] hover:bg-white' : 'hover:bg-[#E5E5E3]'} duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}>
+                  Select Multiple
+                </button>
+                </div>
         </div>
       </div>
       <div
@@ -351,7 +378,7 @@ const SchedulerComponent = ({
                                             {...provided.draggableProps}
                                             ref={provided.innerRef}
                                             {...provided.dragHandleProps}
-                                            className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
+                                            className={`${selectedMultipleDelete?.includes(z?._id) ? 'bg-red-200' : 'bg-[#E5E5E3]'} h-[96%] w-[97%] rounded-sm p-2`}
                                           >
                                             <p className="text-[10px] font-bold">
                                               {dayjs(z.startTime).format(
@@ -417,8 +444,8 @@ const SchedulerComponent = ({
                                                 src={"/static/svg/edit.svg"}
                                               />
                                               <Image
-                                                onClick={() =>
-                                                  deleteShiftModal(z._id)
+                                                onClick={isMultipleDelete ? () => configureMultipleSelected(z?._id) : () =>
+                                                  deleteShiftModal(z._id, 'single')
                                                 }
                                                 width={16}
                                                 height={16}
