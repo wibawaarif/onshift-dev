@@ -1,21 +1,15 @@
 import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import TimesheetApproval from "@/models/timesheetApproval";
-import { verifyJwtToken } from '@/lib/jwt'
+import { getServerSession } from "next-auth";
+import { options } from "@/lib/options";
 
 export const GET = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
-
-  // const url = new URL(request.url);
-
-  // const username = url.searchParams.get("username");
 
   try {
     await connect();
@@ -29,12 +23,9 @@ export const GET = async (request) => {
 };
 
 export const POST = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
 

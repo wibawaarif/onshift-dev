@@ -1,26 +1,20 @@
 import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Workspace from "@/models/workspace";
-import { verifyJwtToken } from '@/lib/jwt'
+import { getServerSession } from "next-auth";
+import { options } from "@/lib/options";
 
 export const GET = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
-
-  // const url = new URL(request.url);
-
-  // const username = url.searchParams.get("username");
 
   try {
     await connect();
 
-    const workspaces = await Workspace.find({user: decodedToken.email}).sort({ createdAt: -1 })
+    const workspaces = await Workspace.find({user: session.user.email}).sort({ createdAt: -1 })
 
     return new NextResponse(JSON.stringify(workspaces), { status: 200 });
   } catch (err) {
@@ -29,24 +23,20 @@ export const GET = async (request) => {
 };
 
 export const POST = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
-
   const body = await request.json();
 
-  const workspace = await Workspace.findOne({user: decodedToken.email, name: body.name})
+  const workspace = await Workspace.findOne({user: session.user.email, name: body.name})
 
   if (workspace) {
     return new NextResponse(JSON.stringify({error: "Workspace already exists"}), { status: 400 });
   }
 
-  const newWorkspace = new Workspace({...body, user: decodedToken.email});
+  const newWorkspace = new Workspace({...body, user: session.user.email});
 
   try {
     await connect();

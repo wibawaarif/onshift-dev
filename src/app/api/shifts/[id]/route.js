@@ -2,15 +2,13 @@ import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Shift from "@/models/shift";
 import Employee from "@/models/employee";
-import { verifyJwtToken } from '@/lib/jwt'
+import { getServerSession } from "next-auth";
+import { options } from "@/lib/options";
 
 export const PUT = async (request, { params }) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
 
@@ -35,12 +33,9 @@ export const PUT = async (request, { params }) => {
 }
 
 export const DELETE = async (request, { params }) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
   

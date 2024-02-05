@@ -3,8 +3,15 @@ import connect from "@/utils/db";
 import bcrypt from 'bcrypt'
 import User from '@/models/user'
 import transporter from "@/utils/mail";
+import { getServerSession } from "next-auth";
+import { options } from "@/lib/options";
 
 export async function POST(req){
+    const session = await getServerSession(options)
+
+    if (!session) {
+      return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
+    }
     try {
         await connect();
 

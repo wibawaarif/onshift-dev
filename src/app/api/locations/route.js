@@ -1,24 +1,22 @@
 import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Location from "@/models/location";
-import { verifyJwtToken } from '@/lib/jwt';
+import { getServerSession } from "next-auth";
+import { options } from "@/lib/options";
 
 export const GET = async (request) => {
-  const accessToken = request.headers.get("authorization")
+  const session = await getServerSession(options)
 
-  const token = accessToken?.split(' ')[1]
-  const workspace = accessToken?.split('#')[1]
-
-  const decodedToken = verifyJwtToken(token)  
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
+
+  const { workspace } = session.user
 
   try {
     await connect();
 
-    const locations = await Location.find({user: decodedToken.email, workspace}).sort({ createdAt: -1 })
+    const locations = await Location.find({user:session.user.email, workspace}).sort({ createdAt: -1 })
 
     return new NextResponse(JSON.stringify(locations), { status: 200 });
   } catch (err) {
@@ -27,24 +25,21 @@ export const GET = async (request) => {
 };
 
 export const POST = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
 
   const body = await request.json();
 
-  const location = await Location.findOne({user: decodedToken.email, name: body.name})
+  const location = await Location.findOne({user:session.user.email, name: body.name})
 
   if (location) {
     return new NextResponse(JSON.stringify({error: "Location already exists"}), { status: 400 });
   }
 
-  const newLocation = new Location({...body, user: decodedToken.email});
+  const newLocation = new Location({...body, user: session.user.email});
 
   try {
     await connect();

@@ -4,27 +4,21 @@ import Shift from "@/models/shift";
 import Employee from "@/models/employee";
 import Location from "@/models/location";
 import Position from "@/models/position";
-import { verifyJwtToken } from '@/lib/jwt'
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { getServerSession } from "next-auth";
+import { options } from "@/lib/options";
 
 dayjs.extend(isSameOrBefore)
 
 export const GET = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
-  const workspace = accessToken?.split(' ')[2]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
 
-  // const url = new URL(request.url);
-
-  // const username = url.searchParams.get("username");
+  const { workspace } = session.user
 
   try {
     await connect();
@@ -38,11 +32,9 @@ export const GET = async (request) => {
 };
 
 export const POST = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
-  const decodedToken = verifyJwtToken(token)  
+  const session = await getServerSession(options)
 
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
 
@@ -54,13 +46,13 @@ export const POST = async (request) => {
     
     let assignNewShift = [];
     let currentDate = dayjs(body.date);
-    console.log('awal', body.repeatedShift.isRepeated)
+
     if (body.repeatedShift.isRepeated) {
-      assignNewShift.push({...body, user: decodedToken.email})
+      assignNewShift.push({...body, user: session.user.email})
       while (currentDate.isSameOrBefore(dayjs(body.repeatedShift.endDate))) {
         console.log('masuk')  
         if (body.repeatedShift.repeatedDays.includes(currentDate.format('dddd'))) {
-          const newShift = new Shift({...body, date: currentDate , user: decodedToken.email});
+          const newShift = new Shift({...body, date: currentDate , user: session.user.email});
 
           await newShift.save();
 
@@ -71,7 +63,7 @@ export const POST = async (request) => {
         currentDate = currentDate.add(1, 'day');
       }
     } else {
-      const newShift = new Shift({...body, user: decodedToken.email});
+      const newShift = new Shift({...body, user: session.user.email});
 
       await newShift.save();
 

@@ -16,6 +16,7 @@ import {
   message,
   Upload,
   AutoComplete,
+  Dropdown
 } from "antd";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -72,6 +73,12 @@ const Scheduler = () => {
   const [isFormInvalid, setIsFormInvalid] = useState(true);
   const [currentTab, setCurrentTab] = useState("1");
   const [locationModal, setLocationModal] = useState(false);
+  // const [items, setItems] = useState([
+  //   {
+  //     label: "12/06/2017",
+  //     key: "1"
+  //   }
+  // ])
   const [form, setForm] = useState({
     date: "",
     startTime: "",
@@ -108,6 +115,32 @@ const Scheduler = () => {
   })
   const options = [];
   const [shiftTemplate, setShiftTemplate] = useState('')
+
+  const items = [
+    {
+      key: "1",
+      type: "group",
+      label: "Copy this week to:",
+      children: [
+        {
+          label: `${dayjs(weeklyDateValue).add("1", "week").startOf('week').format('DD MMM')} - ${dayjs(weeklyDateValue).add("1", "week").endOf('week').format('DD MMM')}`,
+          key: 1,
+        },
+        {
+          label: `${dayjs(weeklyDateValue).add("2", "week").startOf('week').format('DD MMM')} - ${dayjs(weeklyDateValue).add("2", "week").endOf('week').format('DD MMM')}`,
+          key: 2,
+        },
+        {
+          label: `${dayjs(weeklyDateValue).add("3", "week").startOf('week').format('DD MMM')} - ${dayjs(weeklyDateValue).add("3", "week").endOf('week').format('DD MMM')}`,
+          key: 3,
+        },
+        {
+          label: `${dayjs(weeklyDateValue).add("4", "week").startOf('week').format('DD MMM')} - ${dayjs(weeklyDateValue).add("4", "week").endOf('week').format('DD MMM')}`,
+          key: 4,
+        },
+      ]
+    },
+  ]
 
   var x = 30; //minutes interval
   var times = []; // time array
@@ -570,6 +603,20 @@ const Scheduler = () => {
     }
   };
 
+  const copyAction = async (date, shift) => {
+    delete shift["_id"];
+    await fetch(`/api/shifts`, {
+      method: "POST",
+      body: JSON.stringify({...shift, date, workspace: session.data.user.workspace, category: 'Shift'}),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+      mutateEmployees([...employees]);
+
+      message.success("Shift copied");
+  };
+
   const downloadTemplate = async () => {
     const req = await axios({
       method: "GET",
@@ -584,6 +631,20 @@ const Scheduler = () => {
     link.download = `Onshift_Shift_Template.xlsx`;
     link.click();
   };
+
+  const handleCopyShift = async (e) => {
+    console.log(e, 'test')
+    await fetch(`/api/copy-shifts`, {
+      method: "POST",
+      body: JSON.stringify({workspace: session.data.user.workspace, current: weeklyDateValue , week: e.key}),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+      mutateEmployees([...employees]);
+
+      message.success("Shift copied");
+  }
 
   const deleteShift = async () => {
     setShiftModal(false);
@@ -789,9 +850,9 @@ const Scheduler = () => {
                 <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
                   Publish Shifts
                 </button>
-                <button className="hover:bg-[#E5E5E3] mr-3 duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]">
-                  Copy Shifts
-                </button>
+                <Dropdown className="hover:bg-[#E5E5E3] mr-3 duration-300 cursor-pointer px-2 py-1 border-[1px] border-[#E5E5E5]" trigger="click" menu={{items, onClick: handleCopyShift}}>
+                  <p>Copy Shifts</p>
+                </Dropdown>
                 <button
                   onClick={() =>
                     setShiftModal(true) & setActionType("exportImport")
@@ -827,6 +888,7 @@ const Scheduler = () => {
               employees={clonedEmployees}
               listOfShifts={shifts}
               type={type}
+              copyAction={copyAction}
             />
           </div>
         </div>

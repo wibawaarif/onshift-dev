@@ -2,17 +2,16 @@ import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Shift from "@/models/shift";
 import Employee from "@/models/employee";
-import { verifyJwtToken } from '@/lib/jwt'
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { getServerSession } from "next-auth";
+import { options } from "@/lib/options";
 
 
 export const POST = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
-  const decodedToken = verifyJwtToken(token)  
+  const session = await getServerSession(options)
 
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
 
@@ -28,7 +27,7 @@ export const POST = async (request) => {
         console.log('workspace', body[i].workspace)
         const findEmployee = await Employee.findOne({employeeId: String(body[i].employeeId), workspace: body[i].workspace})
         console.log('masuk', findEmployee)
-        const newShift = new Shift({...body[i], employees: [findEmployee._id], user: decodedToken.email});
+        const newShift = new Shift({...body[i], employees: [findEmployee._id], user: session.user.email});
         await newShift.save();
 
 

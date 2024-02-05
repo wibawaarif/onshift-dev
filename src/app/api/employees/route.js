@@ -5,18 +5,18 @@ import Location from "@/models/location";
 import Shift from "@/models/shift";
 import Position from "@/models/position";
 import bcrypt from 'bcrypt'
-import { verifyJwtToken } from '@/lib/jwt';
 import Timesheet from "@/models/timesheet";
+import { getServerSession } from "next-auth";
+import { options } from "@/lib/options";
 
 export const GET = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
-  const workspace = accessToken?.split('#')[1]
-  const decodedToken = verifyJwtToken(token)  
+  const session = await getServerSession(options)
 
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
+
+  const { workspace } = session.user
 
   // const url = new URL(request.url);
 
@@ -25,11 +25,16 @@ export const GET = async (request) => {
   try {
     await connect();
 
-    const employees = await Employee.find({user: decodedToken.email, workspace}).sort({ createdAt: -1 })
+    const employees = await Employee.find({user: session.user.email, workspace}).sort({ createdAt: -1 })
     .populate({
       path: 'shifts',
       model: Shift,
       select: 'date startTime endTime location position platform employees category repeatedShift notes break',
+      populate: {
+        path: 'location',
+        model: Location,
+        select: 'name '
+      }
     }).populate({
       path: 'timesheets',
       model: Timesheet,
@@ -47,14 +52,12 @@ export const GET = async (request) => {
 };
 
 export const POST = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
-  const decodedToken = verifyJwtToken(token)  
+  const session = await getServerSession(options)
 
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
-  
+
   const body = await request.json();
   console.log(body)
 
@@ -68,9 +71,9 @@ export const POST = async (request) => {
 
   if (body.password) {
     const hashedPassword = await bcrypt.hash(body.password, 10)
-    newEmployee = new Employee({...body, password: hashedPassword, user: decodedToken.email});
+    newEmployee = new Employee({...body, password: hashedPassword, user: session.user.email});
   } else {
-    newEmployee = new Employee({...body, user: decodedToken.email});
+    newEmployee = new Employee({...body, user: session.user.email});
   }
 
   try {

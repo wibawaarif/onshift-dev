@@ -1,26 +1,22 @@
 import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Position from "@/models/position";
-import { verifyJwtToken } from '@/lib/jwt'
+import { getServerSession } from "next-auth";
+import { options } from "@/lib/options";
 
 export const GET = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
-  const workspace = accessToken?.split('#')[1]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
 
-  // const url = new URL(request.url);
-
-  // const username = url.searchParams.get("username");
+  const { workspace } = session.user
 
   try {
     await connect();
 
-    const positions = await Position.find({user: decodedToken.email, workspace}).sort({ createdAt: -1 }).populate('employees');
+    const positions = await Position.find({user: session.user.email, workspace}).sort({ createdAt: -1 }).populate('employees');
 
     return new NextResponse(JSON.stringify(positions), { status: 200 });
   } catch (err) {
@@ -29,18 +25,15 @@ export const GET = async (request) => {
 };
 
 export const POST = async (request) => {
-  const accessToken = request.headers.get("authorization")
-  const token = accessToken?.split(' ')[1]
+  const session = await getServerSession(options)
 
-  const decodedToken = verifyJwtToken(token)  
-
-  if (!accessToken || !decodedToken) {
+  if (!session) {
     return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
   }
 
   const body = await request.json();
 
-  const newPosition = new Position({...body, user: decodedToken.email});
+  const newPosition = new Position({...body, user: session.user.email});
 
   try {
     await connect();

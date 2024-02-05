@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Avatar } from "antd";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Fragment, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import Link from "next/link";
 import PlusLogo from "@public/static/jsx/plus";
@@ -21,11 +21,14 @@ const SchedulerComponent = ({
   addShiftFromTable,
   editShiftModal,
   deleteShiftModal,
+  copyAction
 }) => {
   // Get the current date
 
   // Get the start date of the current week (Sunday)
   const [isMultipleDelete, setIsMultipleDelete] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
+  const [copiedData, setCopiedData] = useState({});
   const startDate = weeklyDateValue.startOf("week");
 
   const weekSchedule = [];
@@ -66,18 +69,33 @@ const SchedulerComponent = ({
     "11PM",
   ];
 
-  const configureMultipleSelected = id => {
+  const configureMultipleSelected = (id) => {
     if (selectedMultipleDelete?.includes(id)) {
-      const allSelected = [...selectedMultipleDelete]
-      const index = allSelected.indexOf(id)
+      const allSelected = [...selectedMultipleDelete];
+      const index = allSelected.indexOf(id);
       if (index !== -1) {
-        allSelected.splice(index, 1)
-        setSelectedMultipleDelete(allSelected)
+        allSelected.splice(index, 1);
+        setSelectedMultipleDelete(allSelected);
       }
     } else {
-      setSelectedMultipleDelete([...selectedMultipleDelete, id])
+      setSelectedMultipleDelete([...selectedMultipleDelete, id]);
     }
-  }
+  };
+
+  const escFunction = useCallback((event) => {
+    if (event.key === "Escape") {
+        setIsCopying(false);
+        setCopiedData({});
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", escFunction, false);
+
+    return () => {
+      document.removeEventListener("keydown", escFunction, false);
+    };
+  }, [escFunction]);
 
   return (
     <div className="flex flex-col h-full justify-start items-center">
@@ -115,17 +133,27 @@ const SchedulerComponent = ({
             </div>
           </div> */}
           <div>
-          {
-                  selectedMultipleDelete?.length > 0 && isMultipleDelete && (
-                    <button onClick={() => deleteShiftModal(selectedMultipleDelete, 'multiple')} className={`mr-3 bg-red-500 hover:bg-red-700 text-white duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}>
-                    Delete
-                  </button>
-                  )
+            {selectedMultipleDelete?.length > 0 && isMultipleDelete && (
+              <button
+                onClick={() =>
+                  deleteShiftModal(selectedMultipleDelete, "multiple")
                 }
-              <button onClick={() => setIsMultipleDelete(!isMultipleDelete)} className={`mr-3 ${isMultipleDelete ? 'bg-[#E5E5E3] hover:bg-white' : 'hover:bg-[#E5E5E3]'} duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}>
-                  Select Multiple
-                </button>
-                </div>
+                className={`mr-3 bg-red-500 hover:bg-red-700 text-white duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}
+              >
+                Delete
+              </button>
+            )}
+            <button
+              onClick={() => setIsMultipleDelete(!isMultipleDelete)}
+              className={`mr-3 ${
+                isMultipleDelete
+                  ? "bg-[#E5E5E3] hover:bg-white"
+                  : "hover:bg-[#E5E5E3]"
+              } duration-300 px-2 py-1 border-[1px] border-[#E5E5E5]`}
+            >
+              Select Multiple
+            </button>
+          </div>
         </div>
       </div>
       <div
@@ -145,7 +173,9 @@ const SchedulerComponent = ({
             alt="sort"
             src={"/static/svg/sort.svg"}
           />
-          <span className="text-[#191407] text-xs md:text-lg lg:text-lg">First Name A-Z</span>
+          <span className="text-[#191407] text-xs md:text-lg lg:text-lg">
+            First Name A-Z
+          </span>
           <Image
             width={24}
             height={24}
@@ -254,57 +284,50 @@ const SchedulerComponent = ({
                   weekSchedule.map((dataItem, dataIndex) => (
                     <div key={dataIndex}>
                       <Droppable droppableId={`${dataItem}`}>
-                        {(provided) =>
-                          (
-                            <div
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                              className={`flex justify-center items-center col-span-1 ${
-                                dataIndex === 0 ? "first-child" : ""
-                              } bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
-                            >
-                              {!row?.shifts
-                                ?.map((x) => dayjs(x.date).format("MM-DD-YYYY"))
-                                .includes(
-                                  dayjs(dataItem).format("MM-DD-YYYY")
-                                ) &&
-                                !row?.shifts?.some(
-                                  (z, index) =>
-                                    dayjs(dataItem).diff(
+                        {(provided) => (
+                          <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className={`flex justify-center items-center col-span-1 ${
+                              dataIndex === 0 ? "first-child" : ""
+                            } bg-white border border-[1px] border-[#E5E5E3] h-full w-full`}
+                          >
+                            {!row?.shifts
+                              ?.map((x) => dayjs(x.date).format("MM-DD-YYYY"))
+                              .includes(dayjs(dataItem).format("MM-DD-YYYY")) &&
+                              !row?.shifts?.some(
+                                (z, index) =>
+                                  dayjs(dataItem).diff(
+                                    dayjs(z?.repeatedShift?.endTime),
+                                    "day"
+                                  ) >=
+                                    dayjs(
+                                      z?.repeatedShift?.startRepeatedWeek
+                                    ).diff(
                                       dayjs(z?.repeatedShift?.endTime),
                                       "day"
-                                    ) >=
-                                      dayjs(
-                                        z?.repeatedShift?.startRepeatedWeek
-                                      ).diff(
-                                        dayjs(z?.repeatedShift?.endTime),
-                                        "day"
-                                      ) &&
-                                    dayjs(dataItem).diff(
-                                      dayjs(z?.repeatedShift?.endDate),
-                                      "day"
-                                    ) < 0 &&
-                                    z?.repeatedShift?.repeatedDays?.some(
-                                      (x) =>
-                                        x === dayjs(dataItem).format("dddd")
-                                    )
-                                ) && (
-                                  <div
-                                    onClick={() =>
-                                      addShiftFromTable(
-                                        dayjs(dataItem),
-                                        row._id
-                                      )
-                                    }
-                                    className={`flex justify-center items-center col-span-1 bg-white group/item transition duration-300 hover:bg-stone-200 hover:bg-opacity-50 cursor-pointer h-full w-full`}
-                                  >
-                                    <PlusLogo className="fill-slate-500 w-8 h-8 group/edit invisible group-hover/item:visible" />
-                                  </div>
-                                )}
+                                    ) &&
+                                  dayjs(dataItem).diff(
+                                    dayjs(z?.repeatedShift?.endDate),
+                                    "day"
+                                  ) < 0 &&
+                                  z?.repeatedShift?.repeatedDays?.some(
+                                    (x) => x === dayjs(dataItem).format("dddd")
+                                  )
+                              ) && (
+                                <div
+                                  onClick={isCopying ? () => copyAction(dayjs(dataItem), copiedData) : () =>
+                                    addShiftFromTable(dayjs(dataItem), row._id)
+                                  }
+                                  className={`flex justify-center items-center col-span-1 bg-white group/item transition duration-300 hover:bg-stone-200 hover:bg-opacity-50 cursor-pointer h-full w-full`}
+                                >
+                                  <PlusLogo className="fill-slate-500 w-8 h-8 group/edit invisible group-hover/item:visible" />
+                                </div>
+                              )}
 
-                              {row?.shifts?.length !== 0 && (
-                                row?.shifts?.map((z, index) =>
-                                  
+                            {row?.shifts?.length !== 0 &&
+                              row?.shifts?.map(
+                                (z, index) =>
                                   // (
                                   //   // repeated week
                                   //   <div
@@ -363,22 +386,27 @@ const SchedulerComponent = ({
                                   //           </div>
                                   //   </div>
                                   // ) : (
-                                    (
-                                    dayjs(z.date).format("YYYY-MM-DD") ===
-                                      dataItem && (
-                                      // non repeated week
-                                      <Draggable
-                                        key={z._id}
-                                        draggableId={`${z._id}`}
-                                        index={index}
-                                      >
-                                        {(provided) => (
-                                          z?.category !== 'TimeOff' ?
+                                  dayjs(z.date).format("YYYY-MM-DD") ===
+                                    dataItem && (
+                                    // non repeated week
+                                    <Draggable
+                                      key={z._id}
+                                      draggableId={`${z._id}`}
+                                      index={index}
+                                    >
+                                      {(provided) =>
+                                        z?.category !== "TimeOff" ? (
                                           <div
                                             {...provided.draggableProps}
                                             ref={provided.innerRef}
                                             {...provided.dragHandleProps}
-                                            className={`${selectedMultipleDelete?.includes(z?._id) ? 'bg-red-200' : 'bg-[#E5E5E3]'} h-[96%] w-[97%] rounded-sm p-2`}
+                                            className={`${
+                                              selectedMultipleDelete?.includes(
+                                                z?._id
+                                              )
+                                                ? "bg-red-200"
+                                                : isCopying && copiedData?._id === z?._id ? "bg-cyan-200" : "bg-[#E5E5E3]"
+                                            } h-[96%] hover:animate-pulse group w-[97%] flex flex-col relative rounded-sm p-2`}
                                           >
                                             <p className="text-[10px] font-bold">
                                               {dayjs(z.startTime).format(
@@ -393,16 +421,15 @@ const SchedulerComponent = ({
                                               )}
                                               H
                                             </p>
-                                            {
-                                              z.platform === 'Mobile App' &&
+                                            {z.platform === "Mobile App" && (
                                               <div
-                                              className={`flex justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
-                                            >
-                                              <span className="text-white text-[10px]">
-                                              Mobile App
-                                              </span>
-                                            </div>
-                                            }
+                                                className={`flex justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
+                                              >
+                                                <span className="text-white text-[10px]">
+                                                  Mobile App
+                                                </span>
+                                              </div>
+                                            )}
                                             {/* <div
                                               className={`flex ${
                                                 z?.platform === 'Mobile App' &&
@@ -410,6 +437,7 @@ const SchedulerComponent = ({
                                               } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
                                             >
                                               <span className="text-white text-[10px]">
+
                                               Mobile App
                                               </span>
                                             </div> */}
@@ -418,19 +446,48 @@ const SchedulerComponent = ({
                                                 !z?.position?.name &&
                                                 !z?.location?.name &&
                                                 "invisible hidden"
-                                              } justify-center items-center bg-[#191407] mt-1 px-2 py-[2px] w-max rounded-full`}
+                                              } justify-center items-center bg-[#191407] px-2 py-[1px] w-max rounded-full`}
                                             >
                                               <span className="text-white text-[10px]">
-                                                {z?.location?.name &&
-                                                z?.position?.name
-                                                  ? `${z?.location.name} • ${z?.position.name}`
-                                                  : z?.location?.name
-                                                  ? `${z?.location?.name}`
-                                                  : `${z?.position?.name}`}
+                                              {z?.location?.name}
                                               </span>
                                             </div>
-                                            <div className="relative">
-                                              <Image
+
+                                            {/* <div className="w-full h-full flex justify-center items-end relative"> */}
+                                            <button
+                                              onClick={() => setIsCopying(true) & setCopiedData(z)}
+                                              className={`px-2 text-[10px] text-white hidden group-hover:block bg-[#3b3b3b] absolute bottom-0 left-[54px] rounded-t-md w-max`}
+                                            >
+                                              COPY
+                                            </button>
+                                            <button
+                                              onClick={() => editShiftModal(z)}
+                                              onMouseEnter={() =>
+                                                setRowIndex(index)
+                                              }
+                                              className={`px-2 text-[10px] text-white bg-[#3b3b3b] hidden group-hover:block absolute bottom-0 left-[100px] rounded-t-md w-max`}
+                                            >
+                                              EDIT
+                                            </button>
+                                            <button
+                                              onClick={
+                                                isMultipleDelete
+                                                  ? () =>
+                                                      configureMultipleSelected(
+                                                        z?._id
+                                                      )
+                                                  : () =>
+                                                      deleteShiftModal(
+                                                        z._id,
+                                                        "single"
+                                                      )
+                                              }
+                                              className={`px-2 text-[10px] bg-[#3b3b3b] text-white absolute bottom-0 left-[140px] hidden group-hover:block rounded-t-md w-max`}
+                                            >
+                                              DELETE
+                                            </button>
+
+                                            {/* <Image
                                                 onClick={() =>
                                                   editShiftModal(z)
                                                 }
@@ -439,7 +496,7 @@ const SchedulerComponent = ({
                                                 }
                                                 width={16}
                                                 height={16}
-                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 right-3"
+                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer"
                                                 alt="trash"
                                                 src={"/static/svg/edit.svg"}
                                               />
@@ -449,21 +506,27 @@ const SchedulerComponent = ({
                                                 }
                                                 width={16}
                                                 height={16}
-                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer absolute -bottom-3 -right-1"
+                                                className="hover:bg-stone-400 p-[1px] transition duration-300 rounded-full cursor-pointer"
                                                 alt="trash"
                                                 src={"/static/svg/trash.svg"}
-                                              />
-                                            </div>
+                                              /> */}
+                                            {/* </div> */}
                                             {provided.placeholder}
-                                          </div> : <div
+                                          </div>
+                                        ) : (
+                                          <div
                                             {...provided.draggableProps}
                                             ref={provided.innerRef}
                                             {...provided.dragHandleProps}
                                             className="bg-[#E5E5E3] h-[96%] w-[97%] rounded-sm p-2"
                                           >
-                                                <p className="text-[13px] font-semibold">ALL DAY</p>
-                                                <p className="text-[13px]">TIME OFF</p>
-                                                <div className="relative">
+                                            <p className="text-[13px] font-semibold">
+                                              ALL DAY
+                                            </p>
+                                            <p className="text-[13px]">
+                                              TIME OFF
+                                            </p>
+                                            <div className="relative">
                                               <Image
                                                 onClick={() =>
                                                   editShiftModal(z)
@@ -489,18 +552,16 @@ const SchedulerComponent = ({
                                               />
                                             </div>
                                             {provided.placeholder}
-                                          </div>                                        
-                                          )}
-                                      </Draggable>
-                                    )
+                                          </div>
+                                        )
+                                      }
+                                    </Draggable>
                                   )
-                                )
                               )}
 
-                              {provided.placeholder}
-                            </div>
-                          )
-                        }
+                            {provided.placeholder}
+                          </div>
+                        )}
                       </Droppable>
                     </div>
                   ))}
