@@ -74,7 +74,7 @@ export const POST = async (request) => {
     if (body.employees.length > 0) {
       console.log(body.employees)
       for (let i=0; i < body.employees.length; i++) {
-        const findEmployee = await Employee.findOne({user: decodedToken.email, _id: body.employees[i]})
+        const findEmployee = await Employee.findOne({user:session.user.email, _id: body.employees[i]})
         console.log(findEmployee, 'find')
         let newEmployees;
 
@@ -102,7 +102,7 @@ export const POST = async (request) => {
   
         // await findEmployee.save();
 
-        await Employee.updateOne({user: decodedToken.email, _id: body.employees[i]}, {$set: { "shifts": newEmployees }})
+        await Employee.updateOne({user:session.user.email, _id: body.employees[i]}, {$set: { "shifts": newEmployees }})
       }
     }
 
