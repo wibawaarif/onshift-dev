@@ -164,7 +164,7 @@ const SchedulerComponent = ({
         <div
           className={`${
             type === "week" ? "col-span-2" : "col-span-6"
-          } bg-white flex items-center px-4 border-b-[1px] border-r-[1px] border-[#E5E5E3]`}
+          } bg-white flex sticky top-0 items-center px-4 border-b-[1px] border-r-[1px] border-[#E5E5E3]`}
         >
           <Image
             className="mr-2"
@@ -202,7 +202,7 @@ const SchedulerComponent = ({
           weekSchedule.map((x) => {
             return (
               <div
-                className="bg-white flex justify-center items-center h-[40px] border-b-[1px] border-r-[1px] border-[#E5E5E3]"
+                className="bg-white flex sticky top-0 justify-center items-center h-[40px] border-b-[1px] border-r-[1px] border-[#E5E5E3]"
                 key={x}
               >
                 <span className="text-slate-700 text-xs md:text-base lg:text-base">
