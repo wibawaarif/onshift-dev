@@ -726,7 +726,7 @@ const Employee = () => {
               </button>
             ) : (
               <button
-                disabled={actionType === "resetPassword" ? !resetPassword.confirmPassword || !resetPassword.password  || resetPassword.password !== resetPassword.confirmPassword  : actionType === "statusAction" ? false :  actionType === "edit" ? false : !form.name || !form.email || !form.password || !form.phoneNumber || (showPosition ? !name || !wage || !wageAmount : form.positions.length === 0)}
+                disabled={actionType === "resetPassword" ? !resetPassword.confirmPassword || !resetPassword.password  || resetPassword.password !== resetPassword.confirmPassword  : actionType === "statusAction" ? false :  actionType === "edit" || actionType === "delete" ? false : !form.name || !form.email || !form.password || !form.phoneNumber || (showPosition ? !name || !wage || !wageAmount : form.positions.length === 0)}
                 onClick={
                   actionType === "add"
                     ? addEmployee
