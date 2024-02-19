@@ -5,8 +5,7 @@ import {
   Input,
   Avatar,
   Modal,
-  Select,
-  Tabs,
+  TimePicker,
   Checkbox,
   message,
   Popover,
@@ -48,6 +47,8 @@ const Timesheet = () => {
   const [clonedEmployees, setClonedEmployees] = useState([{}]);
   const [searchEmployeesInput, setSearchEmployeesInput] = useState('');
   const [section, setSection] = useState('Timesheet');
+  const [timesheetModal, setTimesheetModal] = useState(false);
+  const [timesheetData, setTimesheetData] = useState({});
 
   // console.log(employeess);
   // const employees = useMemo(() => [{
@@ -121,6 +122,30 @@ const Timesheet = () => {
 
   const clearFields = () => {
 
+  };
+
+  const onPress = data => {
+    setTimesheetModal(true);
+    setTimesheetData(data);
+    console.log(data)
+  }
+
+  const editTimesheet = async () => {
+    console.log(timesheetData)
+    console.log(new Date(timesheetData.startTime))
+    setTimesheetModal(false);
+    const data = await fetch(`/api/timesheets/${timesheetData._id}`, {
+      method: "PUT",
+      body: JSON.stringify({...timesheetData, startTime: new Date(timesheetData.startTime), endTime: new Date(timesheetData.endTime)}),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+
+    mutateEmployees([...employees]);
+
+    message.success("Timesheet updated");
+    // clearFields();
   };
 
   const headers = [
@@ -325,9 +350,166 @@ const Timesheet = () => {
 
           </div>
 
+          <Modal open={timesheetModal} footer={[ <button
+            className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
+            key="back"
+            onClick={() =>  setTimesheetModal(false) & setTimesheetData({})}
+          >
+            CANCEL
+          </button>, <button onClick={editTimesheet} key="submit" className="bg-black text-white rounded-sm px-4 disabled:opacity-50 py-1 hover:opacity-80">Edit</button>]} title="Edit Timesheet" onCancel={() => setTimesheetModal(false) & setTimesheetData({})}>
+          <div className="flex mt-4 justify-between">
+                        <div className="w-[48%] ">
+                          <span className="text-xs font-semibold">
+                            START SHIFT{" "}
+                            <span className="text-xs text-red-500">*</span>
+                          </span>
+                          <Input
+                            className="w-full"
+                            value={dayjs(timesheetData?.shiftStartTime).format('h:m A')}
+                            disabled
+                          />
+
+                        </div>
+                        <div className="w-[48%]">
+                          <span className="text-xs font-semibold">
+                            FINISH SHIFT{" "}
+                            <span className="text-xs text-red-500">*</span>
+                          </span>
+                          <Input
+                            className="w-full"
+                            value={dayjs(timesheetData?.shiftEndTime).format('h:m A')}
+                            disabled
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex mt-4 justify-between">
+                        <div className="w-[48%] ">
+                          <span className="text-xs font-semibold">
+                            START WORKING TIME{" "}
+                            <span className="text-xs text-red-500">*</span>
+                          </span>
+                          <TimePicker
+                            className="w-full"
+                            defaultValue={dayjs(timesheetData?.startTime)}
+                            onChange={(e) =>
+                              setTimesheetData((prev) => {
+                                return { ...prev, startTime: e };
+                              })
+                            }
+                            format="h:m A"
+                          />
+
+                        </div>
+                        <div className="w-[48%]">
+                          <span className="text-xs font-semibold">
+                            END WORKING TIME{" "}
+                            <span className="text-xs text-red-500">*</span>
+                          </span>
+                          <TimePicker
+                            className="w-full"
+                            defaultValue={dayjs(timesheetData?.endTime)}
+                            onChange={(e) =>
+                              setTimesheetData((prev) => {
+                                return { ...prev, endTime: e };
+                              })
+                            }
+                            format="h:m A"
+                          />
+                        </div>
+                      </div>
+          </Modal>
+
+          {/* <Modal
+      maskClosable={false}
+        footer={[
+          <button
+            className="mr-3 hover:bg-[#E5E5E3] px-4 py-1 border-[1px] border-[#E5E5E3] rounded-sm"
+            key="back"
+            onClick={() => setLocationModal(false) & setAddress(null) & setLatitude(24.432928) & setLongitude(54.644539)}
+          >
+            CANCEL
+          </button>,
+          <button
+            onClick={
+              actionType === "edit"
+                ? editLocation
+                : actionType === "add"
+                ? addLocation
+                : deleteLocation
+            }
+            disabled={actionType === "add" && (!address || !form.radius || !form.name)}
+            className="bg-black text-white rounded-sm px-4 disabled:opacity-50 py-1 hover:opacity-80"
+            key="submit"
+          >
+            {actionType === "edit"
+              ? "EDIT"
+              : actionType === "add"
+              ? "CREATE"
+              : "CONFIRM"}
+          </button>,
+        ]}
+        title={
+          actionType === "edit"
+            ? "Edit Location"
+            : actionType === "add"
+            ? "Create Location"
+            : "Delete Location"
+        }
+        open={locationModal}
+        onCancel={() => setLocationModal(false) & setAddress(null) & setLatitude(24.432928) & setLongitude(54.644539)}
+      >
+        {actionType !== "delete" && (
+          <>
+            <div className="mt-4">
+              <span className="text-xs font-semibold">LOCATION NAME</span>
+              <Input
+                value={form.name}
+                onChange={(e) =>
+                  setForm((prev) => {
+                    return { ...prev, name: e.target.value };
+                  })
+                }
+                className="rounded-none border-t-0 border-l-0 border-r-0"
+                placeholder="e.g My Location"
+              />
+            </div>
+
+            <div className="mt-4">
+              <span className="text-xs font-semibold">ADDRESS</span>
+              <PlaceComponent address={address} setAddress={setAddress} setLatitude={setLatitude} setLongitude={setLongitude} style="w-full px-2 py-1 border-b-[1px] border-[#E5E5E3]" />
+            </div>
+
+            <div className="mt-4">
+              <span className="text-xs font-semibold">RADIUS</span>
+                          <Input
+                          type="number"
+                value={form.radius}
+                onChange={(e) =>
+                  setForm((prev) => {
+                    return { ...prev, radius: Number(e.target.value) };
+                  })
+                }
+                className="rounded-none border-t-0 border-l-0 border-r-0"
+                placeholder="Enter radius..."
+              />
+              </div>
+            <div className="mt-2 px-1 py-1 border-[1px] border-[#E5E5E3]">
+              <GoogleMaps radius={form.radius} latitude={latitude} longitude={longitude} setLatitude={setLatitude} setLongitude={setLongitude} />
+            </div>
+          </>
+        )}
+
+        {actionType === "delete" && (
+          <div>
+            <p>Are you sure want to delete this location?</p>
+          </div>
+        )}
+      </Modal> */}
+
           <div className="flex-1">
             {
-              section === 'Timesheet' ? <TimesheetsComponent employees={clonedEmployees} monthlyDateValue={monthlyDateValue} /> : <ApprovalsComponent monthlyDateValue={monthlyDateValue} employees={clonedEmployees} />
+              section === 'Timesheet' ? <TimesheetsComponent employees={clonedEmployees} onPress={onPress} monthlyDateValue={monthlyDateValue} /> : <ApprovalsComponent monthlyDateValue={monthlyDateValue} employees={clonedEmployees} />
             }
           </div>
 
