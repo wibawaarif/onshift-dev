@@ -5,7 +5,7 @@ import { Avatar, Tooltip, Divider, Space } from "antd";
 import { Fragment } from "react";
 import dayjs from "dayjs";
 
-const TimesheetsComponent = ({ employees, monthlyDateValue }) => {
+const TimesheetsComponent = ({ employees, monthlyDateValue, onPress }) => {
   // Get the start date of the current week (Sunday)
   const daysInMonth = dayjs(monthlyDateValue).daysInMonth();
 
@@ -103,6 +103,7 @@ const TimesheetsComponent = ({ employees, monthlyDateValue }) => {
                             {dayjs(dataItem).format("MM-DD-YYYY") ===
                               dayjs(timesheet.date).format("MM-DD-YYYY") && (
                               timesheet.status !== 'Absent' ? 
+                              <div className="cursor-pointer" onClick={() => onPress(timesheet)}>
                               <Tooltip
                                 placement="bottom"
                                 title={<div className="flex flex-col">
@@ -148,7 +149,7 @@ const TimesheetsComponent = ({ employees, monthlyDateValue }) => {
                                         "hour"
                                       )}
                                 </div>
-                              </Tooltip> :    <div
+                              </Tooltip> </div> :    <div
                                   className={`${"bg-red-500"
                                   } border-r-2 border-black border-opacity-20 h-8 w-8 flex justify-center items-center text-white`}
                                 >
