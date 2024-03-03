@@ -549,6 +549,7 @@ const Employee = () => {
         phoneNumber: data.phoneNumber,
         wageOptions: data.wageOptions,
         positions: data.positions,
+        location: data?.shifts?.length > 0 ? data?.shifts[0]?.location?.name : '-'
       };
       setForm(newForm);
     }
@@ -857,6 +858,10 @@ const Employee = () => {
                   <span>Phone Number</span>
                   <div className="font-medium w-full h-10 rounded-xl bg-stone-100 px-4 flex items-center">{ form.phoneNumber }</div>
                 </div>
+                    <div className="flex flex-col mt-4">
+                    <span>Location</span>
+                    <div className="font-medium w-full h-10 rounded-xl bg-stone-100 px-4 flex items-center">{ form.location  }</div>
+                  </div>
               </div>
 
                

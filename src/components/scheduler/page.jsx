@@ -405,7 +405,7 @@ const SchedulerComponent = ({
                                                 z?._id
                                               )
                                                 ? "bg-red-200"
-                                                : isCopying && copiedData?._id === z?._id ? "bg-cyan-200" : "bg-[#E5E5E3]"
+                                                : isCopying && copiedData?._id === z?._id ? "bg-cyan-200" : z?.status ? z?.status === 'Finished' ? 'bg-red-200' : 'bg-green-500' : "bg-[#E5E5E3]"
                                             } h-[96%] hover:animate-pulse group w-[97%] flex flex-col relative rounded-sm p-2`}
                                           >
                                             <p className="text-[10px] font-bold">
