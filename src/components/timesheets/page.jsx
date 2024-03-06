@@ -94,7 +94,7 @@ const TimesheetsComponent = ({ employees, monthlyDateValue, onPress }) => {
                       {!row?.timesheets
                         ?.map((x) => dayjs(x.date).format("MM-DD-YYYY"))
                         .includes(dayjs(dataItem).format("MM-DD-YYYY")) && (
-                        <div className="bg-stone-200 border-r-2 border-black border-opacity-20 h-8 w-8" />
+                        <div onClick={() => onPress({id: row._id, date: dataItem}, 'create')} className="bg-stone-200 cursor-pointer border-r-2 border-black border-opacity-20 h-8 w-8" />
                       )}
 
                       {row.timesheets &&
@@ -102,8 +102,14 @@ const TimesheetsComponent = ({ employees, monthlyDateValue, onPress }) => {
                           <>
                             {dayjs(dataItem).format("MM-DD-YYYY") ===
                               dayjs(timesheet.date).format("MM-DD-YYYY") && (
+                                timesheet.status === 'Leave' || timesheet.status === 'Week Off' ? <div
+                                  className={`${"bg-cyan-500"
+                                  } border-r-2 border-black border-opacity-20 h-8 w-8 flex justify-center items-center text-white`}
+                                >
+                                  {timesheet.status === 'Leave' ? 'L' : 'T'}
+                                </div> :
                               timesheet.status !== 'Absent' ? 
-                              <div className="cursor-pointer" onClick={() => onPress(timesheet)}>
+                              <div className="cursor-pointer" onClick={() => onPress(timesheet, 'edit')}>
                               <Tooltip
                                 placement="bottom"
                                 title={<div className="flex flex-col">
@@ -140,8 +146,7 @@ const TimesheetsComponent = ({ employees, monthlyDateValue, onPress }) => {
                                 <div
                                   className={`${
                                     timesheet.status === "Present"
-                                      ? "bg-green-500"
-                                      : "bg-yellow-500"
+                                      ? "bg-green-500" : "bg-yellow-500"
                                   } border-r-2 border-black border-opacity-20 h-8 w-8 flex justify-center items-center text-white`}
                                 >
                                   {dayjs(timesheet.endTime).diff(

@@ -3,6 +3,7 @@ import connect from "@/utils/db";
 import Timesheet from "@/models/timesheet";
 import { getServerSession } from "next-auth";
 import { options } from "@/lib/options";
+import Employee from "@/models/employee";
 
 export const GET = async (request) => {
   const session = await getServerSession(options)
@@ -38,27 +39,43 @@ export const POST = async (request) => {
 
     await newTimesheet.save();
 
-    console.log(body);
-    if (body.employees.length > 0) {
-      console.log(body);
-      for (let i=0; i < body.employees.length; i++) {
-        const findEmployee = await Employee.findOne({user: session.user.email, _id: body.employees[i]})
-        let newEmployees;
-  
-        if (findEmployee.timesheets) {
-          newEmployees = [...findEmployee.timesheets, newTimesheet._id]
-        } else {
-          newEmployees = [newTimesheet._id]
-        }
-  
-        findEmployee.set({
-          ...findEmployee,
-          timesheets: newEmployees,
-        })
-  
-        await findEmployee.save();
-      }
+    const findEmployee = await Employee.findOne({ _id: body.employee });
+    let newEmployees;
+    console.log(findEmployee);
+    if (findEmployee?.timesheets) {
+      newEmployees = [...findEmployee.timesheets, newTimesheet._id];
+    } else {
+      newEmployees = [newTimesheet._id];
     }
+
+    findEmployee?.set({
+      ...findEmployee,
+      timesheets: newEmployees,
+    });
+    console.log("in");
+    await findEmployee?.save();
+
+    // console.log(body);
+    // if (body.employees.length > 0) {
+    //   console.log(body);
+    //   for (let i=0; i < body.employees.length; i++) {
+    //     const findEmployee = await Employee.findOne({user: session.user.email, _id: body.employees[i]})
+    //     let newEmployees;
+  
+    //     if (findEmployee.timesheets) {
+    //       newEmployees = [...findEmployee.timesheets, newTimesheet._id]
+    //     } else {
+    //       newEmployees = [newTimesheet._id]
+    //     }
+  
+    //     findEmployee.set({
+    //       ...findEmployee,
+    //       timesheets: newEmployees,
+    //     })
+  
+    //     await findEmployee.save();
+    //   }
+    // }
 
 
     return new NextResponse(JSON.stringify(newTimesheet), { status: 201 });

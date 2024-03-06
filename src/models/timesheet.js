@@ -4,6 +4,12 @@ const timesheetSchema = new Schema({
   date: {
     type: Date,
   },
+  shiftStartTime: {
+    type: Date,
+  },
+  shiftEndTime: {
+    type: Date,
+  },
   startTime: {
     type: Date
   },
@@ -17,11 +23,11 @@ const timesheetSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['Present', 'Absent', 'Late'],
+    enum: ['Present', 'Absent', 'Late', 'Week Off', 'Leave'],
     default: 'Present',
   },
-  workspace: {
-    type: String
+  action: {
+    type: String,
   },
 }, { timestamps: true })
 

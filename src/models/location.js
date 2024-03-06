@@ -5,6 +5,7 @@ const locationSchema = new Schema({
       type: String,
       trim: true,
       required: true,
+      unique: false
     },
     locationId: {
       type: String,

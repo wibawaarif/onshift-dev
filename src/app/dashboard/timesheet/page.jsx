@@ -9,6 +9,7 @@ import {
   Checkbox,
   message,
   Popover,
+  Select,
   DatePicker,
   Dropdown
 } from "antd";
@@ -49,6 +50,10 @@ const Timesheet = () => {
   const [section, setSection] = useState('Timesheet');
   const [timesheetModal, setTimesheetModal] = useState(false);
   const [timesheetData, setTimesheetData] = useState({});
+  const [type, setType] = useState('');
+  const [status, setStatus] = useState('Week Off');
+
+  const statusType = [{ value: "Week Off", label: "Week Off" }, { value: "Leave", label: "Leave" }];
 
   // console.log(employeess);
   // const employees = useMemo(() => [{
@@ -124,10 +129,21 @@ const Timesheet = () => {
 
   };
 
-  const onPress = data => {
-    setTimesheetModal(true);
-    setTimesheetData(data);
-    console.log(data)
+  const onPress = (data, type) => {
+    if (type === 'edit') {
+      setTimesheetModal(true);
+      setTimesheetData(data);
+      setType('edit')
+      console.log(data)
+    } else {
+      setTimesheetModal(true);
+      setTimesheetData({
+        employee: data.id,
+        date: data.date
+      });
+      setType('create')
+    }
+
   }
 
   const editTimesheet = async () => {
@@ -147,6 +163,24 @@ const Timesheet = () => {
     message.success("Timesheet updated");
     // clearFields();
   };
+
+  const createTimesheet = async () => {
+    console.log(timesheetData)
+    console.log(new Date(timesheetData.startTime))
+    setTimesheetModal(false);
+    const data = await fetch(`/api/timesheets`, {
+      method: "POST",
+      body: JSON.stringify({...timesheetData, date: new Date(timesheetData.date), action: status, status}),
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+
+    mutateEmployees([...employees]);
+
+    message.success("Timesheet updated");
+  }
+
 
   const headers = [
     {
@@ -188,9 +222,9 @@ const Timesheet = () => {
           colorPrimary: "#191407",
         },
       }}
-    >
-      <div className="flex-1 flex flex-col">
-        <div className="h-[71px] flex justify-between items-center px-8 py-1 border-b-[1px] border-[#E5E5E3]">
+    > 
+      <div className="flex-1 flex overflow-x-hidden flex-col">
+        <div className="h-[71px] flex justify-between items-center px-8 py-10 overflow-x-hidden border-b-[1px] border-[#E5E5E3]">
           <div className="w-48 flex">
             <Input
               onChange={e => setSearchEmployeesInput(e.target.value)}
@@ -356,68 +390,90 @@ const Timesheet = () => {
             onClick={() =>  setTimesheetModal(false) & setTimesheetData({})}
           >
             CANCEL
-          </button>, <button onClick={editTimesheet} key="submit" className="bg-black text-white rounded-sm px-4 disabled:opacity-50 py-1 hover:opacity-80">Edit</button>]} title="Edit Timesheet" onCancel={() => setTimesheetModal(false) & setTimesheetData({})}>
-          <div className="flex mt-4 justify-between">
-                        <div className="w-[48%] ">
-                          <span className="text-xs font-semibold">
-                            START SHIFT{" "}
-                            <span className="text-xs text-red-500">*</span>
-                          </span>
-                          <Input
-                            className="w-full"
-                            value={dayjs(timesheetData?.shiftStartTime).format('h:m A')}
-                            disabled
-                          />
+          </button>, <button onClick={type === 'edit' ? editTimesheet : createTimesheet} key="submit" className="bg-black text-white rounded-sm px-4 disabled:opacity-50 py-1 hover:opacity-80">{type === 'edit' ? "Edit" : 'Confirm'}</button>]} title={type === 'edit' ? "Edit Timesheet" : 'Set Status'} onCancel={() => setTimesheetModal(false) & setTimesheetData({})}>
+            {
+              type === 'create' && (
+                <div className="w-full flex flex-col">
+                <span className="text-xs font-semibold">Status</span>
+                <Select
+                  value={status}
+                  onChange={(e) => setStatus(e)}
+                  placeholder="Select wage type"
+                  className="mt-1"
+                  options={statusType}
+                />
+              </div>
+              )
+            }
+            
+            {
+              type === 'edit' && (
+                <>
+                <div className="flex mt-4 justify-between">
+                <div className="w-[48%] ">
+                  <span className="text-xs font-semibold">
+                    START SHIFT{" "}
+                    <span className="text-xs text-red-500">*</span>
+                  </span>
+                  <Input
+                    className="w-full"
+                    value={dayjs(timesheetData?.shiftStartTime).format('h:m A')}
+                    disabled
+                  />
 
-                        </div>
-                        <div className="w-[48%]">
-                          <span className="text-xs font-semibold">
-                            FINISH SHIFT{" "}
-                            <span className="text-xs text-red-500">*</span>
-                          </span>
-                          <Input
-                            className="w-full"
-                            value={dayjs(timesheetData?.shiftEndTime).format('h:m A')}
-                            disabled
-                          />
-                        </div>
-                      </div>
+                </div>
+                <div className="w-[48%]">
+                  <span className="text-xs font-semibold">
+                    FINISH SHIFT{" "}
+                    <span className="text-xs text-red-500">*</span>
+                  </span>
+                  <Input
+                    className="w-full"
+                    value={dayjs(timesheetData?.shiftEndTime).format('h:m A')}
+                    disabled
+                  />
+                </div>
+              </div>
 
-                      <div className="flex mt-4 justify-between">
-                        <div className="w-[48%] ">
-                          <span className="text-xs font-semibold">
-                            START WORKING TIME{" "}
-                            <span className="text-xs text-red-500">*</span>
-                          </span>
-                          <TimePicker
-                            className="w-full"
-                            defaultValue={dayjs(timesheetData?.startTime)}
-                            onChange={(e) =>
-                              setTimesheetData((prev) => {
-                                return { ...prev, startTime: e };
-                              })
-                            }
-                            format="h:m A"
-                          />
+              <div className="flex mt-4 justify-between">
+                <div className="w-[48%] ">
+                  <span className="text-xs font-semibold">
+                    START WORKING TIME{" "}
+                    <span className="text-xs text-red-500">*</span>
+                  </span>
+                  <TimePicker
+                    className="w-full"
+                    defaultValue={dayjs(timesheetData?.startTime)}
+                    onChange={(e) =>
+                      setTimesheetData((prev) => {
+                        return { ...prev, startTime: e };
+                      })
+                    }
+                    format="h:m A"
+                  />
 
-                        </div>
-                        <div className="w-[48%]">
-                          <span className="text-xs font-semibold">
-                            END WORKING TIME{" "}
-                            <span className="text-xs text-red-500">*</span>
-                          </span>
-                          <TimePicker
-                            className="w-full"
-                            defaultValue={dayjs(timesheetData?.endTime)}
-                            onChange={(e) =>
-                              setTimesheetData((prev) => {
-                                return { ...prev, endTime: e };
-                              })
-                            }
-                            format="h:m A"
-                          />
-                        </div>
-                      </div>
+                </div>
+                <div className="w-[48%]">
+                  <span className="text-xs font-semibold">
+                    END WORKING TIME{" "}
+                    <span className="text-xs text-red-500">*</span>
+                  </span>
+                  <TimePicker
+                    className="w-full"
+                    defaultValue={dayjs(timesheetData?.endTime)}
+                    onChange={(e) =>
+                      setTimesheetData((prev) => {
+                        return { ...prev, endTime: e };
+                      })
+                    }
+                    format="h:m A"
+                  />
+                </div>
+              </div>
+              </>
+              )
+            }
+       
           </Modal>
 
           {/* <Modal
