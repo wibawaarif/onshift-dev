@@ -243,23 +243,6 @@ const Timesheet = () => {
 
 
           <div>
-            {/* <p className="text-black">{JSON.stringify(clonedEmployees?.reduce((acc, employee) => {
-                    const { name, timesheets } = employee;
-
-                    timesheets.forEach((timesheets) => {
-                      acc.push({
-                        name,
-                        ...timesheets,
-                      date: dayjs(timesheets.date).format("DD/MM/YYYY"),
-                      shiftStartTime: timesheets.status === 'Absent'? '-' : dayjs(timesheets.shiftStartTime).format("hh:mmA"),
-                      shiftEndTime: timesheets.status === 'Absent'? '-' : dayjs(timesheets.shiftEndTime).format("hh:mmA"),
-                      startTime: timesheets.status === 'Absent'? '-' : dayjs(timesheets.startTime).format("hh:mmA"),
-                      endTime: timesheets.status === 'Absent'? '-' : dayjs(timesheets.endTime).format("hh:mmA"),
-                      })
-                    })
-
-                    return acc
-                  }, []))}</p> */}
                   {
                     clonedEmployees && (
                       <CSVLink
