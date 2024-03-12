@@ -144,7 +144,7 @@ const SignUpPage = () => {
               </div>
 
               {
-                isPasswordMatched && <div class="!text-red-600 mb-10">Password didn't match</div>
+                isPasswordMatched && <div class="!text-red-600 mb-10">Password didn&apos;t match</div>
               }
 
 
@@ -259,7 +259,7 @@ const SignUpPage = () => {
     
       </div>
     
-      <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2" style={{ backgroundImage: 'url(/media/misc/auth-bg.png)' }}>
+      <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2" style={{ backgroundImage: "url(/media/misc/auth-bg.png)" }}>
         
         <div class="d-flex flex-column flex-center py-7 py-lg-15 px-5 px-md-15 w-100">
       
