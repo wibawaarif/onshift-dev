@@ -25,6 +25,9 @@ module.exports = {
       gridColumnStart: {
         '37': '37',
         '38': '38',
+      },
+      colors: {
+        primary: '#1c84ff'
       }
     },
   },

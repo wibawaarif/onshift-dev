@@ -1,9 +1,43 @@
 import { NextResponse } from "next/server";
 import connect from "@/utils/db";
 import Employee from "@/models/employee";
+import Location from "@/models/location";
+import Shift from "@/models/shift";
+import Position from "@/models/position";
+import Timesheet from "@/models/timesheet";
 import bcrypt from 'bcrypt'
 import { getServerSession } from "next-auth";
 import { options } from "@/lib/options";
+
+export const GET = async (request, { params }) => {
+  const session = await getServerSession(options)
+
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized (wrong or expired token)" }), { status: 403 })
+  }
+
+  const { workspace } = session.user
+  const { id } = params;
+  // const url = new URL(request.url);
+
+  // const username = url.searchParams.get("username");
+
+  try {
+    await connect();
+
+    const employee = await Shift.findOne({workspace, _id: id}).sort({ createdAt: -1 }).select("date startTime endTime employees location position repeatedShift")
+    .populate({
+      path: 'location',
+      model: Location,
+      select: 'name',
+    })
+
+
+    return new NextResponse(JSON.stringify(employee), { status: 200 });
+  } catch (err) {
+    return new NextResponse(err, { status: 500 });
+  }
+};
 
 export const PUT = async (request, { params }) => {
   const session = await getServerSession(options)

@@ -373,34 +373,42 @@ const Scheduler = () => {
     });
   };
 
-  const editShiftModal = (data) => {
+  const editShiftModal = async (data) => {
+    const getShift = await fetch(`/api/employees/${data._id}`, {
+      method: "GET",
+      headers: {
+        authorization: "Bearer " + session.data.user.accessToken,
+      },
+    });
+    const fetchData = await getShift.json()
+
     setId(data._id);
-    if (data.repeatedShift.repeatedDays.length > 0) {
-      setSelectedRepeatedDays(data.repeatedShift.repeatedDays);
+    if (fetchData.repeatedShift.repeatedDays.length > 0) {
+      setSelectedRepeatedDays(fetchData.repeatedShift.repeatedDays);
       setForm((prev) => {
         return {
           ...prev,
-          ...data,
-          location: data?.location?._id,
-          position: data?.position?._id,
-          startTime: dayjs(data.startTime).format('hh:mmA'),
-          endTime: dayjs(data.endTime).format('hh:mmA'),
-          date: dayjs(data.date),
+          ...fetchData,
+          location: fetchData?.location?._id,
+          position: fetchData?.position?._id,
+          startTime: dayjs(fetchData.startTime).format('hh:mmA'),
+          endTime: dayjs(fetchData.endTime).format('hh:mmA'),
+          date: dayjs(fetchData.date),
           repeatedShift: {
             ...prev.repeatedShift,
-            startRepeatedWeek: dayjs(data.repeatedShift.startRepeatedWeek),
-            endDate: dayjs(data.repeatedShift.endDate),
+            startRepeatedWeek: dayjs(fetchData.repeatedShift.startRepeatedWeek),
+            endDate: dayjs(fetchData.repeatedShift.endDate),
           },
         };
       });
     } else {
-      if (data?.category === "TimeOff") {
+      if (fetchData?.category === "TimeOff") {
         setCurrentTab("2")
         setTimeoffForm((prev) => {
           return {
             ...prev,
-            ...data,
-            date: dayjs(data.date)
+            ...fetchData,
+            date: dayjs(fetchData.date)
           }
         })
       } else {
@@ -408,12 +416,12 @@ const Scheduler = () => {
         setForm((prev) => {
           return {
             ...prev,
-            ...data,
-            location: data?.location?._id,
-            position: data?.position?._id,
-            startTime: dayjs(data.startTime).format('hh:mmA'),
-            endTime: dayjs(data.endTime).format('hh:mmA'),
-            date: dayjs(data.date),
+            ...fetchData,
+            location: fetchData?.location?._id,
+            position: fetchData?.position?._id,
+            startTime: dayjs(fetchData.startTime).format('hh:mmA'),
+            endTime: dayjs(fetchData.endTime).format('hh:mmA'),
+            date: dayjs(fetchData.date),
           };
         });
       }
