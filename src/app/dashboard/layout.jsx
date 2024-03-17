@@ -78,9 +78,9 @@ const DashboardLayout = ({ children }) => {
     return;
   }
 
-  if (workspaces?.length === 0) {
-    push("/accounts");
-  }
+  // if (workspaces?.length === 0) {
+  //   push("/accounts");
+  // }
 
   const handleChangePassword = async () => {
     const response = await fetch("/api/change-password", {
