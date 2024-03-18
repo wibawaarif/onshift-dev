@@ -34,10 +34,10 @@ const SignIn = () => {
   }
 
   if (session.status === "authenticated") {
-    if (!session.data.user.workspace) {
-      router?.push("/accounts");
-      return;
-    }
+    // if (!session.data.user.workspace) {
+    //   router?.push("/accounts");
+    //   return;
+    // }
     router?.push("/dashboard/schedule");
     return;
   }
@@ -133,7 +133,9 @@ const SignIn = () => {
                 <div class="text-gray-500 fw-semibold fs-6">Your Social Campaigns</div>
               </div>
               <div class="row g-3 mb-9">
-                <div class="col-md-12">
+                <div         onClick={() => {
+                  signIn("google", { callbackUrl: "/dashboard/schedule" });
+                  }} class="col-md-12">
                   <a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
                   <img alt="Logo" src="/media/svg/brand-logos/google-icon.svg" class="h-15px me-3" />Sign in with Google</a>
                 </div>

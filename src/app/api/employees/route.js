@@ -8,6 +8,21 @@ import bcrypt from 'bcrypt'
 import Timesheet from "@/models/timesheet";
 import { getServerSession } from "next-auth";
 import { options } from "@/lib/options";
+import { Vonage } from "@vonage/server-sdk"
+
+const from = "Vonage APIs"
+const to = "6285363480277"
+
+const vonage = new Vonage({
+  apiKey: "5b3aceb4",
+  apiSecret: "4LOTXUO2mYVyDROX"
+})
+
+async function sendSMS(text) {
+  await vonage.sms.send({to, from, text})
+      .then(resp => { console.log('Message sent successfully'); console.log(resp); })
+      .catch(err => { console.log('There was an error sending the messages.'); console.error(err); });
+}
 
 export const GET = async (request) => {
   const session = await getServerSession(options)
@@ -29,21 +44,13 @@ export const GET = async (request) => {
     .populate({
       path: 'shifts',
       model: Shift,
-      select: 'date startTime endTime location position platform employees category repeatedShift notes break',
+      select: 'date startTime endTime location position repeatedShift',
       populate: {
         path: 'location',
         model: Location,
         select: 'name '
       }
-    }).populate({
-      path: 'timesheets',
-      model: Timesheet,
-      select: 'date shiftStartTime shiftEndTime startTime endTime status action',
-    }).populate({
-      path: 'positions',
-      model: Position,
-      select: 'name',
-    }).select("name email phoneNumber shifts timesheets wageOptions positions status employeeId")
+    }).select("name shifts status")
 
     return new NextResponse(JSON.stringify(employees), { status: 200 });
   } catch (err) {
@@ -80,6 +87,8 @@ export const POST = async (request) => {
     await connect();
 
     await newEmployee.save();
+
+    sendSMS(`A Manager has been created your account with the following: \n\n Email: ${body.email} \n Password: ${body.password}`);
 
     return new NextResponse(JSON.stringify(newEmployee), { status: 201 });
   } catch (err) {

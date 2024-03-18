@@ -52,14 +52,14 @@ const SidebarComponent = ({ setChangePasswordModal, clicked, setClicked ,current
         open={clicked}
         content={
           <div className="w-36 flex flex-col justify-center items-start">
-                            <button
+                            {/* <button
               onClick={() =>
                 push('/accounts')
               }
               className="hover:bg-[#E5E5E3] w-full text-left rounded-lg py-[1px] px-2 cursor-pointer transition duration-300"
             >
               Switch Workspace
-            </button>
+            </button> */}
             <button
               onClick={() =>
                 setChangePasswordModal(true) & setClicked(false)

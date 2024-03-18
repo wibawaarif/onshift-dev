@@ -56,8 +56,8 @@ export const options = {
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account.provider === "google") {
-
-        const response = await fetch(`https://onshift-dev.vercel.app/api/register`, {
+        console.log(account, 'detail')
+        const response = await fetch(`http://localhost:3000/api/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -5,38 +5,29 @@ const userSchema = new Schema({
     type: String,
     unique: true,
   },
-  username: {
+  name: {
     type: String,
   },
   password: {
     type: String,
   },
-  role: {
+  businessName: {
+    type: String,
+  },
+  industry: {
+    type: String,
+  },
+  startDayOfWeek: {
+    type: String
+  },
+  businessAddress: {
+    type: String,
+  },
+  totalEmployee: {
     type: String,
   },
   type: {
     type: String,
-  },
-  emiratesId: {
-    type: Number,
-  },
-  birthDate: {
-    type: Date,
-  },
-  contacts: {
-    type: Object
-  },
-  fatherName: {
-    type: String,
-  },
-  motherName: {
-    type: String,
-  },
-  totalProgramHours: {
-    type: Number,
-  },
-  contract: {
-    type: Object,
   },
   onboarding: {
     type: Boolean,

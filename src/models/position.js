@@ -23,7 +23,7 @@ const positionSchema = new Schema({
   },
   platform: {
     type: String,
-    enum: ['Mobile App', 'Web Portal']
+    enum: ['Mobile App', 'Web Portal'],
   },
   workspace: {
     type: String
