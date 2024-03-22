@@ -486,7 +486,7 @@ const SignUpPage = () => {
                         <div class="mb-10 fv-row">
                           <label class="form-label mb-3">
                             <p className="text-2xl">
-                              What's your business's address?
+                              What&apos;s your business&apos;s address?
                             </p>
                           </label>
                           <PlaceComponent
@@ -783,7 +783,7 @@ onClose={() => handleClose(tag)}
                         <div class="mb-10 fv-row">
                           <label class="form-label mb-3">
                             <p className="text-2xl">
-                              What's your business called?
+                              What&apos;s your business called?
                             </p>
                           </label>
 
@@ -903,7 +903,6 @@ onClose={() => handleClose(tag)}
                         <span
                           class="ms-1"
                           data-bs-toggle="tooltip"
-                          title="Specify a card holder's name"
                         >
                           <i class="ki-duotone ki-information-5 text-gray-500 fs-6">
                             <span class="path1"></span>
