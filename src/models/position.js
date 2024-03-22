@@ -7,6 +7,11 @@ const positionSchema = new Schema({
   color: {
     type: String,
   },
+  team:
+  {
+      type: mongoose.Types.ObjectId,
+      ref: "Team",
+  },
   wageType: {
     type: String,
   },

@@ -14,7 +14,7 @@ export async function POST(req){
     try {
         await connect();
 
-        const {name, team, businessAddress, startDayOfWeek,  businessName, industry, totalEmployee, email, password: pass, type} = await req.json()
+        const {name, team, businessAddress, startDayOfWeek, phoneNumber, businessName, industry, totalEmployee, email, password: pass, type} = await req.json()
 
         const isUserExist = await User.findOne({email})
 
@@ -51,11 +51,14 @@ export async function POST(req){
             console.log('4')
             const hashedPassword = await bcrypt.hash(pass, 10)
 
-            const newUser = await User.create({name, startDayOfWeek, businessAddress, businessName, industry, totalEmployee, email, password: hashedPassword, type, onboarding: true})
+            const newUser = await User.create({name, startDayOfWeek, businessAddress, phoneNumber, businessName, industry, totalEmployee, email, password: hashedPassword, type, onboarding: true})
             
             for (let i = 0; i < team.length; i++) {
-                const position = await Position.create({name: team[i].position, user: email})
-                await Team.create({name: team[i].team, position: position._id, user: email})
+                const teamDetail = await Team.create({name: team[i].team, user: email})
+                for (let a = 0; a < team[i]?.position?.length; a++) {
+                    await Position.create({name: team[i].position[a], team: teamDetail._id, user: email})
+                }
+
             }
     
             const {password, ...user} = newUser._doc

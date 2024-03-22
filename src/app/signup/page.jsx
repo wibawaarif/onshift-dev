@@ -2,38 +2,47 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { message, ConfigProvider, Input, Spin } from "antd";
-import { MailOutlined, LockOutlined, GoogleOutlined } from "@ant-design/icons";
+import { message, ConfigProvider, Input, Spin, Tag } from "antd";
+import { MailOutlined, LockOutlined, GoogleOutlined, PlusOutlined } from "@ant-design/icons";
 import { SlLocationPin } from "react-icons/sl";
 import { motion } from "framer-motion";
 import "@public/css/style.bundle.css";
 import "@public/css/plugins.bundle.css";
 import PlaceComponent from "@/components/place-autocomplete/page";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+
+const tagPlusStyle = {
+  height: 22,
+  borderStyle: 'dashed',
+};
+
+const tagInputStyle = {
+  width: 64,
+  height: 22,
+  marginInlineEnd: 8,
+  verticalAlign: 'top',
+};
 
 const SignUpPage = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [isPasswordMatched, setIsPasswordMatched] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [spin, setSpin] = useState(false);
+  const [tags, setTags] = useState([]);
   const [address, setAddress] = useState(null);
   const [latitude, setLatitude] = useState(24.432928);
   const [longitude, setLongitude] = useState(54.644539);
   const [totalTeam, setTotalTeam] = useState(2);
   const [currentStep, setCurrentStep] = useState(1);
+  const [inputVisible, setInputVisible] = useState([false]);
+  const [inputValue, setInputValue] = useState([]);
+  const inputRef = useRef(null);
   const [team, setTeam] = useState([
     {
       team: "",
-      position: "",
-    },
-    {
-      team: "",
-      position: "",
+      position: [],
     },
   ]);
   const [form, setForm] = useState({
@@ -43,6 +52,7 @@ const SignUpPage = () => {
     industry: "",
     totalEmployee: "1-5",
     email: "",
+    phoneNumber: "",
     password: "",
     team: [],
   });
@@ -62,6 +72,51 @@ const SignUpPage = () => {
     router?.push("/dashboard/schedule");
     return;
   }
+
+  // useEffect(() => {
+  //   if (inputVisible) {
+  //     inputRef.current?.focus();
+  //   }
+  // }, [inputVisible]);
+
+  const handleClose = (removedTag) => {
+    const newTags = tags.filter((tag) => tag !== removedTag);
+    console.log(newTags);
+    setTags(newTags);
+  };
+
+  const showInput = index => {
+    if (team[index].position?.length > 2) {
+      message.error("Maximum number of tags is 3");
+      return
+    }
+    const cloneInputInvisible = [...inputVisible]
+    cloneInputInvisible[index] = true;
+    setInputVisible(cloneInputInvisible);
+  };
+
+  const handleInputChange = (e, index) => {
+    const cloneInputValue = [...inputValue]
+    cloneInputValue[index] = e.target.value
+    setInputValue(cloneInputValue);
+  };
+  const handleInputConfirm = (x, index) => {
+    if (inputValue[index] && !team[index].position.includes(inputValue[index])) {
+      // setTags([...tags, inputValue]);
+      setTeam((y) => {
+        const cloneTeam = [...y];
+        cloneTeam[index] = {
+          position: [...team[index]?.position, inputValue[index]],
+          team: x.team,
+        };
+        return cloneTeam;
+      })
+    }
+    const cloneInputVisible = [...inputVisible]
+    cloneInputVisible[index] = false
+    setInputVisible(cloneInputVisible);
+    setInputValue('');
+  };
 
   const createAccount = async () => {
     setSpin(true);
@@ -86,9 +141,9 @@ const SignUpPage = () => {
       setSpin(false);
       message.success("Account created");
       await signIn("credentials", {
-        email,
-        password,
-        callbackUrl: `/dashboard/schedule`,
+        email: form.email,
+        password: form.password,
+        callbackUrl: `/welcome`,
       });
     }
   };
@@ -294,6 +349,12 @@ const SignUpPage = () => {
         </div>
 
         <div class="d-flex flex-column flex-lg-row-fluid py-10">
+                     <div class="text-gray-500 text-center fw-semibold fs-6">Already have an Account? {" "}
+               <Link href="/signin">
+                     <span className="link-primary">
+                        Sign In
+                      </span>
+                      </Link></div>
           <div class="d-flex flex-center flex-column flex-column-fluid">
             <div class="w-lg-750px w-xl-900px p-10 p-lg-15 mx-auto">
               <form
@@ -339,8 +400,13 @@ const SignUpPage = () => {
                             autocomplete="off"
                             class="form-control bg-transparent"
                           />
+                          {
+                            (!/\S+@\S+\.\S+/.test(form.email) && form.email !== "") && (
+                              <p className="text-red-400 mt-2 font-semibold">Email is invalid</p>
+                            )
+                          }
                         </div>
-                        <div class="fv-row mb-3">
+                        <div class="fv-row mb-8">
                           <label class="form-label !mb-0">
                             <p className="text-2xl">Password</p>
                           </label>
@@ -356,6 +422,30 @@ const SignUpPage = () => {
                             class="form-control bg-transparent"
                           />
                         </div>
+
+                        <div class="fv-row mb-3">
+                        <label class="form-label !mb-0">
+                            <p className="text-2xl">Phone Number</p>
+                          </label>
+                <PhoneInput
+                  value={String(form.phoneNumber)}
+                  onChange={(phone) =>
+                    setForm((prev) => {
+                      return { ...prev, phoneNumber: phone };
+                    })
+                  }
+                  buttonStyle={{
+
+                    background: "white",
+                  }}
+                  searchStyle={{ border: "0", borderBottomWidth: "1px" }}
+                  inputStyle={{
+                    height: '45px',
+                    width: "100%",
+                  }}
+                  country={"ae"}
+                />
+              </div>
                       </div>
                     </div>
                   </motion.div>
@@ -538,10 +628,9 @@ const SignUpPage = () => {
                           .
                         </div> */}
                         </div>
-
-                        <div className="w-full h-96 overflow-y-auto">
+                        <div className="w-full h-72">
                           {team?.map((x, index) => (
-                            <div className="flex h-40 w-full gap-x-4">
+                            <div className="flex mt-4 w-full gap-x-4">
                               <div className="h-full w-[50%] flex flex-col">
                                 <p>Team</p>
                                 <Input
@@ -563,7 +652,43 @@ const SignUpPage = () => {
 
                               <div className="h-full w-full">
                                 <p>Position</p>
-                                <Input
+<div className="border-1 border-gray-300 rounded-lg px-3 py-2 flex justify-left items-center">
+                                {x?.position?.map((tag, index) => {
+
+return (
+<Tag
+key={tag}
+closable={true}
+style={{
+  userSelect: 'none',
+}}
+onClose={() => handleClose(tag)}
+>{tag}</Tag>
+
+                               ) })}
+
+                              
+
+
+{inputVisible[index] ? (
+        <Input
+          ref={inputRef}
+          type="text"
+          size="small"
+          style={tagInputStyle}
+          value={inputValue[index]}
+          onChange={(e) => handleInputChange(e, index)}
+          onBlur={handleInputConfirm}
+          onPressEnter={() => handleInputConfirm(x, index)}
+        />
+      ) : (
+        <Tag style={tagPlusStyle} icon={<PlusOutlined />} onClick={() => showInput(index)}>
+          New Tag
+        </Tag>
+ )}
+
+</div>
+                                {/* <Input
                                   onChange={(e) =>
                                     setTeam((y) => {
                                       const cloneTeam = [...y];
@@ -577,24 +702,34 @@ const SignUpPage = () => {
                                   placeholder="Enter your email"
                                   value={x?.position}
                                   className="py-2"
-                                />
+                                /> */}
+
+
+
+
+
                               </div>
                             </div>
                           ))}
                         </div>
-                        <button
-                        type="button"
-                          onClick={() =>
-                            setTeam((y) => {
-                              const cloneTeam = [...y];
-                              cloneTeam.push({ team: "", position: "" });
-                              return cloneTeam;
-                            })
-                          }
-                          className="transition duration-300 mt-4 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
-                        >
-                          + ADD TEAM
-                        </button>
+                        {
+                          team.length < 3 && (
+                            <button
+                            type="button"
+                              onClick={() =>
+                                setTeam((y) => {
+                                  const cloneTeam = [...y];
+                                  cloneTeam.push({ team: "", position: [] });
+                                  return cloneTeam;
+                                })
+                              }
+                              className="transition duration-300 mt-4 px-1 py-1 hover:bg-[#E5E5E3] rounded-lg"
+                            >
+                              + ADD TEAM
+                            </button>
+                          )
+                        }
+
 
                         {/* <div class="fv-row mb-10">
                         <label class="form-label">
@@ -684,9 +819,22 @@ const SignUpPage = () => {
                             data-hide-search="true"
                           >
                             <option value="Food & Beverage">
-                              Food & Beverage
+                              Coffee Shop/Bakery
                             </option>
+                            <option value="Healthcare">Table Service Restaurant</option>
+                            <option value="Healthcare">Counter Service Restaurant</option>
+                            <option value="Healthcare">Bar/Lounge</option>
                             <option value="Healthcare">Healthcare</option>
+                            <option value="Healthcare">Fitness/Beauty/Personal Care</option>
+                            <option value="Healthcare">Home/Repair Services</option>
+                            <option value="Healthcare">Leisure/Entertainment</option>
+                            <option value="Healthcare">Professional Services</option>
+                            <option value="Healthcare">Retail</option>
+                            <option value="Healthcare">Transportation</option>
+                            <option value="Healthcare">Education</option>
+                            <option value="Healthcare">Non-profit</option>
+                            <option value="Healthcare">Accounting</option>
+                            <option value="Healthcare">Other</option>
                           </select>
                         </div>
 
@@ -997,7 +1145,7 @@ const SignUpPage = () => {
                   <div>
                     <button
                       type="button"
-                      class="btn btn-lg btn-primary"
+                      class="btn btn-lg disabled:opacity-50 btn-primary"
                       data-kt-stepper-action="submit"
                     >
                       <span class="indicator-label">
@@ -1012,12 +1160,13 @@ const SignUpPage = () => {
                         <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
                       </span>
                     </button>
+
                     {currentStep !== 4 && (
                       <button
+                        disabled={(currentStep === 1 && !/\S+@\S+\.\S+/.test(form.email) || (form.password === "" || form.phoneNumber === "")) || (currentStep === 2 && (form.name === "" || address === null)) || (currentStep === 3 && (team[0].team === "" || team[0].position === ""))}
                         onClick={() => setCurrentStep(currentStep + 1)}
                         type="button"
-                        class="!text-white bg-primary py-4 rounded-md px-4 hover:opacity-75"
-                        data-kt-stepper-action="next"
+                        class="!text-white bg-primary py-4 cursor-pointer disabled:opacity-50 rounded-md px-4 hover:opacity-75"
                       >
                         <div className="flex justify-center items-center">
                           <div>Continue</div>
@@ -1031,9 +1180,10 @@ const SignUpPage = () => {
 
                     {currentStep == 4 && (
                       <button
+                      disabled={currentStep === 4 && form.businessName === ""}
                         onClick={createAccount}
                         type="button"
-                        class="!text-white bg-primary w-24 py-4 rounded-md px-4 hover:opacity-75"
+                        class="!text-white bg-primary w-24 py-4 disabled:opacity-50 rounded-md px-4 hover:opacity-75"
                         data-kt-stepper-action="next"
                       >
                         <div className="flex justify-center items-center">
