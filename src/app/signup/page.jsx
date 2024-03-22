@@ -468,7 +468,7 @@ const SignUpPage = () => {
 
                         <div class="mb-10 fv-row">
                           <label class="form-label mb-3">
-                            <p className="text-2xl">What's your name?</p>
+                            <p className="text-2xl">What&apos;s your name?</p>
                           </label>
 
                           <input
@@ -630,7 +630,7 @@ const SignUpPage = () => {
                         </div>
                         <div className="w-full h-72">
                           {team?.map((x, index) => (
-                            <div className="flex mt-4 w-full gap-x-4">
+                            <div key={index} className="flex mt-4 w-full gap-x-4">
                               <div className="h-full w-[50%] flex flex-col">
                                 <p>Team</p>
                                 <Input
@@ -853,9 +853,10 @@ onClose={() => handleClose(tag)}
                               "20-29",
                               "30-50",
                               "51+",
-                            ].map((x) => {
+                            ].map((x, index) => {
                               return (
                                 <div
+                                key={index}
                                   onClick={() =>
                                     setForm({ ...form, totalEmployee: x })
                                   }
