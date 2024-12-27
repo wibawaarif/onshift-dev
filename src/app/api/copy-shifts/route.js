@@ -19,7 +19,6 @@ export const POST = async (request) => {
 
   try {
     await connect();
-    console.log('tes',  new Date(dayjs(body.week)))
     const start = new Date(dayjs(body.current).startOf("week"))
     const end = new Date(dayjs(body.current).endOf("week"))
     console.log(body.current, 'tanggal top')
